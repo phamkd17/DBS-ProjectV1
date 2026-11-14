@@ -1,0 +1,81 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+# AGENTS.md — Culinary Lab Book
+
+**Culinary Lab Book helps cooks turn what they say while they cook into recipes
+that can be shared for others to repeat.**
+
+Design, Build, Ship (MPCS 51238, Autumn 2026). v1 due **Nov 17** (core task end
+to end, tested with real users, plan for v2). v2 at the fair **Dec 1**.
+Course focus: **AI** (model calls, tools, **evals**), held to a higher standard.
+
+- Proposal: https://dbs-projectproposal.vercel.app · repo `phamkd17/DBS-project_proposal`
+- Decision log: `notes/build-log.md` (keep it current)
+
+## Core task (v1)
+
+Paste a dictation → the app asks what it can't know → the user answers, or
+accepts/edits a suggestion → a recipe page (her words · recipe · why labeled by
+source) → optionally **send** it by link; the recipient saves a copy into their
+own lab book.
+
+## How to work with the student
+
+- One question at a time; multiple-choice for real decisions (recommendation first).
+- Push back once on vague answers, then accept their call.
+- User-facing text is **theirs**: draft it, label it as a draft, have them review it.
+- Use their terms: AI **"suggestions"** (never "guesses").
+- Commit and push regularly (one-shot work is marked incomplete). End messages
+  with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Prefer the simplest option. **Free tiers only**, with usage limits and alerts.
+
+## Product rules (non-negotiable)
+
+1. **Her words are never edited.** Transcripts are stored verbatim, errors
+   included. Corrections happen only in the generated recipe.
+2. **Ask, don't guess.** Unrecoverable amounts, contradictions, missing steps,
+   and ambiguous dictation become questions.
+3. **Unknown → suggestion.** If no one knows, offer a suggestion the user
+   accepts or edits. It stays labeled **Suggested**, never shown as the cook's.
+4. **Label every why by source:** `cook` (her quote), `user_answer`,
+   `suggested`, `food_science`.
+5. Capture and recipe creation are **separate moments**. Capture asks nothing.
+
+## Sharing model (decided Nov 13)
+
+- Every user has a **private lab book** (single-user works on its own).
+- **Send = private link → save a copy.** The owner turns on a link
+  (`share_token`); anyone with it can read that one recipe; a signed-in
+  recipient can **save a copy** to their own lab book. Copies keep the
+  transcript and every source label. The owner can turn the link off.
+- Clerk Organizations / families are **not** used in v1.
+
+## Stack
+
+| Piece | Choice |
+|---|---|
+| App | Next.js (App Router) + Tailwind on Vercel Hobby. **Mobile-first, 390px.** |
+| Capture | Phone keyboard dictation into a text box (no STT API) |
+| Auth | Clerk (development keys) |
+| Data | Supabase Postgres, Clerk third-party auth, **RLS on every table**, migrations in `supabase/migrations/` |
+| AI | Gemini API free tier (Flash), called only from server code. Key server-side only. |
+| Evals | `evals/samples/*.md` (verbatim; never edit) run by `npm run eval` |
+
+## Course requirements
+
+- Keys in `.env.local` only; `.claude/settings.json` denies reading `.env*`.
+  The **student** creates `.env.local` (template: `.env.example`).
+- Signed-out visitors see no one's data (except a recipe whose link is on).
+- Work on a branch; run `/security-review` before merging.
+- Design loading / empty / error states, incl. Gemini rate-limited (429) and down.
+- Forms: one column, labels, errors next to fields, keep typed input;
+  keyboard access; contrast; hover/focus/pressed states.
+- Supabase free projects pause after a week unused.
