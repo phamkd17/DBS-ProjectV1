@@ -156,3 +156,9 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   placeholder during navigation). Fixed by adding a `loading.tsx` skeleton to
   each route.
 - Share link not tried yet in this run.
+
+### B18. Deployed (Nov 13)
+- Vercel: https://dbs-project-v1-omega.vercel.app, with all 6 env vars set in Vercel.
+- Signed-out checks on the live site: home ✓; `/new` and recipe pages →
+  Clerk sign-in ✓ (non-browser requests get a 404); fake share token → "isn't
+  shared anymore" ✓; `/.env.local` → 404 ✓.
