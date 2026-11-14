@@ -1,4 +1,4 @@
-import { ApiError, GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { z } from "zod";
 import {
   Answer,
@@ -38,7 +38,16 @@ function getConfig() {
   const model = process.env.GEMINI_MODEL;
   if (!apiKey) throw new ModelError("GEMINI_API_KEY is not set.");
   if (!model) throw new ModelError("GEMINI_MODEL is not set.");
-  return { ai: new GoogleGenAI({ apiKey }), model };
+  // Optional: GEMINI_THINKING=MINIMAL|LOW|MEDIUM|HIGH (unset = model default).
+  const level = process.env.GEMINI_THINKING?.toUpperCase();
+  const thinkingLevel =
+    level && level in ThinkingLevel ? (level as ThinkingLevel) : undefined;
+  return {
+    // Give up after 90 s so a phone never waits forever.
+    ai: new GoogleGenAI({ apiKey, httpOptions: { timeout: 90_000 } }),
+    model,
+    thinkingLevel,
+  };
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -47,8 +56,9 @@ async function generate<T>(
   schema: z.ZodType<T>,
   system: string,
   user: string
-): Promise<{ data: T; model: string }> {
-  const { ai, model } = getConfig();
+): Promise<{ data: T; model: string; ms: number }> {
+  const { ai, model, thinkingLevel } = getConfig();
+  const started = Date.now();
   const delays = [2000, 8000];
 
   for (let attempt = 0; ; attempt++) {
@@ -61,6 +71,7 @@ async function generate<T>(
           temperature: 0.2,
           responseMimeType: "application/json",
           responseJsonSchema: jsonSchemaFor(schema),
+          ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
         },
       });
       const text = res.text;
@@ -72,7 +83,7 @@ async function generate<T>(
             parsed.error.issues.slice(0, 3).map((i) => i.message).join("; ")
         );
       }
-      return { data: parsed.data, model };
+      return { data: parsed.data, model, ms: Date.now() - started };
     } catch (err) {
       const status = err instanceof ApiError ? err.status : undefined;
       const retryable = status === 429 || (status !== undefined && status >= 500);
@@ -94,12 +105,12 @@ async function generate<T>(
 
 /** Pass 1: transcript → draft recipe + questions. */
 export async function draftRecipe(transcript: string, dishName?: string) {
-  const { data, model } = await generate(
+  const { data, model, ms } = await generate(
     Pass1Output,
     PASS1_SYSTEM,
     pass1User(transcript, dishName)
   );
-  return { ...data, model, prompt_version: PROMPT_VERSION };
+  return { ...data, model, ms, prompt_version: PROMPT_VERSION };
 }
 
 /** Pass 2: transcript + draft + answers → final recipe. */
@@ -115,7 +126,7 @@ export async function finalizeRecipe(
     answer: a.answer_source === "skipped" ? "" : a.answer,
     answer_source: a.answer_source,
   }));
-  const { data, model } = await generate(
+  const { data, model, ms } = await generate(
     Recipe,
     PASS2_SYSTEM,
     pass2User(
@@ -124,5 +135,5 @@ export async function finalizeRecipe(
       JSON.stringify(answersForModel, null, 2)
     )
   );
-  return { recipe: data, model, prompt_version: PROMPT_VERSION };
+  return { recipe: data, model, ms, prompt_version: PROMPT_VERSION };
 }

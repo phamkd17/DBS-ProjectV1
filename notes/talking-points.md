@@ -74,8 +74,21 @@ deterministic checks (`evals/run.ts`).
   If the prompt said "10 in means Dannon," the eval would pass without measuring
   anything.
 
-*(Results will go here after the first run: score, what failed, what we
-changed.)*
+**First run (Nov 13, yogurt, prompt p1, gemini-3.8-flash): 14/17.**
+- Both must-pass checks passed. It asked *"What brand or size was the 'small 10
+  in yogurt container'?"* and *"Do you let the milk cool down before stirring in
+  the yogurt starter?"*
+- **The eval caught a real labeling bug.** An accepted suggestion ("whole
+  pasteurized milk") was folded into an ingredient labeled as the cook's: the
+  exact thing the product promises never happens. The cause was one label per
+  ingredient, when one line can mix sources (her amount plus a suggested kind of
+  milk). The fix: a `suggested_detail` field, a prompt change (p2), and a new
+  must-pass check.
+- **The harness also caught itself.** On the very first run it printed "All
+  must-pass checks passed" even though nothing ran (a config typo). Now a run
+  error can never show up as a pass.
+- **Speed is a design problem:** about 12 minutes for both passes on 3.8 Flash.
+  We're comparing thinking levels and models next.
 
 ## 5. Keys and safety (what I stopped the agent from doing)
 

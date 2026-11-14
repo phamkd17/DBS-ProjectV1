@@ -121,7 +121,21 @@ const SPECS: Record<string, Spec> = {
       { name: "final: has a cooling step", must: true, pass: /cool/i.test(stepsText(r)) },
       {
         name: "final: accepted suggestions are labeled suggested",
-        pass: [...r.ingredients.map((i) => i.source), ...allWhy(r).map((w) => w.source)].includes("suggested"),
+        must: true,
+        pass:
+          [...r.ingredients.map((i) => i.source), ...allWhy(r).map((w) => w.source)].includes("suggested") ||
+          [...r.ingredients, ...r.steps].some((x) => x.suggested_detail.trim() !== ""),
+      },
+      {
+        name: "final: no suggestion hidden under a cook/family label",
+        must: true,
+        pass: !r.ingredients.some(
+          (i) => i.source !== "suggested" && /suggest/i.test(i.note) && !i.suggested_detail.trim()
+        ),
+        detail: r.ingredients
+          .filter((i) => i.source !== "suggested" && /suggest/i.test(i.note) && !i.suggested_detail.trim())
+          .map((i) => `${i.item} [${i.source}]`)
+          .join(", "),
       },
     ],
   },
@@ -192,6 +206,7 @@ async function runSample(file: string) {
   ];
 
   let final: Recipe | undefined;
+  let p2ms: number | undefined;
   if (spec.pass2) {
     await sleep(4000); // stay under the free-tier rate limit
     const answers: Answer[] = p1.questions.map((q) => {
@@ -202,11 +217,12 @@ async function runSample(file: string) {
     });
     const p2 = await finalizeRecipe(transcript, p1.draft, answers);
     final = p2.recipe;
+    p2ms = p2.ms;
     checks.push(...commonChecks(transcript, final, "final"), ...spec.pass2(final));
   }
 
   checks.unshift({ name: "transcript unchanged", pass: transcript === before, must: true });
-  return { name, model: p1.model, pass1: p1, final, checks };
+  return { name, model: p1.model, ms: { pass1: p1.ms, pass2: p2ms }, pass1: p1, final, checks };
 }
 
 async function main() {
@@ -225,7 +241,10 @@ async function main() {
         console.log(`  ${mark.padEnd(7)} ${c.name}${!c.pass && c.detail ? `  (${c.detail})` : ""}`);
       }
       const passed = r.checks.filter((c) => c.pass).length;
-      console.log(`  ${passed}/${r.checks.length} passed · ${r.pass1.questions.length} questions`);
+      const secs = (ms?: number) => (ms === undefined ? "–" : `${(ms / 1000).toFixed(0)}s`);
+      console.log(
+        `  ${passed}/${r.checks.length} passed · ${r.pass1.questions.length} questions · pass 1 ${secs(r.ms.pass1)}, pass 2 ${secs(r.ms.pass2)}`
+      );
       results.push(r);
     } catch (err) {
       const e = err as Error & { detail?: string };
@@ -237,10 +256,14 @@ async function main() {
 
   mkdirSync(RESULTS_DIR, { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const out = join(RESULTS_DIR, `${stamp}_${PROMPT_VERSION}.json`);
+  const out = join(RESULTS_DIR, `${stamp}_${PROMPT_VERSION}_${process.env.GEMINI_MODEL}.json`);
   writeFileSync(
     out,
-    JSON.stringify({ prompt_version: PROMPT_VERSION, model: process.env.GEMINI_MODEL, results }, null, 2)
+    JSON.stringify(
+      { prompt_version: PROMPT_VERSION, model: process.env.GEMINI_MODEL, thinking: process.env.GEMINI_THINKING ?? "default", results },
+      null,
+      2
+    )
   );
 
   const all = results.flatMap((r) => ("checks" in r ? r.checks : []));

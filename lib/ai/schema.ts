@@ -24,6 +24,11 @@ export const Ingredient = z.object({
     .describe('Amount with unit, e.g. "1/2 gallon". Empty string if not known.'),
   source: Source.describe("Where the amount came from."),
   note: z.string().describe('Short note, e.g. "she added more as they reduced". Empty if none.'),
+  suggested_detail: z
+    .string()
+    .describe(
+      "The part of this ingredient that came from an accepted suggestion (e.g. 'whole milk'). Empty if none."
+    ),
 });
 
 export const Why = z.object({
@@ -44,6 +49,11 @@ export const Dial = z.object({
 
 export const Step = z.object({
   text: z.string().describe("One clear instruction, corrected for dictation errors."),
+  suggested_detail: z
+    .string()
+    .describe(
+      "The part of this step that came from an accepted suggestion (e.g. 'about 110°F'). Empty if none."
+    ),
   why: z.array(Why),
   dials: z.array(Dial),
 });

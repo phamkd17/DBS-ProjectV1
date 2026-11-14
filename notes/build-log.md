@@ -67,3 +67,20 @@ answer (quoted), and why.
   the `$schema` key is stripped from the JSON Schema sent to Gemini.
 - **Real cause:** a typo in `.env.local` (`GEMINI_MODEL=GEMINI_MODEL=…`). Found
   by printing only the model value, never the keys.
+
+### B10. First real eval: yogurt, prompt p1, gemini-3.8-flash (14/17)
+- **Both must-pass checks passed:** it asked about the "10 in" container
+  ("What brand or size…?") and flagged the missing cooling step ("Do you let the
+  milk cool down…?", suggestion ≈110–115°F).
+- **Missed:** it didn't ask the incubator *temperature* (it asked what kind of
+  incubator instead), and it didn't ask fridge vs. freezer.
+- **Real bug, the one the product promises can't happen:** the accepted suggestion
+  "whole pasteurized milk" ended up inside an ingredient labeled **cook**. The
+  110°F from a suggestion was labeled as the family's answer.
+  One label per ingredient couldn't hold mixed sources.
+- **Fix (prompt p2):** ingredients and steps get a `suggested_detail` field for
+  the parts that came from a suggestion. Pass 2 must surface every accepted
+  suggestion there or in a "suggested" why. A new must-pass check fails if a
+  suggestion hides under a cook/family label.
+- **Too slow:** ~12 minutes for two calls. Added a 90 s request timeout, timing
+  per pass, and a `GEMINI_THINKING` setting to compare thinking levels.

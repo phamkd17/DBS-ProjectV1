@@ -1,0 +1,315 @@
+{
+  "prompt_version": "p1",
+  "model": "gemini-3.8-flash",
+  "results": [
+    {
+      "name": "yogurt",
+      "model": "gemini-3.8-flash",
+      "pass1": {
+        "draft": {
+          "title": "Homemade Sweetened Yogurt",
+          "ingredients": [
+            {
+              "item": "Milk",
+              "amount": "1/2 gallon",
+              "source": "cook",
+              "note": ""
+            },
+            {
+              "item": "Plain unflavored yogurt (with live active cultures)",
+              "amount": "",
+              "source": "not_stated",
+              "note": "Cook described it as a 'small 10 in yogurt container'."
+            },
+            {
+              "item": "Sugar",
+              "amount": "1/3 cup",
+              "source": "cook",
+              "note": "Use less if you prefer a less sweet yogurt."
+            }
+          ],
+          "steps": [
+            {
+              "text": "Heat the milk in a pot just until it steams slightly, making sure it does not boil.",
+              "why": [
+                {
+                  "source": "cook",
+                  "text": "The milk needs to be heated without coming to a boil.",
+                  "quote": "make sure it doesn't boil uh just until it steams a little bit"
+                },
+                {
+                  "source": "food_science",
+                  "text": "Heating milk denatures the whey proteins so the yogurt sets properly, but boiling can scorch the bottom and create off-flavors.",
+                  "quote": ""
+                }
+              ],
+              "dials": []
+            },
+            {
+              "text": "Add the sugar to the warm milk and stir until dissolved.",
+              "why": [],
+              "dials": [
+                {
+                  "setting": "Less than 1/3 cup",
+                  "effect": "less sweet",
+                  "source": "cook"
+                }
+              ]
+            },
+            {
+              "text": "Mix the plain yogurt into the milk and stir until everything is completely blended.",
+              "why": [],
+              "dials": []
+            },
+            {
+              "text": "Divide the yogurt mixture evenly among small jars.",
+              "why": [],
+              "dials": []
+            },
+            {
+              "text": "Place the jars into an incubator and let them incubate undisturbed for 8 to 12 hours.",
+              "why": [],
+              "dials": [
+                {
+                  "setting": "8 hours",
+                  "effect": "not too tangy",
+                  "source": "cook"
+                },
+                {
+                  "setting": "12 hours",
+                  "effect": "super tangy",
+                  "source": "cook"
+                }
+              ]
+            },
+            {
+              "text": "Chill the jars in the refrigerator or place them in the freezer before serving.",
+              "why": [],
+              "dials": []
+            }
+          ],
+          "notes": [
+            "The phrase 'small 10 in yogurt container' was flagged as a probable dictation error (likely 'Dannon' or an amount like 6 oz).",
+            "Crucial food-science step omitted by cook: steaming milk must cool to roughly 110°F (43°C) before stirring in the yogurt starter, or the live cultures will die."
+          ]
+        },
+        "questions": [
+          {
+            "kind": "missing_step",
+            "quote": "",
+            "question": "Do you let the milk cool down before stirring in the yogurt starter?",
+            "why_it_matters": "If you mix live yogurt cultures into steaming hot milk, the heat will kill the bacteria and the yogurt will not set.",
+            "suggestion": "Cool the milk to lukewarm (about 110°F to 115°F, or comfortably warm to the inside of your wrist) before stirring in the yogurt."
+          },
+          {
+            "kind": "dictation_error",
+            "quote": "one of these small 10 in yogurt container",
+            "question": "What brand or size was the 'small 10 in yogurt container'?",
+            "why_it_matters": "Too little starter culture will fail to ferment the batch, while too much can create an overly sour or watery texture.",
+            "suggestion": "One standard 5.3 oz to 6 oz container of plain, unflavored yogurt with live active cultures."
+          },
+          {
+            "kind": "ambiguity",
+            "quote": "this incubator",
+            "question": "What kind of incubator or appliance do you use to keep the jars warm?",
+            "why_it_matters": "Yogurt cultures require a steady temperature between 105°F and 115°F to ferment properly.",
+            "suggestion": "An electric yogurt maker machine (or an Instant Pot on the 'Yogurt' setting)."
+          },
+          {
+            "kind": "ambiguity",
+            "quote": "jug of milk",
+            "question": "What kind of milk works best for this recipe (whole, 2%, skim, or ultra-pasteurized)?",
+            "why_it_matters": "Fat content dictates creaminess and thickness, while ultra-pasteurized (UHT) milk can sometimes struggle to culture firmly.",
+            "suggestion": "Whole pasteurized cow's milk for the creamiest texture."
+          }
+        ],
+        "model": "gemini-3.8-flash",
+        "prompt_version": "p1"
+      },
+      "final": {
+        "title": "Homemade Sweetened Yogurt",
+        "ingredients": [
+          {
+            "item": "Milk (preferably whole pasteurized cow's milk)",
+            "amount": "1/2 gallon",
+            "source": "cook",
+            "note": "Family accepted suggestion to use whole pasteurized milk for the creamiest texture."
+          },
+          {
+            "item": "Plain unflavored yogurt (such as Dannon)",
+            "amount": "1 small single-serving cup",
+            "source": "user_answer",
+            "note": "Corrected from 'small 10 in yogurt container' per family confirmation."
+          },
+          {
+            "item": "Sugar",
+            "amount": "1/3 cup",
+            "source": "cook",
+            "note": "Use less if you prefer it less sweet."
+          }
+        ],
+        "steps": [
+          {
+            "text": "Heat the milk in a pot just until it begins to steam slightly, taking care not to let it boil.",
+            "why": [
+              {
+                "source": "cook",
+                "text": "The milk needs to be heated without coming to a boil.",
+                "quote": "make sure it doesn't boil uh just until it steams a little bit"
+              },
+              {
+                "source": "food_science",
+                "text": "Heating milk denatures the whey proteins to help the yogurt set firmly, but boiling can scorch the bottom and create burnt off-flavors.",
+                "quote": ""
+              }
+            ],
+            "dials": []
+          },
+          {
+            "text": "Add the sugar to the warm milk and stir until it dissolves.",
+            "why": [],
+            "dials": [
+              {
+                "setting": "Less than 1/3 cup",
+                "effect": "less sweet",
+                "source": "cook"
+              }
+            ]
+          },
+          {
+            "text": "Let the sweetened milk cool down until warm to the touch (around 110°F / 43°C) before adding the yogurt.",
+            "why": [
+              {
+                "source": "user_answer",
+                "text": "The family confirmed that the cook lets the milk cool down before adding the yogurt.",
+                "quote": ""
+              },
+              {
+                "source": "food_science",
+                "text": "Hot milk will kill the live active bacterial cultures in the yogurt starter, preventing the milk from fermenting.",
+                "quote": ""
+              }
+            ],
+            "dials": []
+          },
+          {
+            "text": "Add the small cup of plain yogurt to the cooled milk and stir until thoroughly blended.",
+            "why": [],
+            "dials": []
+          },
+          {
+            "text": "Pour the yogurt mixture into small jars.",
+            "why": [],
+            "dials": []
+          },
+          {
+            "text": "Place the jars into an incubator (such as an electric yogurt maker machine or an Instant Pot on the 'Yogurt' setting) and incubate undisturbed for 8 to 12 hours.",
+            "why": [],
+            "dials": [
+              {
+                "setting": "8 hours",
+                "effect": "not too tangy",
+                "source": "cook"
+              },
+              {
+                "setting": "12 hours",
+                "effect": "super tangy",
+                "source": "cook"
+              }
+            ]
+          },
+          {
+            "text": "Transfer the jars to the refrigerator to chill, or freeze them before serving.",
+            "why": [],
+            "dials": []
+          }
+        ],
+        "notes": [
+          "Fixed dictation error: 'small 10 in yogurt container' was identified by the family as a small single-serving cup of plain Dannon yogurt.",
+          "Added missing step: letting the heated milk cool down before adding the yogurt starter was confirmed by the family and is necessary to keep live cultures alive.",
+          "Clarified 'this incubator' with accepted suggestion: an electric yogurt maker machine or an Instant Pot yogurt setting.",
+          "Clarified milk choice with accepted suggestion: whole pasteurized cow's milk produces the creamiest results."
+        ]
+      },
+      "checks": [
+        {
+          "name": "transcript unchanged",
+          "pass": true,
+          "must": true
+        },
+        {
+          "name": "draft: has title, ingredients, ordered steps",
+          "pass": true
+        },
+        {
+          "name": "draft: every \"cook\" why quotes the transcript exactly",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "draft: no \"cook\" amount has a number she never said",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "asks about the \"10 in\" yogurt container",
+          "must": true,
+          "pass": true
+        },
+        {
+          "name": "flags the missing cooling step",
+          "must": true,
+          "pass": true
+        },
+        {
+          "name": "milk is heated and not boiled",
+          "pass": true
+        },
+        {
+          "name": "asks which kind of milk",
+          "pass": true
+        },
+        {
+          "name": "asks the incubator temperature",
+          "pass": false
+        },
+        {
+          "name": "asks fridge or freezer",
+          "pass": false
+        },
+        {
+          "name": "incubation dial: 8 h milder vs 12 h tangy",
+          "pass": true
+        },
+        {
+          "name": "final: has title, ingredients, ordered steps",
+          "pass": true
+        },
+        {
+          "name": "final: every \"cook\" why quotes the transcript exactly",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "final: no \"cook\" amount has a number she never said",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "final: starter is Dannon, labeled as a family answer",
+          "must": true,
+          "pass": true
+        },
+        {
+          "name": "final: has a cooling step",
+          "must": true,
+          "pass": true
+        },
+        {
+          "name": "final: accepted suggestions are labeled suggested",
+          "pass": false
+        }
+      ]
+    }
+  ]
+}

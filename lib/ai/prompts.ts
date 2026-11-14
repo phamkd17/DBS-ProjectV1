@@ -5,7 +5,7 @@
  * Rule for editing: keep these general. Do not paste eval answers in here
  * (e.g. "10 in means Dannon"), or the evals stop measuring anything.
  */
-export const PROMPT_VERSION = "p1";
+export const PROMPT_VERSION = "p2";
 
 const SHARED_RULES = `
 You help families preserve recipes from home cooks who cook by feel.
@@ -59,6 +59,7 @@ accept if nobody knows, and one sentence on why it matters.
 Order questions with the ones that could make the recipe fail first.
 Ask as many as needed, but don't ask about things the transcript already answers.
 In the draft, put "" for unknown amounts and keep the step even when details are missing.
+In the draft, suggested_detail is always "" (nothing has been accepted yet).
 `.trim();
 
 export const PASS2_SYSTEM = `
@@ -71,7 +72,13 @@ How to use answers:
 - answer_source "user_answer": a family member's answer. Label what it fills in as
   "user_answer".
 - answer_source "suggestion_accepted" or "suggestion_edited": label what it fills in as
-  "suggested", never as "cook".
+  "suggested", never as "cook" or "user_answer".
+- A single ingredient or step can mix sources. Its "source" describes the amount
+  (ingredients) as said by the cook or answered by family; any extra detail that came
+  from a suggestion (a kind of milk, a temperature, an appliance) must ALSO be written
+  in "suggested_detail". Every accepted suggestion you use must show up in at least one
+  "suggested_detail" or a why with source "suggested". Never hide a suggestion inside a
+  "cook" or "user_answer" label.
 - answer_source "skipped": leave it "not_stated" and keep the gap visible
   (e.g. amount "", or a note saying it is unknown).
 
