@@ -51,3 +51,19 @@ answer (quoted), and why.
 - **Decision:** `notes/talking-points.md`, a running draft organized around the
   questions the course asks in class (tracing a request, identity/access, where
   API calls happen, the failing test, what the agent was stopped from doing).
+
+## Nov 13 — First eval run
+
+### B8. Model choice
+- `npm run models` listed 12 Flash models. Agent recommended `gemini-3.8-flash`
+  (newest full Flash; Lite models reason less well about missing steps), with
+  `gemini-2.5-flash` as the fallback if the free-tier quota is too low.
+
+### B9. First run failed with a 400, and the harness hid why
+- The error said only "unavailable (400)", and the summary wrongly printed "All
+  must-pass checks passed" even though nothing ran.
+- **Fixes:** errors now carry Gemini's raw message (for logs and evals only,
+  never shown to users); the summary reports run errors instead of a false pass;
+  the `$schema` key is stripped from the JSON Schema sent to Gemini.
+- **Real cause:** a typo in `.env.local` (`GEMINI_MODEL=GEMINI_MODEL=…`). Found
+  by printing only the model value, never the keys.

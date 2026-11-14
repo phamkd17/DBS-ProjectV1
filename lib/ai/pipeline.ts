@@ -24,9 +24,12 @@ export class RateLimitError extends Error {
 
 /** Thrown when the model is down, or returns something we can't use. */
 export class ModelError extends Error {
-  constructor(message: string) {
+  /** Raw detail for server logs and evals. Never shown to users. */
+  detail?: string;
+  constructor(message: string, detail?: string) {
     super(message);
     this.name = "ModelError";
+    this.detail = detail;
   }
 }
 
@@ -82,7 +85,8 @@ async function generate<T>(
       if (err instanceof SyntaxError)
         throw new ModelError("The model returned malformed JSON.");
       throw new ModelError(
-        `The recipe helper is unavailable${status ? ` (${status})` : ""}.`
+        `The recipe helper is unavailable${status ? ` (${status})` : ""}.`,
+        err instanceof Error ? err.message.slice(0, 500) : String(err)
       );
     }
   }

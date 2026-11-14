@@ -102,5 +102,8 @@ export type Answer = {
 
 /** JSON Schema for Gemini structured output. */
 export function jsonSchemaFor(schema: z.ZodType) {
-  return z.toJSONSchema(schema, { target: "draft-2020-12" });
+  // Gemini rejects the "$schema" meta key, so drop it.
+  const { $schema: _drop, ...rest } = z.toJSONSchema(schema, { target: "draft-2020-12" });
+  void _drop;
+  return rest;
 }

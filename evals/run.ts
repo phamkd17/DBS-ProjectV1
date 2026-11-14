@@ -228,7 +228,8 @@ async function main() {
       console.log(`  ${passed}/${r.checks.length} passed · ${r.pass1.questions.length} questions`);
       results.push(r);
     } catch (err) {
-      console.log(`  ERROR ${(err as Error).message}`);
+      const e = err as Error & { detail?: string };
+      console.log(`  ERROR ${e.message}${e.detail ? `\n        ${e.detail}` : ""}`);
       results.push({ name: file, error: (err as Error).message });
     }
     await sleep(4000);
@@ -245,7 +246,9 @@ async function main() {
   const all = results.flatMap((r) => ("checks" in r ? r.checks : []));
   const mustFail = all.filter((c) => c.must && !c.pass);
   console.log(`\nTotal: ${all.filter((c) => c.pass).length}/${all.length} checks passed`);
-  console.log(mustFail.length ? `MUST-PASS FAILURES: ${mustFail.length}` : "All must-pass checks passed.");
+  const errors = results.filter((r) => "error" in r).length;
+  if (errors) console.log(`RUN ERRORS: ${errors} sample(s) did not finish, so checks are incomplete.`);
+  else console.log(mustFail.length ? `MUST-PASS FAILURES: ${mustFail.length}` : "All must-pass checks passed.");
   console.log(`Saved ${out}`);
   process.exitCode = mustFail.length || results.some((r) => "error" in r) ? 1 : 0;
 }
