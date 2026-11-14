@@ -1,0 +1,19 @@
+{
+  "prompt_version": "p4",
+  "model": "gemini-3.7-flash",
+  "thinking": "default",
+  "results": [
+    {
+      "name": "pork-mango-soup.md",
+      "error": "The recipe helper is unavailable (504)."
+    },
+    {
+      "name": "tomato-tofu.md",
+      "error": "The recipe helper is unavailable (504)."
+    },
+    {
+      "name": "yogurt.md",
+      "error": "The recipe helper is unavailable (504)."
+    }
+  ]
+}

@@ -11,6 +11,7 @@
 create or replace function public.requesting_user_id()
 returns text
 language sql stable
+set search_path = ''
 as $$ select nullif(auth.jwt() ->> 'sub', '') $$;
 
 -- ---------------------------------------------------------------------------
@@ -37,7 +38,9 @@ create policy "owners delete their dictations" on public.dictations
 -- No UPDATE policy: her words are never edited. The trigger below backs this up.
 
 create or replace function public.forbid_transcript_update()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql
+set search_path = ''
+as $$
 begin
   if new.transcript is distinct from old.transcript then
     raise exception 'Transcripts are never edited';
@@ -188,5 +191,6 @@ begin
   return new_recipe;
 end $$;
 
-revoke all on function public.save_shared_recipe(uuid) from public;
+-- Supabase also grants EXECUTE to anon directly, so revoke that too.
+revoke all on function public.save_shared_recipe(uuid) from public, anon;
 grant execute on function public.save_shared_recipe(uuid) to authenticated;

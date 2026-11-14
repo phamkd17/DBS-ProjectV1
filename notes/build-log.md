@@ -107,3 +107,30 @@ answer (quoted), and why.
 - **Student chose:** "Connect Supabase MCP."
 - Scoped to this one project (`project_ref=…` in `.mcp.json`, committed; no
   secrets in it, since login is OAuth in the browser).
+
+### B14. Migration applied + RLS verified (Nov 13)
+- `/mcp` connected the **claude.ai Supabase connector** (account-wide), not
+  the project-scoped server in `.mcp.json`. The agent only used project
+  `zsfkpztpdxcowqsjfylu`. To do: switch to the scoped server for v2.
+- Before applying: pinned `search_path` on the helper functions, and revoked
+  anon EXECUTE on `save_shared_recipe` (Supabase grants it to anon by default).
+- **RLS checks** (`supabase/tests/rls_check.sql`, rolled back): user A sees 1
+  own dictation; **user B sees 0; signed-out visitor sees 0**. The owner's
+  attempt to edit the transcript changed 0 rows. A signed-out visitor with the
+  link gets the recipe, and with a wrong token gets nothing. User B's "save a
+  copy" creates their own recipe with the transcript unchanged.
+- **Security advisor:** 3 warnings, all that `get_shared_recipe` /
+  `save_shared_recipe` are callable. That's intentional (they are the
+  share-link door), and both require the token.
+
+### B15. Model comparison on prompt p4 (all 3 dictations)
+| Model | Score | Must-pass | Time |
+|---|---|---|---|
+| gemini-3.5-flash | 45/50 | all ✓ | ~20 s per pass |
+| gemini-3.7-flash | — | — | every call 504 (timed out) |
+| gemini-3.8-flash | 14/17 (p1, yogurt only) | ✓ | ~12 min, then 504s |
+| gemini-2.5-flash | — | — | 404: closed to new users |
+- p3 → p4 on 3.5-flash: 42/50 → 45/50. Pork soup questions went 5 → 7 (the
+  scan step), and the mango contradiction is now asked. Still missed: where the
+  green onions go, the number of parboils, tomatoes ≈ 5, kind of milk, fridge or
+  freezer.
