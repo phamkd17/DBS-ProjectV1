@@ -92,13 +92,19 @@ type Spec = {
 const SPECS: Record<string, Spec> = {
   yogurt: {
     pass1: ({ draft, questions: qs }) => [
-      { name: 'asks about the "10 in" yogurt container', must: true, pass: !!anyQ(qs, /10 in/i) },
+      { name: 'asks about the "10 in" yogurt container', pass: !!anyQ(qs, /10 in/i) },
+      {
+        // The cousin's yogurt failed because of the starter, so size alone isn't enough.
+        name: 'asks the starter\'s brand or live cultures, not just size',
+        must: true,
+        pass: qs.some((q) => /10 in/i.test(q.quote + q.question) && /brand|dannon|live|cultur|which yogurt|kind of yogurt|type of yogurt/i.test(q.question + q.suggestion)),
+      },
       {
         name: "flags the missing cooling step",
         must: true,
         pass: !!anyQ(qs, /cool/i, "missing_step"),
       },
-      { name: "milk is heated and not boiled", pass: /(not|n't|without) (let it )?boil/i.test(stepsText(draft)) },
+      { name: "milk is heated and not boiled", pass: /\b(not|n't|never|without)\b[^.]{0,30}boil/i.test(stepsText(draft)) },
       { name: "asks which kind of milk", pass: !!anyQ(qs, /whole|kind of milk|type of milk|which milk/i) },
       { name: "asks the incubator temperature", pass: !!anyQ(qs, /incubat[\s\S]*(temp|°|degree)|(temp|°|degree)[\s\S]*incubat/i) },
       { name: "asks fridge or freezer", pass: !!anyQ(qs, /freez/i) },

@@ -1,0 +1,11 @@
+{
+  "prompt_version": "p2",
+  "model": "gemini-3.8-flash",
+  "thinking": "LOW",
+  "results": [
+    {
+      "name": "yogurt.md",
+      "error": "The recipe helper is unavailable (504)."
+    }
+  ]
+}
