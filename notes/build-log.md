@@ -162,3 +162,8 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - Signed-out checks on the live site: home ✓; `/new` and recipe pages →
   Clerk sign-in ✓ (non-browser requests get a 404); fake share token → "isn't
   shared anymore" ✓; `/.env.local` → 404 ✓.
+
+### B19. Phone + share link test (student, live site)
+- **Student:** "done, it worked on my phone." Signed in on the phone, read the
+  recipe, made a link, opened it signed out, and saw the recipe without getting
+  into the lab book.
