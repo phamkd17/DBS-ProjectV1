@@ -39,3 +39,15 @@ answer (quoted), and why.
 ### B5. Safety before keys
 - `.claude/settings.json` denies agent reads of `.env` / `.env.*`.
 - `.env.example` lists the variable names; the student creates `.env.local`.
+
+### B6. The deny rule in action
+- The agent tried to run `cp .env.example .env.local` itself; the permission
+  system **denied** it. The student created `.env.local` and pasted the keys
+  themselves. The agent has never read the keys.
+
+### B7. Talking points
+- **Student:** "Can you also keep notes of what we are doing so I can speak
+  about it."
+- **Decision:** `notes/talking-points.md`, a running draft organized around the
+  questions the course asks in class (tracing a request, identity/access, where
+  API calls happen, the failing test, what the agent was stopped from doing).
