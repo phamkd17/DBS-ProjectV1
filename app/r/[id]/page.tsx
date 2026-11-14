@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { RecipeView } from "@/components/RecipeView";
 import { SourceBadge, Transcript } from "@/components/ui";
@@ -46,6 +47,9 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
   }
 
   const answered = (questions ?? []).filter((q) => q.answer_source);
+  const h = await headers();
+  const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
+  const shareUrl = recipe.share_token ? `${origin}/s/${recipe.share_token}` : null;
 
   return (
     <main className="space-y-8">
@@ -83,7 +87,7 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
         </details>
       )}
 
-      <SharePanel recipeId={recipe.id} token={recipe.share_token} title={recipe.recipe.title} />
+      <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
 
       <p className="text-xs text-stone-500">
         Made with {recipe.model} · prompt {recipe.prompt_version}

@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { setSharing } from "@/app/actions";
 import { Button, Spinner } from "@/components/ui";
 
-export function SharePanel({ recipeId, token, title }: { recipeId: string; token: string | null; title: string }) {
+export function SharePanel({ recipeId, url, title }: { recipeId: string; url: string | null; title: string }) {
   const [pending, start] = useTransition();
   const [copied, setCopied] = useState(false);
-  // Read the origin after mount so server and client render the same HTML.
-  const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
-  const url = token && origin ? `${origin}/s/${token}` : "";
 
   const toggle = (on: boolean) => start(() => setSharing(recipeId, on));
 
@@ -20,7 +16,7 @@ export function SharePanel({ recipeId, token, title }: { recipeId: string; token
         Send this recipe
       </h2>
 
-      {!token ? (
+      {!url ? (
         <>
           <p className="text-sm text-stone-700">
             Make a private link to text or email. Anyone with the link can read this recipe and save a copy to their

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { Geist } from "next/font/google";
 import "./globals.css";
@@ -24,21 +25,35 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/" className="font-semibold tracking-tight">
                 Culinary Lab Book
               </Link>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
-              <Show when="signed-out">
-                <SignInButton mode="modal">
-                  <button className="rounded-md px-3 py-1.5 text-sm font-medium hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-stone-900 active:bg-stone-200">
-                    Sign in
-                  </button>
-                </SignInButton>
-              </Show>
+              <Suspense fallback={<span className="size-7" />}>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <button className="min-h-11 rounded-md px-3 py-1.5 text-sm font-medium hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-stone-900 active:bg-stone-200">
+                      Sign in
+                    </button>
+                  </SignInButton>
+                </Show>
+              </Suspense>
             </div>
           </header>
-          <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">{children}</div>
+          <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
+            <Suspense fallback={<PageLoading />}>{children}</Suspense>
+          </div>
         </body>
       </html>
     </ClerkProvider>
+  );
+}
+
+function PageLoading() {
+  return (
+    <div role="status" aria-label="Loading" className="space-y-3">
+      <div className="h-8 w-2/3 animate-pulse rounded bg-stone-200 motion-reduce:animate-none" />
+      <div className="h-24 animate-pulse rounded-xl bg-stone-200 motion-reduce:animate-none" />
+      <div className="h-24 animate-pulse rounded-xl bg-stone-200 motion-reduce:animate-none" />
+    </div>
   );
 }
