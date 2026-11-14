@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { PageLoading } from "@/components/PageLoading";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
@@ -48,12 +49,3 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   );
 }
 
-function PageLoading() {
-  return (
-    <div role="status" aria-label="Loading" className="space-y-3">
-      <div className="h-8 w-2/3 animate-pulse rounded bg-stone-200 motion-reduce:animate-none" />
-      <div className="h-24 animate-pulse rounded-xl bg-stone-200 motion-reduce:animate-none" />
-      <div className="h-24 animate-pulse rounded-xl bg-stone-200 motion-reduce:animate-none" />
-    </div>
-  );
-}

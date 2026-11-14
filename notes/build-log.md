@@ -136,3 +136,23 @@ answer (quoted), and why.
   freezer.
 - **Student chose:** "gemini-3.5-flash" for v1. Why: it passed every must-pass
   check and is fast enough for someone waiting on a phone.
+
+## Nov 13 — Screens + first run of the core task
+
+### B16. Screens built (one commit each)
+Home (lab book + empty state + signed-out landing) → New dictation → Dictation
+page (Create recipe, with a loading state that says what's happening) →
+Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
+"What the app changed", her words, Send panel) → Shared link page (read +
+"Save to my lab book").
+
+### B17. First run, by the student, on localhost
+- **Student:** "done, it worked"
+- Yogurt, 4 questions: cooling step (used suggestion → **Suggested**), brand
+  and size (answered → **Family answer**, Dannon credited), incubator
+  (suggestion), fridge or freeze (answered). All labels saved correctly.
+- Timing: create recipe 35 s, finish recipe 13 s.
+- Agent found in the logs: a dev warning on every page (data fetched without a
+  placeholder during navigation). Fixed by adding a `loading.tsx` skeleton to
+  each route.
+- Share link not tried yet in this run.
