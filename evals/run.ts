@@ -51,6 +51,7 @@ function commonChecks(transcript: string, r: Recipe, label: string): Check[] {
     return nums.some((n) => !t.includes(n));
   });
   return [
+
     {
       name: `${label}: has title, ingredients, ordered steps`,
       pass: !!r.title && r.ingredients.length >= 2 && r.steps.length >= 3,
@@ -119,10 +120,14 @@ const SPECS: Record<string, Spec> = {
     ],
     pass2: (r) => [
       {
-        name: "final: starter is Dannon, labeled as a family answer",
+        name: "final: starter is Dannon, credited to the family answer",
         must: true,
-        pass: ing(r, /dannon/i).some((i) => i.source === "user_answer") ||
-          r.ingredients.some((i) => /dannon/i.test(i.item + i.note) && i.source === "user_answer"),
+        pass: r.ingredients.some(
+          (i) =>
+            /dannon/i.test(i.item + i.note + i.from_answers.map((a) => a.text).join(" ")) &&
+            (i.source === "user_answer" ||
+              i.from_answers.some((a) => a.source === "user_answer" && /dannon/i.test(a.text)))
+        ),
       },
       { name: "final: has a cooling step", must: true, pass: /cool/i.test(stepsText(r)) },
       {
@@ -130,18 +135,14 @@ const SPECS: Record<string, Spec> = {
         must: true,
         pass:
           [...r.ingredients.map((i) => i.source), ...allWhy(r).map((w) => w.source)].includes("suggested") ||
-          [...r.ingredients, ...r.steps].some((x) => x.suggested_detail.trim() !== ""),
+          [...r.ingredients, ...r.steps].some((x) => x.from_answers.some((a) => a.source === "suggested")),
       },
       {
         name: "final: no suggestion hidden under a cook/family label",
         must: true,
         pass: !r.ingredients.some(
-          (i) => i.source !== "suggested" && /suggest/i.test(i.note) && !i.suggested_detail.trim()
+          (i) => i.source !== "suggested" && /suggest/i.test(i.note) && !i.from_answers.some((a) => a.source === "suggested")
         ),
-        detail: r.ingredients
-          .filter((i) => i.source !== "suggested" && /suggest/i.test(i.note) && !i.suggested_detail.trim())
-          .map((i) => `${i.item} [${i.source}]`)
-          .join(", "),
       },
     ],
   },

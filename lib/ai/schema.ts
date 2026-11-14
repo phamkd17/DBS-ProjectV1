@@ -17,6 +17,12 @@ export const Source = z.enum([
 ]);
 export type Source = z.infer<typeof Source>;
 
+/** A detail that came from someone other than the cook (a family answer or an accepted suggestion). */
+export const Addition = z.object({
+  text: z.string().describe('The added detail, e.g. "Dannon" or "about 110°F".'),
+  source: z.enum(["user_answer", "suggested"]),
+});
+
 export const Ingredient = z.object({
   item: z.string().describe("Ingredient name, corrected for dictation errors."),
   amount: z
@@ -24,11 +30,9 @@ export const Ingredient = z.object({
     .describe('Amount with unit, e.g. "1/2 gallon". Empty string if not known.'),
   source: Source.describe("Where the amount came from."),
   note: z.string().describe('Short note, e.g. "she added more as they reduced". Empty if none.'),
-  suggested_detail: z
-    .string()
-    .describe(
-      "The part of this ingredient that came from an accepted suggestion (e.g. 'whole milk'). Empty if none."
-    ),
+  from_answers: z
+    .array(Addition)
+    .describe("Details of this ingredient that came from family answers or accepted suggestions. Empty in the draft."),
 });
 
 export const Why = z.object({
@@ -49,11 +53,9 @@ export const Dial = z.object({
 
 export const Step = z.object({
   text: z.string().describe("One clear instruction, corrected for dictation errors."),
-  suggested_detail: z
-    .string()
-    .describe(
-      "The part of this step that came from an accepted suggestion (e.g. 'about 110°F'). Empty if none."
-    ),
+  from_answers: z
+    .array(Addition)
+    .describe("Details of this step that came from family answers or accepted suggestions. Empty in the draft."),
   why: z.array(Why),
   dials: z.array(Dial),
 });
@@ -90,7 +92,17 @@ export const Question = z.object({
 });
 export type Question = z.infer<typeof Question>;
 
+export const Issue = z.object({
+  quote: z.string().describe("The exact words from the transcript (empty for something missing)."),
+  issue: z.string().describe("What a first-time cook couldn't do or know from this."),
+});
+
 export const Pass1Output = z.object({
+  scan: z
+    .array(Issue)
+    .describe(
+      "Written FIRST. Go through the transcript in order and list every problem a first-time cook would hit."
+    ),
   draft: Recipe,
   questions: z.array(Question),
 });
