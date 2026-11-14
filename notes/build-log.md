@@ -84,3 +84,13 @@ answer (quoted), and why.
   suggestion hides under a cook/family label.
 - **Too slow:** ~12 minutes for two calls. Added a 90 s request timeout, timing
   per pass, and a `GEMINI_THINKING` setting to compare thinking levels.
+
+## Nov 13 — Connecting the services
+
+### B11. Clerk ↔ Supabase
+- New Clerk app "Culinary Lab Book" (development keys, email sign-in).
+- Clerk's Supabase integration activated, so session tokens carry
+  `role: authenticated`. Clerk domain (public, not a secret):
+  `https://loved-lionfish-7298.clerk.accounts.dev`
+- Supabase → Authentication → Third-Party Auth → Clerk, using that domain.
+  RLS reads the Clerk user id from `auth.jwt() ->> 'sub'`.
