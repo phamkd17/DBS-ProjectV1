@@ -134,3 +134,5 @@ answer (quoted), and why.
   scan step), and the mango contradiction is now asked. Still missed: where the
   green onions go, the number of parboils, tomatoes ≈ 5, kind of milk, fridge or
   freezer.
+- **Student chose:** "gemini-3.5-flash" for v1. Why: it passed every must-pass
+  check and is fast enough for someone waiting on a phone.

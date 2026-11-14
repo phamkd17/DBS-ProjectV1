@@ -90,6 +90,42 @@ deterministic checks (`evals/run.ts`).
 - **Speed is a design problem:** about 12 minutes for both passes on 3.8 Flash.
   We're comparing thinking levels and models next.
 
+## 4b. Picking the model with evals, not hype
+
+The newest model wasn't the best one for this app:
+
+| Model | Score (prompt p4) | Time |
+|---|---|---|
+| **gemini-3.5-flash** (chosen) | 45/50, all must-pass ✓ | ~20 s per pass |
+| gemini-3.7-flash | every call timed out | — |
+| gemini-3.8-flash | passed must-pass (p1) | ~12 min, then timeouts |
+| gemini-2.5-flash | closed to new users | — |
+
+**Prompt history: every change came from a failing check.**
+- **p1:** caught the cooling step, but hid a suggestion under the cook's label.
+- **p2:** suggestions get their own label.
+- **p3:** a misheard brand gets asked as *which brand*, not just the size.
+- **p4:** "scan the transcript first," so the pork soup questions went from 5 to
+  7, and the mango contradiction is now caught.
+
+**Still missed (honest list for v2):** where the prepped green onions go, the
+number of parboils, tomatoes ≈ 5, kind of milk, fridge or freezer.
+
+## 4c. Where identity and access are decided
+
+- **Clerk** signs people in. **Supabase trusts Clerk's token** (third-party
+  auth), so the database itself knows who is asking.
+- **Row-level security on every table:** a row is visible only when its
+  `owner_id` matches the Clerk user id in the token (`auth.jwt() ->> 'sub'`).
+- **Proved it with a test** (`supabase/tests/rls_check.sql`, rolled back):
+  user A sees 1 dictation; **user B sees 0; a signed-out visitor sees 0.**
+- **Her words can't be edited:** there's no UPDATE policy on dictations, plus a
+  trigger. The owner's own edit attempt changed 0 rows.
+- **Share links are one narrow door:** a database function returns one finished
+  recipe *only* for the right token (a wrong token gets nothing). Saving a copy
+  is a second function that needs a signed-in user.
+- **No service-role key anywhere:** the app talks to Supabase *as the user*.
+
 ## 5. Keys and safety (what I stopped the agent from doing)
 
 - Before any key existed, we added a **deny rule** in `.claude/settings.json`
