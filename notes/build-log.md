@@ -94,3 +94,16 @@ answer (quoted), and why.
   `https://loved-lionfish-7298.clerk.accounts.dev`
 - Supabase → Authentication → Third-Party Auth → Clerk, using that domain.
   RLS reads the Clerk user id from `auth.jwt() ->> 'sub'`.
+
+### B12. Supabase project + keys
+- The student created a new Supabase project (`zsfkpztpdxcowqsjfylu`, free
+  plan) and added Clerk under Third-Party Auth.
+- `npm run check-env` validates `.env.local` without printing secrets: formats,
+  doubled names, a service-role key used by mistake, and that the Clerk key's
+  domain matches. All passed.
+
+### B13. How migrations get applied
+- **Options offered:** connect the Supabase MCP, or paste into the SQL Editor.
+- **Student chose:** "Connect Supabase MCP."
+- Scoped to this one project (`project_ref=…` in `.mcp.json`, committed; no
+  secrets in it, since login is OAuth in the browser).
