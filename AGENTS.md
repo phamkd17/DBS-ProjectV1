@@ -110,3 +110,12 @@ screenshots**, and report what's broken against this list:
 - **Simplicity:** nothing extra. If a word or an image doesn't help, remove it.
 
 Then the student checks it themselves, including with the keyboard.
+
+### Saving Gemini quota while testing
+- `lib/ai/cache.ts`: **dev-only** cache of Gemini responses in `.ai-cache/`
+  (git-ignored), keyed by the exact request. Off in production and for
+  `npm run eval` (`AI_CACHE=off`). `npm run verify` reuses responses: 0 calls
+  after the first run.
+- `npm run verify:fresh` clears the cache to test with the real model (do this
+  after changing a prompt; the key includes the prompt, so it would miss anyway).
+- The dev server logs `[ai] calling Gemini` / `[ai] cache hit` for each request.

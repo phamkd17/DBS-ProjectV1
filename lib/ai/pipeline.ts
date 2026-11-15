@@ -6,6 +6,7 @@ import {
   Pass1Output,
   Recipe,
 } from "./schema";
+import { aiCacheGet, aiCacheKey, aiCacheSet } from "./cache";
 import {
   PASS1_SYSTEM,
   PASS2_SYSTEM,
@@ -60,6 +61,16 @@ async function generate<T>(
   const { ai, model, thinkingLevel } = getConfig();
   const started = Date.now();
   const delays = [2000, 8000];
+  const responseJsonSchema = jsonSchemaFor(schema);
+
+  // Dev-only: reuse an identical earlier response instead of spending quota.
+  const cacheKey = aiCacheKey([model, thinkingLevel ?? null, system, user, responseJsonSchema]);
+  const cached = schema.safeParse(await aiCacheGet(cacheKey));
+  if (cached.success) {
+    console.log(`[ai] cache hit (${cacheKey.slice(0, 8)}): no Gemini call`);
+    return { data: cached.data, model, ms: 0 };
+  }
+  console.log(`[ai] calling Gemini (${model})`);
 
   for (let attempt = 0; ; attempt++) {
     try {
@@ -70,7 +81,7 @@ async function generate<T>(
           systemInstruction: system,
           temperature: 0.2,
           responseMimeType: "application/json",
-          responseJsonSchema: jsonSchemaFor(schema),
+          responseJsonSchema,
           ...(thinkingLevel ? { thinkingConfig: { thinkingLevel } } : {}),
         },
       });
@@ -83,6 +94,7 @@ async function generate<T>(
             parsed.error.issues.slice(0, 3).map((i) => i.message).join("; ")
         );
       }
+      await aiCacheSet(cacheKey, parsed.data);
       return { data: parsed.data, model, ms: Date.now() - started };
     } catch (err) {
       const status = err instanceof ApiError ? err.status : undefined;

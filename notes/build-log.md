@@ -282,3 +282,13 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   showed its designed state ("The recipe helper is busy right now. Try again in
   a minute.") with Try again. Verify now fails fast with that message instead
   of waiting 4 minutes.
+
+### B27. Limit Gemini calls during testing
+- **Student:** "Can you limit the API call to Gemini during testing?"
+- **Built:** a dev-only response cache (`lib/ai/cache.ts`), keyed by model +
+  prompt + transcript + answers + schema. The same request reuses the saved
+  answer; anything new still calls Gemini. Off in production (the live site
+  always calls the model) and off for evals (they measure the model).
+- **Measured:** two verify runs in a row = **0 Gemini calls** (2 cache hits
+  each), and each run took about 35 s instead of over a minute.
+- `npm run verify:fresh` clears it, for when a test should use the real model.

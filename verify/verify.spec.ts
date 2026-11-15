@@ -17,7 +17,8 @@ const TEST_EMAIL = "labbook-tester+clerk_test@example.com";
 // Unique per run, so leftovers from a failed run never match this run's checks.
 const RUN = new Date().toISOString().slice(5, 16).replace("T", " ");
 const IDEA = `Caramelized onion crunch (verify ${RUN})`;
-const DISH = `Yogurt (verify ${RUN})`;
+// Constant, so the dev-only AI cache can reuse responses (the dish name is part of the prompt).
+const DISH = "Yogurt (verify run)";
 const YOGURT =
   "Yogurt is a very simple dish you need about 1/2 gallon jug of milk and then one of these small 10 in yogurt container that is not flavored at all uh you heat up the milk make sure it doesn't boil uh just until it steams a little bit and then from there you add 1/3 a cup of sugar maybe less if you like it less sweet and then you mix in the yogurt with the milk you stir it into everything blends and then you put it into these little jars and then you put all these little jars into this incubator and you let it sit for about 8 hours if you don't like it too tangy but I like it at 12 hours super tangy and then from there you can either keep it in the fridge or freeze it and then serve";
 

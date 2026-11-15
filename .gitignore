@@ -47,3 +47,6 @@ next-env.d.ts
 /verify/screenshots/
 /verify/.results/
 /verify/report.md
+
+# dev-only Gemini response cache
+/.ai-cache/
