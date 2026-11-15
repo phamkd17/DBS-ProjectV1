@@ -126,6 +126,46 @@ number of parboils, tomatoes ≈ 5, kind of milk, fridge or freezer.
   is a second function that needs a signed-in user.
 - **No service-role key anywhere:** the app talks to Supabase *as the user*.
 
+## 4d. Security review found a real hole (and how we fixed it)
+
+`/security-review` (one agent finds issues, a second checks each for false
+positives) found that the UPDATE policy on questions checked only *who owned
+the row*, not *which recipe it pointed to*. Someone who saved a copy of your
+shared recipe could re-point one of their questions at your original, and every
+later recipient would get that fake Q&A labeled "Family answer".
+**Fix:** people can now edit only the answer fields (column-level grants), the
+policy re-checks the parent recipe's owner, and the share functions follow only
+rows that belong to the same owner. **Proof:** `supabase/tests/repoint_attack.sql`
+now gets "permission denied".
+
+## 4e. Design: my own style, checked in a real browser every time
+
+- **Visual style:** the app uses **Line & Stone**, my design system from
+  Assignment 2 (Limestone, Ink hairlines, Instrument Serif + Jost, square
+  corners). I swapped its blue for a **Scarlet** primary (`#ae1f2e`) after
+  comparing 10 reds side by side (`notes/design/red-swatches*.html`), with
+  contrast ratios.
+- **Verify on every change:** `npm run verify` (Playwright) runs the whole core
+  task as a new user and screenshots 20+ screens at **390px and 1440px**, with
+  an axe accessibility/contrast scan and a keyboard Tab pass.
+- **What looking at the screenshots caught, that passing checks didn't:**
+  the dev server served stale CSS (it "passed" while showing none of my style);
+  placeholders looked like filled-in values; finished recipes couldn't be
+  deleted; "Move to" gave no feedback. Each one was fixed and re-verified.
+- **Real error state seen live:** after many test runs we hit Gemini's
+  free-tier rate limit, and the app showed its designed message: "The recipe
+  helper is busy right now. Try again in a minute."
+
+## 4f. The lab book: Ideas → Development → Finished
+
+- **Ideas:** quick notes and links to come back to (photos in v2).
+- **Development:** recipes I'm working out with the app's questions.
+- **Finished:** ready to cook and send.
+- The app moves things forward automatically, and I can **move anything**
+  myself (e.g. send a finished recipe back to Development to rework it).
+  Links must be http(s), enforced in the database too, so a saved link can't
+  run code.
+
 ## 5. Keys and safety (what I stopped the agent from doing)
 
 - Before any key existed, we added a **deny rule** in `.claude/settings.json`
