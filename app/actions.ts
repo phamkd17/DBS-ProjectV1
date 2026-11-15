@@ -121,6 +121,10 @@ export async function createRecipe(dictationId: string, _prev: ActionState): Pro
     .eq("id", dictationId)
     .single<DictationRow>();
   if (!dictation) return { error: "We couldn't find that dictation in your lab book." };
+  // The AI step only runs from Development (the UI hides it elsewhere; this enforces it).
+  if (dictation.stage !== "development") {
+    return { error: "Move this to Development first, then create the recipe." };
+  }
 
   // Don't make a second recipe if one exists (e.g. a double tap).
   const { data: existing } = await supabase

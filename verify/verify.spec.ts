@@ -225,8 +225,15 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.waitForURL(/\/d\//);
 
   // ---- Create recipe (pass 1) ----
+  // In Ideas there's no AI button, only "Move to Development". (Wait for the page first,
+  // or the "no AI button" check passes trivially on the loading skeleton.)
+  await expect(view.getByRole("heading", { name: "Ready to develop it?" })).toBeVisible();
+  await expect(view.getByRole("button", { name: "Create recipe with AI" })).toHaveCount(0);
+  await check(page, "dictation-in-ideas");
+  await view.getByRole("button", { name: "Move to Development" }).click();
+
   // The AI step stays off until the user confirms they're ready.
-  const createBtn = page.getByRole("button", { name: "Create recipe with AI" });
+  const createBtn = view.getByRole("button", { name: "Create recipe with AI" });
   await expect(createBtn).toBeDisabled();
   await page.getByLabel(/Their words are complete/).check();
   await expect(createBtn).toBeEnabled();

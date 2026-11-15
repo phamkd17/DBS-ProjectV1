@@ -124,7 +124,7 @@ function EntryCard({ d }: { d: Row }) {
   const r = d.recipes[0];
   const title = r?.recipe?.title || d.dish_name || "Untitled dictation";
   const href = r ? `/r/${r.id}` : `/d/${d.id}`;
-  const next = !r ? "Words saved" : r.status === "ready" ? null : "Answer questions";
+  const next = r ? (r.status === "ready" ? null : "Answer questions") : d.stage === "development" ? "Create recipe" : null;
   return (
     <li className="pb-1">
       <Link

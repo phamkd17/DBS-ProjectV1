@@ -6,7 +6,18 @@ import { STAGE_LABEL, STAGES, type Stage } from "@/lib/types";
 import { eyebrow, focusRing } from "./ui";
 
 /** "Move to: Development · Finished": moves an idea or dictation between tabs. */
-export function MoveTo({ kind, id, current }: { kind: "idea" | "dictation"; id: string; current: Stage }) {
+export function MoveTo({
+  kind,
+  id,
+  current,
+  hide = [],
+}: {
+  kind: "idea" | "dictation";
+  id: string;
+  current: Stage;
+  /** Stages offered elsewhere on the page (avoid two controls for one action). */
+  hide?: Stage[];
+}) {
   const [pending, start] = useTransition();
   const [target, setTarget] = useState<Stage | null>(null);
 
@@ -14,7 +25,7 @@ export function MoveTo({ kind, id, current }: { kind: "idea" | "dictation"; id: 
     <div className="flex flex-wrap items-center gap-x-1" aria-busy={pending}>
       <span className={eyebrow}>{pending && target ? `Moving to ${STAGE_LABEL[target]}…` : "Move to"}</span>
       {!pending &&
-        STAGES.filter((s) => s !== current).map((s) => (
+        STAGES.filter((s) => s !== current && !hide.includes(s)).map((s) => (
           <button
             key={s}
             type="button"

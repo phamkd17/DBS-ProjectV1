@@ -338,3 +338,15 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Tested:** in the DB, the first version is kept across two edits ✓, forging
   the original is blocked ✓, another user edits 0 ✓. Verify edits words after
   the recipe exists: notice ✓, original kept ✓, 0 Gemini calls.
+
+### B31. The AI recipe step only lives in Development
+- **Student:** "Only have genearte Create Recipe with AI in the development tab."
+- **Built:** in Ideas (or Finished, with no recipe yet) a dictation shows
+  "Ready to develop it? · Move to Development" instead of the AI panel. Once
+  it's in Development, the "Create recipe with AI" panel appears (still behind
+  the "I'm ready" tick). **Enforced on the server too:** `createRecipe` refuses
+  unless the dictation's stage is development.
+- **Verify found:** the "no AI button in Ideas" check first passed on the
+  *loading skeleton* (a false pass), so it now waits for the panel. A
+  duplicate "Move to: Development" link sat under the big button and was hidden
+  (Simplicity). 0 Gemini calls per run.

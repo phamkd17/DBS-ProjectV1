@@ -6,6 +6,7 @@ import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow } from "@/lib/types";
 import { CreateRecipe } from "./CreateRecipe";
+import { StartDeveloping } from "@/components/StartDeveloping";
 import { MoveTo } from "@/components/MoveTo";
 import { STAGE_LABEL } from "@/lib/types";
 
@@ -50,9 +51,10 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
 
       <Transcript text={d.transcript} cookName={d.cook_name} original={d.original_transcript} editedAt={d.edited_at} open />
 
-      <CreateRecipe dictationId={d.id} />
+      {/* The AI recipe step only appears in Development. */}
+      {d.stage === "development" ? <CreateRecipe dictationId={d.id} /> : <StartDeveloping dictationId={d.id} />}
 
-      <MoveTo kind="dictation" id={d.id} current={d.stage} />
+      <MoveTo kind="dictation" id={d.id} current={d.stage} hide={d.stage === "development" ? [] : ["development"]} />
 
       <form action={deleteDictation.bind(null, d.id)} className="border-t border-ls-border pt-4">
         <ConfirmSubmit variant="danger" message="Delete these words and any recipe made from them? This can't be undone.">
