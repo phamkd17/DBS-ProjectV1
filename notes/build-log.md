@@ -292,3 +292,17 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Measured:** two verify runs in a row = **0 Gemini calls** (2 cache hits
   each), and each run took about 35 s instead of over a minute.
 - `npm run verify:fresh` clears it, for when a test should use the real model.
+
+### B28. One "New" button
+- **Student:** "arent these two buttons do the same thing? Can you merge with
+  the option to add dictation in the New button."
+- **Built:** a single Scarlet **New** button (the one primary action) that
+  opens **Idea** ("A note, link, or dish to try later") or **Dictation** ("The
+  cook's words, to turn into a recipe"). It's a disclosure button with
+  `aria-expanded`; outside click or Escape closes it and returns focus. The
+  first-run "Add your first dictation" became secondary, so there's still one
+  primary per screen.
+- **Verify found:** the menu was cut off at 390px (anchored right while the
+  button sits left on phones), and the ▾ rendered as a dot. Fixed (left-anchored
+  on mobile, an SVG chevron). Keyboard test: Enter opens ✓, Tab reaches Idea ✓,
+  Escape closes and returns focus ✓. Page waits now time out at 30 s.

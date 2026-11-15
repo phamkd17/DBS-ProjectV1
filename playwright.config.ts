@@ -13,6 +13,7 @@ export default defineConfig({
     deviceScaleFactor: 1,
     trace: "retain-on-failure",
     actionTimeout: 15_000, // a blocked click fails fast instead of hanging
+    navigationTimeout: 30_000, // AI steps pass their own longer timeout
   },
   outputDir: "verify/.results",
 });

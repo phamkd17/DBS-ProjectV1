@@ -4,6 +4,7 @@ import { SignUpButton } from "@clerk/nextjs";
 import { supabaseForUser } from "@/lib/supabase/server";
 import { Button, ErrorNote, eyebrow, focusRing, formatDate, LinkButton } from "@/components/ui";
 import { MoveTo } from "@/components/MoveTo";
+import { NewMenu } from "@/components/NewMenu";
 import type { DictationRow, IdeaRow, RecipeStatus } from "@/lib/types";
 
 type Row = DictationRow & { recipes: { id: string; status: RecipeStatus; recipe: { title?: string } | null }[] };
@@ -14,7 +15,7 @@ const TABS = {
   ideas: {
     label: "Ideas",
     blurb: "Notes, links, and saved words to come back to.",
-    empty: "Nothing here yet. Jot down an idea, or save a cook's words with “New dictation”.",
+    empty: "Nothing here yet. Tap “New” to jot down an idea or save a cook's words.",
   },
   development: {
     label: "Development",
@@ -65,12 +66,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     <main className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-ls-serif text-5xl leading-none">Your lab book</h1>
-        <div className="flex flex-wrap gap-3">
-          <LinkButton href="/ideas/new" variant="secondary">
-            New idea
-          </LinkButton>
-          <LinkButton href="/new">New dictation</LinkButton>
-        </div>
+        <NewMenu />
       </div>
 
       {error && <ErrorNote>We couldn&apos;t load your lab book. Refresh the page to try again.</ErrorNote>}
@@ -191,7 +187,9 @@ function FirstRun() {
         Then paste or dictate it here. The app keeps their words exactly, asks about anything a new cook couldn&apos;t
         figure out, and turns it into a recipe you can send to others.
       </p>
-      <LinkButton href="/new">Add your first dictation</LinkButton>
+      <LinkButton href="/new" variant="secondary">
+        Add your first dictation
+      </LinkButton>
     </div>
   );
 }

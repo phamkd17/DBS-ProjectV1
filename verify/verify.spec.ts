@@ -145,7 +145,20 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await check(page, "home", { keyboard: true });
 
   // ---- Ideas: create, validate, move, delete ----
-  await page.getByRole("link", { name: "New idea" }).click();
+  // "New" menu: keyboard first (Enter opens, Tab reaches the options, Escape closes).
+  const newBtn = page.getByRole("button", { name: "New" });
+  await newBtn.focus();
+  await page.keyboard.press("Enter");
+  await expect(newBtn).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: /^Idea A note/ })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(newBtn).toHaveAttribute("aria-expanded", "false");
+  await expect(newBtn).toBeFocused();
+  report.push("## New menu keyboard", "- Enter opens ✓ · Tab reaches “Idea” ✓ · Escape closes and returns focus ✓", "");
+  await newBtn.click();
+  await check(page, "home-new-menu-open");
+  await page.getByRole("link", { name: /^Idea A note/ }).click();
   await page.waitForURL(/\/ideas\/new/);
   await page.getByRole("button", { name: "Save idea" }).click();
   await expect(page.getByText(/Give the idea a short name/)).toBeVisible();
@@ -181,7 +194,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await expect(page.locator("main").getByText(IDEA).filter({ visible: true })).toHaveCount(0);
 
   // ---- Capture ----
-  await page.getByRole("link", { name: "New dictation" }).first().click();
+  await page.goto("/");
+  await page.getByRole("button", { name: "New" }).click();
+  await page.getByRole("link", { name: /^Dictation/ }).click();
   await page.getByRole("button", { name: /Save their words/ }).click();
   await expect(page.getByText(/Paste or dictate/)).toBeVisible();
   await check(page, "new-empty-error", { keyboard: true });
