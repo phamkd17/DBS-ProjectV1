@@ -167,3 +167,24 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Student:** "done, it worked on my phone." Signed in on the phone, read the
   recipe, made a link, opened it signed out, and saw the recipe without getting
   into the lab book.
+
+## Nov 14 — Security review
+
+### B20. `/security-review` on the whole app (d5c7577..HEAD)
+- One reviewer agent searched for vulnerabilities, and a second agent checked
+  each finding for false positives.
+- **Finding (MEDIUM, confirmed by both; 7/10 confidence, so just under the
+  skill's 8/10 reporting bar):** the UPDATE policy on `recipe_questions`
+  only checked `owner_id`. A user who saved a copy of someone's shared recipe
+  could learn the original recipe id (`copied_from`), re-point one of their own
+  questions at it, and `save_shared_recipe` would copy that fake Q&A,
+  labeled "Family answer", into every later recipient's lab book. The same gap
+  existed for `recipes.dictation_id` (no new data exposed).
+- **Fixed anyway** (`20261114010000_tighten_updates.sql`): column-level UPDATE
+  grants (questions: answer fields only; recipes: generated content + sharing
+  only), the UPDATE policy re-checks the parent owner, and both share functions
+  only follow rows with the same owner.
+- **Proved:** `supabase/tests/repoint_attack.sql`. Both attacks are now
+  "permission denied"; normal answering, sharing, and saving a copy still work.
+- From here on, work happens on branches (`refine-v1`), each with its own
+  Vercel preview link, merged after review.
