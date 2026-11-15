@@ -89,7 +89,7 @@ export const textLink = `underline decoration-ls-rule underline-offset-4 transit
 // ---------------------------------------------------------------------------
 // Form fields
 // ---------------------------------------------------------------------------
-export const fieldClass = `w-full border border-ls-ink bg-ls-surface px-3 py-2.5 font-ls-sans text-base text-ls-ink placeholder:text-ls-muted transition-colors duration-150 hover:bg-white ${focusRing} aria-invalid:border-ls-error aria-invalid:border-2`;
+export const fieldClass = `w-full border border-ls-ink bg-ls-surface px-3 py-2.5 font-ls-sans text-base text-ls-ink placeholder:text-ls-muted/80 placeholder:italic transition-colors duration-150 hover:bg-white ${focusRing} aria-invalid:border-ls-error aria-invalid:border-2`;
 
 // ---------------------------------------------------------------------------
 // States

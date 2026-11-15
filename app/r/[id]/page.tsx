@@ -84,14 +84,14 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
               </li>
             ))}
           </ol>
+          <p className={`border-t border-ls-border px-4 py-3 ${eyebrow}`}>
+            Made with {recipe.model} · prompt {recipe.prompt_version}
+          </p>
         </details>
       )}
 
       <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
 
-      <p className={eyebrow}>
-        Made with {recipe.model} · prompt {recipe.prompt_version}
-      </p>
     </main>
   );
 }

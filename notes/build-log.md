@@ -207,3 +207,32 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   It opens on the tab where the work is, and each tab has its own empty state.
 - **v2 headline:** Ideas get notes, photos, and links, plus "Start developing";
   Finished recipes get iterations (each trial: what changed, how it turned out).
+
+## Nov 14 — Line & Stone + browser verification
+
+### B22. Visual style
+- **Student:** "can you use line and stone" (their Assignment 2 design system).
+- Restyled every screen from the A2 tokens and components: Limestone, Plaster,
+  Ink, Slate, Stone hairlines, Aegean for the one primary action, Instrument
+  Serif + Jost, square corners, no shadows, underline tabs.
+- Source labels kept their meaning: cook = ochre, food science = Cypress tint,
+  suggested = Aegean tint, family answer = ink outline, not stated = dashed.
+
+### B23. "Constantly review" against the design checklist
+- **Student:** "Can you constantly review for the following requirements"
+  (brief step 6 Verify + Design Requirements). Written into AGENTS.md as a
+  standing rule.
+- `npm run verify` (Playwright): runs the whole core task as a test user and
+  takes screenshots at 390px and 1440px of 16 screens, an axe WCAG AA scan, a
+  keyboard Tab pass, and a sideways-scroll check.
+- **Caught by looking at the screenshots, not by the automated checks:** the
+  first run passed every check, but the screenshots showed none of the colors
+  or fonts. The dev server was serving stale CSS (Tailwind's cache, after a
+  production build ran alongside it). Restarted it with a clean cache.
+- **Review fixes:** placeholders looked like filled-in values ("Yogurt",
+  "Grandma"), so they now read "e.g. …" in italic. The "Made with model ·
+  prompt" line moved inside "Questions the app asked" (Simplicity).
+- **Result:** 0 axe violations on all 16 screens, no sideways scroll at 390px,
+  a visible focus style on every Tab stop.
+- **Known, left:** Clerk's default avatar is purple (only for accounts without a
+  photo).

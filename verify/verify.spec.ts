@@ -91,7 +91,8 @@ test.afterAll(() => {
 test("core task as a new person, every screen at 390 and 1440", async ({ page, browser }) => {
   // ---- Signed out ----
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  // First load after an edit can take a while in dev while the page recompiles.
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 30_000 });
   await check(page, "landing-signed-out", { keyboard: true });
 
   await page.goto("/s/11111111-1111-1111-1111-111111111111");
@@ -143,10 +144,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   const boxes = page.getByPlaceholder("Your answer");
   if ((await boxes.count()) > 1) await boxes.nth(1).fill("Plain Dannon, the small single cup.");
   await page.getByRole("button", { name: /Make the recipe/ }).click();
-  await page.waitForFunction(() => !document.querySelector("textarea[placeholder='Your answer']"), null, {
-    timeout: 4 * 60_000,
-  });
-  await expect(page.getByRole("heading", { name: "Ingredients" })).toBeVisible();
+  await expect(page.getByRole("status")).toBeVisible();
+  await check(page, "finishing-loading");
+  await expect(page.getByRole("heading", { name: "Ingredients" })).toBeVisible({ timeout: 4 * 60_000 });
   await check(page, "recipe-finished", { keyboard: true });
 
   // ---- Send ----

@@ -26,7 +26,7 @@ export function NewDictationForm() {
           aria-invalid={!!err.transcript}
           aria-describedby={err.transcript ? "transcript-error" : "transcript-hint"}
           className={FIELD}
-          placeholder="Yogurt is a very simple dish you need about 1/2 gallon jug of milk…"
+          placeholder="e.g. “Yogurt is a very simple dish, you need about a half gallon of milk…”"
         />
         {err.transcript ? (
           <p id="transcript-error" className="text-[15px] text-ls-error">
@@ -43,7 +43,7 @@ export function NewDictationForm() {
         <label htmlFor="dish_name" className="block text-[17px] font-medium">
           Dish name <span className={eyebrow}>Optional</span>
         </label>
-        <input id="dish_name" name="dish_name" maxLength={120} defaultValue={v.dish_name} className={FIELD} placeholder="Yogurt" />
+        <input id="dish_name" name="dish_name" maxLength={120} defaultValue={v.dish_name} className={FIELD} placeholder="e.g. Yogurt" />
       </div>
 
       <div className="space-y-1.5">
@@ -57,7 +57,7 @@ export function NewDictationForm() {
           defaultValue={v.cook_name}
           aria-describedby="cook_name-hint"
           className={FIELD}
-          placeholder="Grandma"
+          placeholder="e.g. Grandma"
         />
         <p id="cook_name-hint" className="text-[15px] text-ls-muted">
           Used to label their reasons in the recipe.
