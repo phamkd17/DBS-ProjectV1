@@ -1,7 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
 import { DictationEditor } from "@/components/DictationEditor";
-import { eyebrow, textLink } from "@/components/ui";
+import { eyebrow, formatDate, textLink } from "@/components/ui";
+import { EditableNotes, EditableTitle } from "@/components/InlineEdit";
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
@@ -31,6 +32,8 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
     .maybeSingle();
   if (recipe) redirect(`/r/${recipe.id}`);
 
+  const inIdeas = d.stage === "ideas";
+
   return (
     <main className="space-y-8">
       <div className="space-y-3">
@@ -39,11 +42,29 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
             {STAGE_LABEL[d.stage]}
           </Link>
         </p>
-        <DictationEditor dictation={d} withHeading open>
+        <EditableTitle kind="dictation" id={d.id} title={d.dish_name ?? ""} placeholder="Untitled dictation" />
+        <p className={eyebrow}>
+          {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
+        </p>
+      </div>
+
+      {inIdeas ? (
+        <>
+          {/* In Ideas it's just notes. Moved to Development, these become the cook's words for the AI. */}
+          <EditableNotes
+            kind="dictation"
+            id={d.id}
+            note={d.transcript}
+            hint="When you move this to Development, these notes become the cook's words the AI reads."
+          />
+          <StartDeveloping dictationId={d.id} />
+        </>
+      ) : (
+        <DictationEditor dictation={d} open>
           {/* The AI recipe step only appears in Development. */}
           {d.stage === "development" ? <CreateRecipe dictationId={d.id} /> : <StartDeveloping dictationId={d.id} />}
         </DictationEditor>
-      </div>
+      )}
 
       <MoveTo kind="dictation" id={d.id} current={d.stage} hide={d.stage === "development" ? [] : ["development"]} />
 

@@ -178,12 +178,21 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   // Edit in place: same page, no navigation.
   // Next keeps hidden copies of earlier pages (e.g. the New idea form), so act on the visible <main>.
   const view = page.locator("main").filter({ visible: true });
-  await view.getByRole("button", { name: "Edit", exact: true }).click();
-  await view.getByLabel(/Note/).fill("Had it on pho. Crunchy and sweet. Dry at 200°F for 2 hours?");
-  await check(page, "idea-edit-in-place", { keyboard: true });
-  await view.getByRole("button", { name: "Save changes" }).click();
+  // Pencil next to the title: Enter saves.
+  await view.getByRole("button", { name: "Edit title" }).click();
+  await view.getByRole("textbox", { name: "Title" }).fill(`${IDEA} (renamed)`);
+  await check(page, "idea-title-editing", { keyboard: true });
+  await view.getByRole("textbox", { name: "Title" }).press("Enter");
+  await expect(view.getByRole("heading", { level: 1 })).toContainText("(renamed)");
+  await expect(view.getByRole("button", { name: "Edit title" })).toBeFocused(); // focus returns
+
+  // Pencil on Idea notes.
+  await view.getByRole("button", { name: "Edit idea notes" }).click();
+  await view.getByRole("textbox", { name: "Idea notes" }).fill("Had it on pho. Crunchy and sweet. Dry at 200°F for 2 hours?");
+  await check(page, "idea-notes-editing", { keyboard: true });
+  await view.getByRole("button", { name: "Save", exact: true }).click();
   await expect(view.getByText(/Dry at 200°F/)).toBeVisible();
-  await expect(view.getByRole("button", { name: "Edit", exact: true })).toBeFocused(); // focus returns
+  await expect(view.getByRole("button", { name: "Edit idea notes" })).toBeFocused();
   expect(page.url()).toBe(ideaUrl);
 
   await page.goto("/?tab=ideas");
@@ -229,6 +238,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   // In Ideas there's no AI button, only "Move to Development". (Wait for the page first,
   // or the "no AI button" check passes trivially on the loading skeleton.)
   await expect(view.getByRole("heading", { name: "Ready to develop it?" })).toBeVisible();
+  // In Ideas a dictation reads as idea notes, not the cook's-words panel.
+  await expect(view.getByRole("heading", { name: "Idea notes" })).toBeVisible();
+  await expect(view.getByText("Their words, exactly as said")).toHaveCount(0);
   await expect(view.getByRole("button", { name: "Create recipe with AI" })).toHaveCount(0);
   await check(page, "dictation-in-ideas");
   await view.getByRole("button", { name: "Move to Development" }).click();

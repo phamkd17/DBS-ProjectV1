@@ -365,3 +365,20 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   cook's words" or "Create recipe with AI"). Fixed: the next-step panel hides
   while editing, so Save is the only primary action. In-place save ✓, focus
   returns ✓, URL unchanged ✓.
+
+### B33. Pencil icons, and "Idea notes" for everything in Ideas
+- **Student:** "I want to be able to click on a small icon next to french onion
+  soup and Change it. For all ideas it should have a Idea notes. It does not
+  need the [Cook · Their words, exactly as said panel]."
+- **Built:** a pencil right after every title (ideas and dictations). The title
+  becomes a field in place; Enter saves, Escape cancels. Every item in Ideas
+  shows **Idea notes** with its own pencil (for an idea: note + link; for a
+  dictation in Ideas: its words). The cook's-words panel only appears once
+  it's in Development, with the hint "When you move this to Development, these
+  notes become the cook's words the AI reads." The big Edit button is gone.
+  In-place Save is the secondary style, so the page's one primary stays the
+  next step.
+- **Verify found:** the title field was much smaller than the title, and long
+  titles were cut off in a one-line box. Now it's the same serif size and wraps
+  (a textarea where Enter saves). Rename ✓, notes ✓, focus returns to the
+  pencil ✓, no cook panel in Ideas ✓.

@@ -366,3 +366,69 @@ export async function moveItem(kind: "idea" | "dictation", id: string, formData:
   if (error) console.error("[moveItem]", error);
   revalidatePath("/", "layout");
 }
+
+// ---------------------------------------------------------------------------
+// In-place edits, one part at a time (pencil icons).
+// For a dictation, its title is dish_name and its notes are the words.
+// ---------------------------------------------------------------------------
+export async function renameItem(
+  kind: "idea" | "dictation",
+  id: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireUser();
+  const title = String(formData.get("title") ?? "").trim().slice(0, 120);
+  const values = { title };
+  if (kind === "idea" && !title) return { values, fieldErrors: { title: "Give it a short name." } };
+
+  const supabase = await supabaseForUser();
+  const { error } =
+    kind === "idea"
+      ? await supabase.from("ideas").update({ title, updated_at: new Date().toISOString() }).eq("id", id)
+      : await supabase.from("dictations").update({ dish_name: title || null }).eq("id", id);
+  if (error) {
+    console.error("[renameItem]", error);
+    return { values, error: "Couldn't save the name. Try again." };
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+export async function updateNotes(
+  kind: "idea" | "dictation",
+  id: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireUser();
+  const supabase = await supabaseForUser();
+
+  if (kind === "idea") {
+    const { note, link, fieldErrors } = readIdea(formData);
+    const values = { note, link: String(formData.get("link") ?? "") };
+    if (fieldErrors.link) return { values, fieldErrors: { link: fieldErrors.link } };
+    const { error } = await supabase
+      .from("ideas")
+      .update({ note, link, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) {
+      console.error("[updateNotes idea]", error);
+      return { values, error: "Couldn't save your notes. What you typed is still here. Try again." };
+    }
+  } else {
+    const transcript = String(formData.get("note") ?? "");
+    const values = { note: transcript };
+    if (!transcript.trim()) return { values, fieldErrors: { note: "Add a few words, or delete this instead." } };
+    if (transcript.length > MAX_TRANSCRIPT) {
+      return { values, fieldErrors: { note: `That's too long (${transcript.length} of ${MAX_TRANSCRIPT} characters).` } };
+    }
+    const { error } = await supabase.from("dictations").update({ transcript }).eq("id", id);
+    if (error) {
+      console.error("[updateNotes dictation]", error);
+      return { values, error: "Couldn't save your notes. What you typed is still here. Try again." };
+    }
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
