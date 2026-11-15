@@ -14,6 +14,10 @@ import { expect, test, type Page } from "@playwright/test";
 
 const SHOTS = "verify/screenshots";
 const TEST_EMAIL = "labbook-tester+clerk_test@example.com";
+// Unique per run, so leftovers from a failed run never match this run's checks.
+const RUN = new Date().toISOString().slice(5, 16).replace("T", " ");
+const IDEA = `Caramelized onion crunch (verify ${RUN})`;
+const DISH = `Yogurt (verify ${RUN})`;
 const YOGURT =
   "Yogurt is a very simple dish you need about 1/2 gallon jug of milk and then one of these small 10 in yogurt container that is not flavored at all uh you heat up the milk make sure it doesn't boil uh just until it steams a little bit and then from there you add 1/3 a cup of sugar maybe less if you like it less sweet and then you mix in the yogurt with the milk you stir it into everything blends and then you put it into these little jars and then you put all these little jars into this incubator and you let it sit for about 8 hours if you don't like it too tangy but I like it at 12 hours super tangy and then from there you can either keep it in the fridge or freeze it and then serve";
 
@@ -75,6 +79,19 @@ async function check(page: Page, name: string, opts: { keyboard?: boolean } = {}
   report.push("");
 }
 
+
+/** Wait for an AI step to finish, or fail fast if the app shows its error state. */
+async function waitForAi(page: Page, done: () => Promise<unknown>) {
+  const alert = page.locator("main [role=alert]").filter({ visible: true });
+  const result = await Promise.race([
+    done().then(() => "done" as const),
+    alert.waitFor({ timeout: 4 * 60_000 }).then(() => "error" as const),
+  ]);
+  if (result === "error") {
+    throw new Error(`App showed its AI error state: "${(await alert.innerText()).trim()}" (likely the Gemini free-tier rate limit).`);
+  }
+}
+
 test.beforeAll(async () => {
   mkdirSync(SHOTS, { recursive: true });
   await clerkSetup();
@@ -126,6 +143,42 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await expect(page.getByRole("heading", { name: "Your lab book" })).toBeVisible();
   await check(page, "home", { keyboard: true });
 
+  // ---- Ideas: create, validate, move, delete ----
+  await page.getByRole("link", { name: "New idea" }).click();
+  await page.waitForURL(/\/ideas\/new/);
+  await page.getByRole("button", { name: "Save idea" }).click();
+  await expect(page.getByText(/Give the idea a short name/)).toBeVisible();
+  await page.getByLabel("Idea", { exact: true }).fill(IDEA);
+  await page.getByLabel(/Note/).fill("Had it on pho. Crunchy and sweet. Try drying in a low oven?");
+  await page.getByLabel(/Link/).fill("javascript:alert(1)");
+  await page.getByRole("button", { name: "Save idea" }).click();
+  await expect(page.getByText(/doesn't look like a web link/)).toBeVisible();
+  await check(page, "idea-new-errors", { keyboard: true });
+  await page.getByLabel(/Link/).fill("example.com/onions");
+  await page.getByRole("button", { name: "Save idea" }).click();
+  await page.waitForURL(/\/i\//);
+  const ideaUrl = page.url();
+  await expect(page.getByRole("link", { name: /example\.com\/onions/ })).toBeVisible();
+  await check(page, "idea", { keyboard: true });
+
+  await page.goto("/?tab=ideas");
+  const ideaRow = page.getByRole("listitem").filter({ hasText: IDEA, visible: true });
+  await expect(ideaRow).toBeVisible();
+  await check(page, "home-ideas-with-idea");
+  await ideaRow.getByRole("button", { name: "Development" }).click();
+  await expect(ideaRow).toHaveCount(0); // it leaves the Ideas tab once moved
+  await page.goto("/?tab=development");
+  await expect(page.getByRole("listitem").filter({ hasText: IDEA, visible: true })).toBeVisible();
+  await check(page, "home-development-moved-idea");
+
+  await page.goto(ideaUrl);
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Delete this idea" }).click();
+  await page.waitForURL(/tab=ideas/);
+  // Scope to <main>: Next keeps hidden copies of past pages, and its screen-reader
+  // route announcer still holds the old title.
+  await expect(page.locator("main").getByText(IDEA).filter({ visible: true })).toHaveCount(0);
+
   // ---- Capture ----
   await page.getByRole("link", { name: "New dictation" }).first().click();
   await page.getByRole("button", { name: /Save their words/ }).click();
@@ -133,23 +186,23 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await check(page, "new-empty-error", { keyboard: true });
 
   await page.getByLabel("The cook's words").fill(YOGURT);
-  await page.getByLabel(/Dish name/).fill("Yogurt (verify run)");
+  await page.getByLabel(/Dish name/).fill(DISH);
   await page.getByLabel(/Whose words/).fill("Grandma");
   await page.getByRole("button", { name: /Save their words/ }).click();
   await page.waitForURL(/\/d\//);
   await check(page, "dictation", { keyboard: true });
 
   await page.goto("/?tab=ideas");
-  await expect(page.getByText("Yogurt (verify run)").first()).toBeVisible();
+  await expect(page.getByText(DISH).first()).toBeVisible();
   await check(page, "home-ideas-tab");
-  await page.getByText("Yogurt (verify run)").first().click();
+  await page.getByText(DISH).first().click();
   await page.waitForURL(/\/d\//);
 
   // ---- Create recipe (pass 1) ----
   await page.getByRole("button", { name: "Create recipe" }).click();
   await expect(page.getByRole("status")).toBeVisible();
   await check(page, "creating-loading");
-  await page.waitForURL(/\/r\//, { timeout: 4 * 60_000 });
+  await waitForAi(page, () => page.waitForURL(/\/r\//, { timeout: 4 * 60_000 }));
   const recipeUrl = page.url();
   await expect(page.getByRole("heading", { name: /questions/i })).toBeVisible();
   await check(page, "questions", { keyboard: true });
@@ -166,7 +219,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.getByRole("button", { name: /Make the recipe/ }).click();
   await expect(page.getByRole("status")).toBeVisible();
   await check(page, "finishing-loading");
-  await expect(page.getByRole("heading", { name: "Ingredients" })).toBeVisible({ timeout: 4 * 60_000 });
+  await waitForAi(page, () =>
+    page.getByRole("heading", { name: "Ingredients" }).waitFor({ timeout: 4 * 60_000 })
+  );
   await check(page, "recipe-finished", { keyboard: true });
 
   // ---- Send ----
@@ -187,6 +242,16 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await sp.reload();
   await expect(sp.getByRole("heading", { name: /isn.t shared anymore/ })).toBeVisible();
   await stranger.close();
+
+  // ---- Move a finished recipe back to Development and back again ----
+  await page.goto(recipeUrl);
+  await page.getByRole("button", { name: "Development" }).click();
+  await expect(page.getByRole("button", { name: "Finished" })).toBeVisible(); // now offers "Finished"
+  await expect(page.getByRole("button", { name: "Development" })).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator("main").getByRole("link", { name: "Development" })).toBeVisible(); // breadcrumb follows the move
+  await page.getByRole("button", { name: "Finished" }).click();
+  await expect(page.getByRole("button", { name: "Development" })).toBeVisible();
 
   await page.goto("/?tab=finished");
   await check(page, "home-finished-tab");

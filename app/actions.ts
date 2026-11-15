@@ -13,7 +13,14 @@ import { redirect } from "next/navigation";
 import { draftRecipe, finalizeRecipe, ModelError, RateLimitError } from "@/lib/ai/pipeline";
 import type { Answer, AnswerSource } from "@/lib/ai/schema";
 import { supabaseForUser } from "@/lib/supabase/server";
-import { toQuestion, type ActionState, type DictationRow, type QuestionRow, type RecipeRow } from "@/lib/types";
+import {
+  isStage,
+  toQuestion,
+  type ActionState,
+  type DictationRow,
+  type QuestionRow,
+  type RecipeRow,
+} from "@/lib/types";
 
 const MAX_TRANSCRIPT = 20000;
 
@@ -123,6 +130,8 @@ export async function createRecipe(dictationId: string, _prev: ActionState): Pro
     );
     if (qErr) console.error("[createRecipe questions]", qErr);
   }
+  // Working on it now: move it to Development (the user can move it back).
+  await supabase.from("dictations").update({ stage: "development" }).eq("id", dictationId);
 
   revalidatePath("/");
   redirect(`/r/${recipe.id}`);
@@ -199,6 +208,7 @@ export async function submitAnswers(recipeId: string, _prev: ActionState, formDa
     console.error("[submitAnswers finalize]", error, userId);
     return { values, error: "Couldn't save the recipe. Your answers are saved. Try again." };
   }
+  await supabase.from("dictations").update({ stage: "finished" }).eq("id", recipe.dictation_id);
 
   revalidatePath(`/r/${recipeId}`);
   revalidatePath("/");
@@ -246,4 +256,86 @@ export async function deleteDictation(dictationId: string): Promise<void> {
   if (error) console.error("[deleteDictation]", error);
   revalidatePath("/");
   redirect("/");
+}
+
+// ---------------------------------------------------------------------------
+// Ideas: quick notes and links. No AI.
+// ---------------------------------------------------------------------------
+function readIdea(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim().slice(0, 120);
+  const note = String(formData.get("note") ?? "").slice(0, 5000);
+  const rawLink = String(formData.get("link") ?? "").trim();
+  const values = { title, note, link: rawLink };
+  const fieldErrors: Record<string, string> = {};
+  if (!title) fieldErrors.title = "Give the idea a short name, like “Caramelized onion crunch”.";
+  let link: string | null = null;
+  if (rawLink) {
+    try {
+      const u = new URL(/^https?:\/\//i.test(rawLink) ? rawLink : `https://${rawLink}`);
+      if (u.protocol !== "http:" && u.protocol !== "https:") throw new Error("protocol");
+      link = u.toString().slice(0, 2000);
+    } catch {
+      fieldErrors.link = "That doesn't look like a web link. Paste the full address, like https://…";
+    }
+  }
+  return { title, note, link, values, fieldErrors };
+}
+
+export async function createIdea(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser();
+  const { title, note, link, values, fieldErrors } = readIdea(formData);
+  if (Object.keys(fieldErrors).length) return { values, fieldErrors };
+
+  const supabase = await supabaseForUser();
+  const { data, error } = await supabase.from("ideas").insert({ title, note, link }).select("id").single();
+  if (error || !data) {
+    console.error("[createIdea]", error);
+    return { values, error: "Couldn't save the idea. What you typed is still here. Try again." };
+  }
+  revalidatePath("/");
+  redirect(`/i/${data.id}`);
+}
+
+export async function updateIdea(ideaId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser();
+  const { title, note, link, values, fieldErrors } = readIdea(formData);
+  if (Object.keys(fieldErrors).length) return { values, fieldErrors };
+
+  const supabase = await supabaseForUser();
+  const { error } = await supabase
+    .from("ideas")
+    .update({ title, note, link, updated_at: new Date().toISOString() })
+    .eq("id", ideaId);
+  if (error) {
+    console.error("[updateIdea]", error);
+    return { values, error: "Couldn't save your changes. Try again." };
+  }
+  revalidatePath(`/i/${ideaId}`);
+  revalidatePath("/");
+  return { values, saved: true };
+}
+
+export async function deleteIdea(ideaId: string): Promise<void> {
+  await requireUser();
+  const supabase = await supabaseForUser();
+  const { error } = await supabase.from("ideas").delete().eq("id", ideaId);
+  if (error) console.error("[deleteIdea]", error);
+  revalidatePath("/");
+  redirect("/?tab=ideas");
+}
+
+// ---------------------------------------------------------------------------
+// Move anything between Ideas / Development / Finished.
+// ---------------------------------------------------------------------------
+export async function moveItem(kind: "idea" | "dictation", id: string, formData: FormData): Promise<void> {
+  await requireUser();
+  const stage = formData.get("stage");
+  if (!isStage(stage)) return;
+  const supabase = await supabaseForUser();
+  const { error } = await supabase
+    .from(kind === "idea" ? "ideas" : "dictations")
+    .update({ stage })
+    .eq("id", id);
+  if (error) console.error("[moveItem]", error);
+  revalidatePath("/", "layout");
 }

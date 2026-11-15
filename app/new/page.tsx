@@ -2,7 +2,8 @@ import { NewDictationForm } from "./NewDictationForm";
 
 export const metadata = { title: "New dictation · Culinary Lab Book" };
 
-export default function NewDictationPage() {
+export default async function NewDictationPage({ searchParams }: PageProps<"/new">) {
+  const { dish } = await searchParams;
   return (
     <main className="space-y-8">
       <div className="space-y-3">
@@ -12,7 +13,7 @@ export default function NewDictationPage() {
           are saved exactly as they are.
         </p>
       </div>
-      <NewDictationForm />
+      <NewDictationForm defaultDish={typeof dish === "string" ? dish.slice(0, 120) : ""} />
     </main>
   );
 }

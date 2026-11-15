@@ -8,6 +8,8 @@ import { eyebrow, focusRing, SourceBadge, textLink, Transcript } from "@/compone
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
 import { QuestionsForm } from "./QuestionsForm";
+import { MoveTo } from "@/components/MoveTo";
+import { STAGE_LABEL } from "@/lib/types";
 import { SharePanel } from "./SharePanel";
 
 // Pass 2 can take a while on the free tier.
@@ -31,8 +33,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       <main className="space-y-8">
         <div className="space-y-3">
           <p className={eyebrow}>
-            <Link href="/?tab=development" className={textLink}>
-              Development
+            <Link href={`/?tab=${dictation.stage}`} className={textLink}>
+              {STAGE_LABEL[dictation.stage]}
             </Link>{" "}
             / {dictation.dish_name || recipe.draft?.title || "Recipe"}
           </p>
@@ -56,8 +58,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
   return (
     <main className="space-y-10">
       <p className={eyebrow}>
-        <Link href="/?tab=finished" className={textLink}>
-          Finished
+        <Link href={`/?tab=${dictation.stage}`} className={textLink}>
+          {STAGE_LABEL[dictation.stage]}
         </Link>{" "}
         / {recipe.recipe.title}
         {recipe.copied_from ? " · saved from a link" : ""}
@@ -93,6 +95,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       )}
 
       <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
+
+      <MoveTo kind="dictation" id={dictation.id} current={dictation.stage} />
 
       <form action={deleteDictation.bind(null, dictation.id)} className="border-t border-ls-border pt-4">
         <ConfirmSubmit

@@ -3,54 +3,51 @@ import { auth } from "@clerk/nextjs/server";
 import { SignUpButton } from "@clerk/nextjs";
 import { supabaseForUser } from "@/lib/supabase/server";
 import { Button, ErrorNote, eyebrow, focusRing, formatDate, LinkButton } from "@/components/ui";
-import type { DictationRow, RecipeStatus } from "@/lib/types";
+import { MoveTo } from "@/components/MoveTo";
+import type { DictationRow, IdeaRow, RecipeStatus } from "@/lib/types";
 
 type Row = DictationRow & { recipes: { id: string; status: RecipeStatus; recipe: { title?: string } | null }[] };
+type Item = { kind: "dictation"; d: Row; at: string } | { kind: "idea"; idea: IdeaRow; at: string };
 
 // Draft wording: for the student to review.
 const TABS = {
   ideas: {
     label: "Ideas",
-    blurb: "Words you've saved but haven't turned into a recipe yet.",
-    empty: "No ideas waiting. Save a cook's words with “New dictation”, and they'll wait here until you're ready.",
+    blurb: "Notes, links, and saved words to come back to.",
+    empty: "Nothing here yet. Jot down an idea, or save a cook's words with “New dictation”.",
   },
   development: {
     label: "Development",
-    blurb: "Recipes you're working out: the app has questions for you.",
-    empty: "Nothing in development. Open an idea and tap “Create recipe” to start one.",
+    blurb: "Recipes you're working on.",
+    empty: "Nothing in development. Move an idea here, or open saved words and tap “Create recipe”.",
   },
   finished: {
     label: "Finished",
     blurb: "Recipes ready to cook and send.",
-    empty: "No finished recipes yet. Answer the questions on a recipe in Development to finish it.",
+    empty: "No finished recipes yet. Answer a recipe's questions to finish it, or move something here.",
   },
 } as const;
 type Tab = keyof typeof TABS;
 
-function tabOf(d: Row): Tab {
-  const r = d.recipes[0];
-  if (!r) return "ideas";
-  if (r.status === "ready") return "finished";
-  return "development";
-}
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const { userId } = await auth();
   if (!userId) return <Landing />;
 
   const supabase = await supabaseForUser();
-  const [{ tab: tabParam }, { data, error }] = await Promise.all([
+  const [{ tab: tabParam }, dictations, ideas] = await Promise.all([
     searchParams,
-    supabase
-      .from("dictations")
-      .select("*, recipes(id, status, recipe)")
-      .order("created_at", { ascending: false })
-      .returns<Row[]>(),
+    supabase.from("dictations").select("*, recipes(id, status, recipe)").returns<Row[]>(),
+    supabase.from("ideas").select("*").returns<IdeaRow[]>(),
   ]);
+  const error = dictations.error || ideas.error;
 
-  const rows = data ?? [];
-  const byTab: Record<Tab, Row[]> = { ideas: [], development: [], finished: [] };
-  for (const d of rows) byTab[tabOf(d)].push(d);
+  const rows: Item[] = [
+    ...(dictations.data ?? []).map((d) => ({ kind: "dictation" as const, d, at: d.created_at })),
+    ...(ideas.data ?? []).map((idea) => ({ kind: "idea" as const, idea, at: idea.created_at })),
+  ].sort((a, b) => b.at.localeCompare(a.at));
+  const byTab: Record<Tab, Item[]> = { ideas: [], development: [], finished: [] };
+  for (const item of rows) byTab[item.kind === "idea" ? item.idea.stage : item.d.stage].push(item);
 
   // Explicit ?tab= wins; otherwise open where the work is.
   const tab: Tab =
@@ -68,7 +65,12 @@ export default async function Home({ searchParams }: PageProps<"/">) {
     <main className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-ls-serif text-5xl leading-none">Your lab book</h1>
-        <LinkButton href="/new">New dictation</LinkButton>
+        <div className="flex flex-wrap gap-3">
+          <LinkButton href="/ideas/new" variant="secondary">
+            New idea
+          </LinkButton>
+          <LinkButton href="/new">New dictation</LinkButton>
+        </div>
       </div>
 
       {error && <ErrorNote>We couldn&apos;t load your lab book. Refresh the page to try again.</ErrorNote>}
@@ -107,9 +109,13 @@ export default async function Home({ searchParams }: PageProps<"/">) {
             <p className="border border-dashed border-ls-border p-6 text-[15px] text-ls-muted">{TABS[tab].empty}</p>
           ) : (
             <ul className="divide-y divide-ls-border border-y border-ls-ink">
-              {items.map((d) => (
-                <EntryCard key={d.id} d={d} />
-              ))}
+              {items.map((item) =>
+                item.kind === "idea" ? (
+                  <IdeaCard key={item.idea.id} idea={item.idea} />
+                ) : (
+                  <EntryCard key={item.d.id} d={item.d} />
+                )
+              )}
             </ul>
           )}
         </>
@@ -124,10 +130,10 @@ function EntryCard({ d }: { d: Row }) {
   const href = r ? `/r/${r.id}` : `/d/${d.id}`;
   const next = !r ? "Create recipe" : r.status === "ready" ? null : "Answer questions";
   return (
-    <li>
+    <li className="pb-1">
       <Link
         href={href}
-        className={`group block px-1 py-4 transition-colors hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
+        className={`group block px-1 pt-4 pb-1 transition-colors hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 space-y-1">
@@ -146,6 +152,32 @@ function EntryCard({ d }: { d: Row }) {
         </div>
         <p className="mt-2 line-clamp-2 text-[15px] text-ls-muted">{d.transcript}</p>
       </Link>
+      <div className="px-1">
+        <MoveTo kind="dictation" id={d.id} current={d.stage} />
+      </div>
+    </li>
+  );
+}
+
+function IdeaCard({ idea }: { idea: IdeaRow }) {
+  return (
+    <li className="pb-1">
+      <Link
+        href={`/i/${idea.id}`}
+        className={`group block px-1 pt-4 pb-1 transition-colors hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
+      >
+        <div className="min-w-0 space-y-1">
+          <p className="truncate font-ls-serif text-2xl leading-tight">{idea.title}</p>
+          <p className={eyebrow}>
+            Idea · {formatDate(idea.created_at)}
+            {idea.link ? " · has a link" : ""}
+          </p>
+        </div>
+        {idea.note && <p className="mt-2 line-clamp-2 text-[15px] text-ls-muted">{idea.note}</p>}
+      </Link>
+      <div className="px-1">
+        <MoveTo kind="idea" id={idea.id} current={idea.stage} />
+      </div>
     </li>
   );
 }

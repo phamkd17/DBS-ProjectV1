@@ -256,3 +256,29 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   recipe and checks that it's gone.
 - Next's floating dev badge covered the Delete button at 390px (dev only),
   so the badge is now off (`devIndicators: false`).
+
+## Nov 15 — Ideas you can create, and Move to
+
+### B26. New ideas + moving between tabs
+- **Student:** "Can you add a way for me to create new ideas a move them between
+  ideas, development and finished."
+- **Built:** "New idea" (title, optional note, optional link; photos still v2)
+  → idea page (note, link opens in a new tab, "Add the cook's words" starts a
+  dictation with the dish name filled in, Edit, Delete). A **Move to** row on
+  every item (list, dictation page, recipe page). Creating a recipe moves it to
+  Development and finishing moves it to Finished automatically; the user can
+  move anything afterwards. Moving only reorganizes and never deletes anything.
+- **Database** (`20261115000000_ideas_and_stages.sql`): `ideas` table with
+  owner-only RLS; links must be http(s) (a check constraint, plus server
+  validation); `dictations.stage`, where owners may update **only** `stage`
+  (column grant). Her words stay blocked by the grant + trigger. Copies saved
+  from a link land in Finished. Tested: owner moves ✓, transcript edit
+  blocked ✓, `javascript:` link rejected ✓, another user sees/moves 0 ✓.
+- **Verify found:** Move gave no feedback (now shows "Moving to …"). Other
+  failures were test issues: Next keeps hidden copies of past pages, and its
+  screen-reader route announcer still holds the old title, so checks now count
+  only visible text inside `<main>`.
+- **Hit the Gemini free-tier rate limit** after many verify runs. The app
+  showed its designed state ("The recipe helper is busy right now. Try again in
+  a minute.") with Try again. Verify now fails fast with that message instead
+  of waiting 4 minutes.

@@ -7,9 +7,9 @@ import type { ActionState } from "@/lib/types";
 
 const FIELD = fieldClass;
 
-export function NewDictationForm() {
+export function NewDictationForm({ defaultDish = "" }: { defaultDish?: string }) {
   const [state, action, pending] = useActionState<ActionState, FormData>(createDictation, {});
-  const v = state.values ?? {};
+  const v = state.values ?? { dish_name: defaultDish };
   const err = state.fieldErrors ?? {};
 
   return (

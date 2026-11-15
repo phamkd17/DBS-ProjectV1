@@ -6,6 +6,8 @@ import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow } from "@/lib/types";
 import { CreateRecipe } from "./CreateRecipe";
+import { MoveTo } from "@/components/MoveTo";
+import { STAGE_LABEL } from "@/lib/types";
 
 // Gemini can take a while on the free tier.
 export const maxDuration = 300;
@@ -31,8 +33,8 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
     <main className="space-y-8">
       <div className="space-y-3">
         <p className={eyebrow}>
-          <Link href="/?tab=ideas" className={textLink}>
-            Ideas
+          <Link href={`/?tab=${d.stage}`} className={textLink}>
+            {STAGE_LABEL[d.stage]}
           </Link>
         </p>
         <h1 className="font-ls-serif text-5xl leading-none">{d.dish_name || "Untitled dictation"}</h1>
@@ -44,6 +46,8 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
       <Transcript text={d.transcript} cookName={d.cook_name} open />
 
       <CreateRecipe dictationId={d.id} />
+
+      <MoveTo kind="dictation" id={d.id} current={d.stage} />
 
       <form action={deleteDictation.bind(null, d.id)} className="border-t border-ls-border pt-4">
         <ConfirmSubmit variant="danger" message="Delete these words and any recipe made from them? This can't be undone.">
