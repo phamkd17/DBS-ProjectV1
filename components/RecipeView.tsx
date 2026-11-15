@@ -3,7 +3,8 @@ import { eyebrow, SourceBadge, Transcript } from "./ui";
 
 type Props = {
   recipe: Recipe;
-  transcript: string;
+  /** Omit to render the words elsewhere (e.g. the owner's editable copy). */
+  transcript?: string;
   cookName?: string | null;
   original?: string | null;
   editedAt?: string | null;
@@ -122,9 +123,11 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt }:
         </section>
       )}
 
-      <section aria-label="Original dictation">
-        <Transcript text={transcript} cookName={cookName} original={original} editedAt={editedAt} />
-      </section>
+      {transcript !== undefined && (
+        <section aria-label="Original dictation">
+          <Transcript text={transcript} cookName={cookName} original={original} editedAt={editedAt} />
+        </section>
+      )}
     </article>
   );
 }

@@ -350,3 +350,18 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   *loading skeleton* (a false pass), so it now waits for the panel. A
   duplicate "Move to: Development" link sat under the big button and was hidden
   (Simplicity). 0 Gemini calls per run.
+
+### B32. Edit in place, no separate page
+- **Student:** "I want to be able to edit the title and description and cooks
+  word all in the same page ... I don't want to click on the edit idea and open
+  up a whole new page."
+- **Built:** an **Edit** button turns the idea (title, note, link) or the
+  dictation (cook's words, dish name, whose words) into fields **in the same
+  spot**. Save changes / Cancel return to the view on the same URL, and focus
+  goes back to Edit. The recipe page has "Edit their words" in place too. The
+  separate `/edit` pages were removed.
+- **Verify found:** the breadcrumb overlapped the edit box (a negative-margin
+  spacing trick), and while editing there were two red buttons (Save + "Add the
+  cook's words" or "Create recipe with AI"). Fixed: the next-step panel hides
+  while editing, so Save is the only primary action. In-place save ✓, focus
+  returns ✓, URL unchanged ✓.

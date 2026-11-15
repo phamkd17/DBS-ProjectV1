@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { RecipeView } from "@/components/RecipeView";
-import { eyebrow, focusRing, formatDate, LinkButton, SourceBadge, textLink, Transcript } from "@/components/ui";
+import { DictationEditor } from "@/components/DictationEditor";
+import { eyebrow, focusRing, formatDate, SourceBadge, textLink } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
 import { QuestionsForm } from "./QuestionsForm";
@@ -44,12 +45,7 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
             words. Answer what you know.
           </p>
         </div>
-        <Transcript
-          text={dictation.transcript}
-          cookName={dictation.cook_name}
-          original={dictation.original_transcript}
-          editedAt={dictation.edited_at}
-        />
+        <DictationEditor dictation={dictation} />
         <QuestionsForm recipeId={recipe.id} questions={questions ?? []} cookName={dictation.cook_name} />
       </main>
     );
@@ -77,17 +73,11 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
         </p>
       )}
 
-      <RecipeView
-        recipe={recipe.recipe}
-        transcript={dictation.transcript}
-        cookName={dictation.cook_name}
-        original={dictation.original_transcript}
-        editedAt={dictation.edited_at}
-      />
+      <RecipeView recipe={recipe.recipe} cookName={dictation.cook_name} />
 
-      <LinkButton href={`/d/${dictation.id}/edit`} variant="secondary">
-        Edit their words
-      </LinkButton>
+      <section aria-label="Original dictation" className="space-y-3">
+        <DictationEditor dictation={dictation} />
+      </section>
 
       {answered.length > 0 && (
         <details className="border border-ls-border bg-ls-surface">

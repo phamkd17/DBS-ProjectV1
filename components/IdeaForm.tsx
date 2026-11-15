@@ -3,13 +3,24 @@
 import { useActionState } from "react";
 import { createIdea, updateIdea } from "@/app/actions";
 import type { ActionState, IdeaRow } from "@/lib/types";
-import Link from "next/link";
 import { Button, ErrorNote, eyebrow, fieldClass, Spinner, textLink } from "./ui";
 
 /** New idea, or edit an existing one. One column; errors sit under their field. */
-export function IdeaForm({ idea }: { idea?: Pick<IdeaRow, "id" | "title" | "note" | "link"> }) {
-  const action = idea ? updateIdea.bind(null, idea.id) : createIdea;
-  const [state, formAction, pending] = useActionState<ActionState, FormData>(action, {});
+export function IdeaForm({
+  idea,
+  onSaved,
+  onCancel,
+}: {
+  idea?: Pick<IdeaRow, "id" | "title" | "note" | "link">;
+  onSaved?: () => void;
+  onCancel?: () => void;
+}) {
+  const base = idea ? updateIdea.bind(null, idea.id) : createIdea;
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(async (prev, fd) => {
+    const result = await base(prev, fd);
+    if (result.saved) onSaved?.();
+    return result;
+  }, {});
   const v = state.values ?? { title: idea?.title ?? "", note: idea?.note ?? "", link: idea?.link ?? "" };
   const err = state.fieldErrors ?? {};
 
@@ -22,6 +33,7 @@ export function IdeaForm({ idea }: { idea?: Pick<IdeaRow, "id" | "title" | "note
         <input
           id="title"
           name="title"
+          autoFocus={!!idea}
           maxLength={120}
           defaultValue={v.title}
           aria-invalid={!!err.title}
@@ -80,10 +92,14 @@ export function IdeaForm({ idea }: { idea?: Pick<IdeaRow, "id" | "title" | "note
           {pending && <Spinner />}
           {pending ? "Saving…" : idea ? "Save changes" : "Save idea"}
         </Button>
-        {idea && (
-          <Link href={`/i/${idea.id}`} className={`min-h-11 px-3 py-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className={`min-h-11 cursor-pointer px-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}
+          >
             Cancel
-          </Link>
+          </button>
         )}
       </div>
     </form>

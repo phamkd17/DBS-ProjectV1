@@ -96,15 +96,8 @@ export async function updateDictation(dictationId: string, _prev: ActionState, f
     console.error("[updateDictation]", error);
     return { values, error: "Couldn't save your changes. What you typed is still here. Try again." };
   }
-  const { data: recipe } = await supabase
-    .from("recipes")
-    .select("id")
-    .eq("dictation_id", dictationId)
-    .neq("status", "failed")
-    .limit(1)
-    .maybeSingle();
   revalidatePath("/", "layout");
-  redirect(recipe ? `/r/${recipe.id}` : `/d/${dictationId}`);
+  return { saved: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -345,9 +338,8 @@ export async function updateIdea(ideaId: string, _prev: ActionState, formData: F
     console.error("[updateIdea]", error);
     return { values, error: "Couldn't save your changes. Try again." };
   }
-  revalidatePath(`/i/${ideaId}`);
-  revalidatePath("/");
-  redirect(`/i/${ideaId}`);
+  revalidatePath("/", "layout");
+  return { saved: true };
 }
 
 export async function deleteIdea(ideaId: string): Promise<void> {

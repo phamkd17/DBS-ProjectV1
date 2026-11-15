@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import { createDictation, updateDictation } from "@/app/actions";
 import { Button, ErrorNote, eyebrow, fieldClass, Spinner, textLink } from "@/components/ui";
 import type { ActionState, DictationRow } from "@/lib/types";
@@ -13,16 +12,20 @@ type Editing = Pick<DictationRow, "id" | "transcript" | "dish_name" | "cook_name
 export function NewDictationForm({
   defaultDish = "",
   dictation,
-  backHref,
+  onSaved,
+  onCancel,
 }: {
   defaultDish?: string;
   dictation?: Editing;
-  backHref?: string;
+  onSaved?: () => void;
+  onCancel?: () => void;
 }) {
-  const [state, action, pending] = useActionState<ActionState, FormData>(
-    dictation ? updateDictation.bind(null, dictation.id) : createDictation,
-    {}
-  );
+  const base = dictation ? updateDictation.bind(null, dictation.id) : createDictation;
+  const [state, action, pending] = useActionState<ActionState, FormData>(async (prev, fd) => {
+    const result = await base(prev, fd);
+    if (result.saved) onSaved?.();
+    return result;
+  }, {});
   const v =
     state.values ??
     (dictation
@@ -40,6 +43,7 @@ export function NewDictationForm({
           id="transcript"
           name="transcript"
           rows={12}
+          autoFocus={!!dictation}
           defaultValue={v.transcript}
           aria-invalid={!!err.transcript}
           aria-describedby={err.transcript ? "transcript-error" : "transcript-hint"}
@@ -88,13 +92,14 @@ export function NewDictationForm({
         {pending && <Spinner />}
         {pending ? "Saving…" : dictation ? "Save changes" : "Save their words"}
       </Button>
-      {dictation && backHref && (
-        <Link
-          href={backHref}
-          className={`ml-2 inline-flex min-h-11 items-center px-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}
+      {onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          className={`ml-2 inline-flex min-h-11 cursor-pointer items-center px-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}
         >
           Cancel
-        </Link>
+        </button>
       )}
     </form>
   );

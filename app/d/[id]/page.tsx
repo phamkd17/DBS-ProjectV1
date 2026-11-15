@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
-import { eyebrow, formatDate, LinkButton, textLink, Transcript } from "@/components/ui";
+import { DictationEditor } from "@/components/DictationEditor";
+import { eyebrow, textLink } from "@/components/ui";
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
@@ -38,21 +39,11 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
             {STAGE_LABEL[d.stage]}
           </Link>
         </p>
-        <h1 className="font-ls-serif text-5xl leading-none">{d.dish_name || "Untitled dictation"}</h1>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className={eyebrow}>
-            {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
-          </p>
-          <LinkButton href={`/d/${d.id}/edit`} variant="secondary">
-            Edit their words
-          </LinkButton>
-        </div>
+        <DictationEditor dictation={d} withHeading open>
+          {/* The AI recipe step only appears in Development. */}
+          {d.stage === "development" ? <CreateRecipe dictationId={d.id} /> : <StartDeveloping dictationId={d.id} />}
+        </DictationEditor>
       </div>
-
-      <Transcript text={d.transcript} cookName={d.cook_name} original={d.original_transcript} editedAt={d.edited_at} open />
-
-      {/* The AI recipe step only appears in Development. */}
-      {d.stage === "development" ? <CreateRecipe dictationId={d.id} /> : <StartDeveloping dictationId={d.id} />}
 
       <MoveTo kind="dictation" id={d.id} current={d.stage} hide={d.stage === "development" ? [] : ["development"]} />
 

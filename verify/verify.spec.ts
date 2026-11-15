@@ -175,15 +175,16 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await expect(page.getByRole("link", { name: /example\.com\/onions/ })).toBeVisible();
   await check(page, "idea", { keyboard: true });
 
-  await page.getByRole("link", { name: "Edit idea" }).click();
-  await page.waitForURL(/\/edit$/);
+  // Edit in place: same page, no navigation.
   // Next keeps hidden copies of earlier pages (e.g. the New idea form), so act on the visible <main>.
   const view = page.locator("main").filter({ visible: true });
+  await view.getByRole("button", { name: "Edit", exact: true }).click();
   await view.getByLabel(/Note/).fill("Had it on pho. Crunchy and sweet. Dry at 200°F for 2 hours?");
-  await check(page, "idea-edit", { keyboard: true });
+  await check(page, "idea-edit-in-place", { keyboard: true });
   await view.getByRole("button", { name: "Save changes" }).click();
-  await page.waitForURL((u) => /\/i\/[^/]+$/.test(u.pathname));
-  await expect(page.locator("main").getByText(/Dry at 200°F/)).toBeVisible();
+  await expect(view.getByText(/Dry at 200°F/)).toBeVisible();
+  await expect(view.getByRole("button", { name: "Edit", exact: true })).toBeFocused(); // focus returns
+  expect(page.url()).toBe(ideaUrl);
 
   await page.goto("/?tab=ideas");
   const ideaRow = page.getByRole("listitem").filter({ hasText: IDEA, visible: true });
@@ -294,12 +295,11 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
 
   // ---- Edit their words after the recipe exists (no AI call) ----
   await page.goto(recipeUrl);
-  await view.getByRole("link", { name: "Edit their words" }).click();
-  await page.waitForURL(/\/d\/[^/]+\/edit$/);
+  await view.getByRole("button", { name: "Edit their words" }).click();
   await view.getByLabel("The cook's words").fill(`${YOGURT} oh and let the milk cool down first`);
-  await check(page, "dictation-edit", { keyboard: true });
+  await check(page, "recipe-words-edit-in-place", { keyboard: true });
   await view.getByRole("button", { name: "Save changes" }).click();
-  await page.waitForURL((u) => u.pathname === new URL(recipeUrl).pathname);
+  expect(new URL(page.url()).pathname).toBe(new URL(recipeUrl).pathname);
   await expect(view.getByText(/after this recipe was made/)).toBeVisible();
   await expect(view.getByText(/Their words · edited/)).toBeVisible();
   await view.getByText(/Their words · edited/).click(); // open the transcript
