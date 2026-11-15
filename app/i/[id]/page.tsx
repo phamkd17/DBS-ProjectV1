@@ -2,9 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteIdea } from "@/app/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
-import { IdeaForm } from "@/components/IdeaForm";
 import { MoveTo } from "@/components/MoveTo";
-import { eyebrow, focusRing, formatDate, LinkButton, textLink } from "@/components/ui";
+import { eyebrow, formatDate, LinkButton, textLink } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import { STAGE_LABEL, type IdeaRow } from "@/lib/types";
 
@@ -25,7 +24,15 @@ export default async function IdeaPage({ params }: PageProps<"/i/[id]">) {
           / Idea
         </p>
         <h1 className="font-ls-serif text-5xl leading-none">{idea.title}</h1>
-        <p className={eyebrow}>Saved {formatDate(idea.created_at)}</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className={eyebrow}>
+            Saved {formatDate(idea.created_at)}
+            {idea.updated_at > idea.created_at ? ` · edited ${formatDate(idea.updated_at)}` : ""}
+          </p>
+          <LinkButton href={`/i/${idea.id}/edit`} variant="secondary">
+            Edit idea
+          </LinkButton>
+        </div>
       </div>
 
       {(idea.note || idea.link) && (
@@ -50,16 +57,6 @@ export default async function IdeaPage({ params }: PageProps<"/i/[id]">) {
 
       <MoveTo kind="idea" id={idea.id} current={idea.stage} />
 
-      <details className="border border-ls-border bg-ls-surface">
-        <summary
-          className={`flex min-h-11 cursor-pointer items-center px-4 py-3 text-[15px] hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
-        >
-          Edit idea
-        </summary>
-        <div className="border-t border-ls-border p-4">
-          <IdeaForm idea={idea} />
-        </div>
-      </details>
 
       <form action={deleteIdea.bind(null, idea.id)} className="border-t border-ls-border pt-4">
         <ConfirmSubmit variant="danger" message="Delete this idea? This can't be undone.">

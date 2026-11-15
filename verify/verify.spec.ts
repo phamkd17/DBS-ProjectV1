@@ -175,6 +175,16 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await expect(page.getByRole("link", { name: /example\.com\/onions/ })).toBeVisible();
   await check(page, "idea", { keyboard: true });
 
+  await page.getByRole("link", { name: "Edit idea" }).click();
+  await page.waitForURL(/\/edit$/);
+  // Next keeps hidden copies of earlier pages (e.g. the New idea form), so act on the visible <main>.
+  const view = page.locator("main").filter({ visible: true });
+  await view.getByLabel(/Note/).fill("Had it on pho. Crunchy and sweet. Dry at 200°F for 2 hours?");
+  await check(page, "idea-edit", { keyboard: true });
+  await view.getByRole("button", { name: "Save changes" }).click();
+  await page.waitForURL((u) => /\/i\/[^/]+$/.test(u.pathname));
+  await expect(page.locator("main").getByText(/Dry at 200°F/)).toBeVisible();
+
   await page.goto("/?tab=ideas");
   const ideaRow = page.getByRole("listitem").filter({ hasText: IDEA, visible: true });
   await expect(ideaRow).toBeVisible();
@@ -215,7 +225,13 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.waitForURL(/\/d\//);
 
   // ---- Create recipe (pass 1) ----
-  await page.getByRole("button", { name: "Create recipe" }).click();
+  // The AI step stays off until the user confirms they're ready.
+  const createBtn = page.getByRole("button", { name: "Create recipe with AI" });
+  await expect(createBtn).toBeDisabled();
+  await page.getByLabel(/Their words are complete/).check();
+  await expect(createBtn).toBeEnabled();
+  await check(page, "dictation-ready-to-create", { keyboard: true });
+  await createBtn.click();
   await expect(page.getByRole("status")).toBeVisible();
   await check(page, "creating-loading");
   await waitForAi(page, () => page.waitForURL(/\/r\//, { timeout: 4 * 60_000 }));
@@ -232,7 +248,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await check(page, "questions-suggestion-used");
   const boxes = page.getByPlaceholder("Your answer");
   if ((await boxes.count()) > 1) await boxes.nth(1).fill("Plain Dannon, the small single cup.");
-  await page.getByRole("button", { name: /Make the recipe/ }).click();
+  await page.getByRole("button", { name: /Make the recipe with AI/ }).click();
   await expect(page.getByRole("status")).toBeVisible();
   await check(page, "finishing-loading");
   await waitForAi(page, () =>

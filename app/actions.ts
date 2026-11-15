@@ -312,7 +312,7 @@ export async function updateIdea(ideaId: string, _prev: ActionState, formData: F
   }
   revalidatePath(`/i/${ideaId}`);
   revalidatePath("/");
-  return { values, saved: true };
+  redirect(`/i/${ideaId}`);
 }
 
 export async function deleteIdea(ideaId: string): Promise<void> {

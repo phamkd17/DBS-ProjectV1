@@ -306,3 +306,19 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   button sits left on phones), and the ▾ rendered as a dot. Fixed (left-anchored
   on mobile, an SVG chevron). Keyboard test: Enter opens ✓, Tab reaches Idea ✓,
   Escape closes and returns focus ✓. Page waits now time out at 30 s.
+
+### B29. Edit ideas; make the AI step deliberate
+- **Student:** "Add a way to edit ideas. The crete recipe should be more
+  highlighted because it uses AI to generate the receipe. We do not want to hit
+  that as offten untile we are ready."
+- **Edit ideas:** an "Edit idea" button under the title → `/i/[id]/edit`
+  (same form; Save changes returns to the idea, Cancel goes back). Replaced
+  the folded "Edit idea" box that was easy to miss.
+- **AI step:** Create recipe is its own panel with a **Uses AI** badge (blue
+  tint = from AI, same as "Suggested"), a plain explanation, and a required
+  "Their words are complete. I'm ready." checkbox. The button ("Create recipe
+  with AI") stays disabled until it's ticked. "Make the recipe with AI" on the
+  questions page is marked the same way. The home card hint now says "Words
+  saved" instead of "Create recipe", since tapping it only opens the page.
+- **Verify:** the button is disabled before the tick ✓ and enabled after ✓;
+  edit idea saves and shows the new note ✓; 0 axe violations.

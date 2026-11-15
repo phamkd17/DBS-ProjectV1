@@ -46,6 +46,15 @@ export function SourceBadge({ source, cookName }: { source: Source; cookName?: s
   );
 }
 
+/** Marks anything that calls the AI. Same blue tint as "Suggested": blue = from AI. */
+export function AiBadge({ children = "Uses AI" }: { children?: ReactNode }) {
+  return (
+    <span className="inline-flex shrink-0 items-center bg-src-suggested px-2 py-0.5 font-ls-sans text-[11px] font-medium uppercase leading-4 tracking-[0.16em] text-src-suggested-ink">
+      {children}
+    </span>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Buttons
 // ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { submitAnswers } from "@/app/actions";
-import { Button, ErrorNote, eyebrow, fieldClass, focusRing, SourceBadge } from "@/components/ui";
+import { AiBadge, Button, ErrorNote, eyebrow, fieldClass, focusRing, SourceBadge } from "@/components/ui";
 import { Working } from "@/components/Working";
 import type { ActionState, QuestionRow } from "@/lib/types";
 
@@ -131,9 +131,14 @@ export function QuestionsForm({
 
       {state.error && <ErrorNote>{state.error}</ErrorNote>}
 
-      <Button type="submit" className="w-full sm:w-auto">
-        {state.error ? "Try again" : "Make the recipe"}
-      </Button>
+      <div className="space-y-2">
+        <Button type="submit" className="w-full sm:w-auto">
+          {state.error ? "Try again with AI" : "Make the recipe with AI"}
+        </Button>
+        <p className="flex flex-wrap items-center gap-2 text-[15px] text-ls-muted">
+          <AiBadge /> Uses one AI request, about 15 seconds. Your answers are saved first.
+        </p>
+      </div>
     </form>
   );
 }

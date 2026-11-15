@@ -3,7 +3,8 @@
 import { useActionState } from "react";
 import { createIdea, updateIdea } from "@/app/actions";
 import type { ActionState, IdeaRow } from "@/lib/types";
-import { Button, ErrorNote, eyebrow, fieldClass, Spinner } from "./ui";
+import Link from "next/link";
+import { Button, ErrorNote, eyebrow, fieldClass, Spinner, textLink } from "./ui";
 
 /** New idea, or edit an existing one. One column; errors sit under their field. */
 export function IdeaForm({ idea }: { idea?: Pick<IdeaRow, "id" | "title" | "note" | "link"> }) {
@@ -79,10 +80,10 @@ export function IdeaForm({ idea }: { idea?: Pick<IdeaRow, "id" | "title" | "note
           {pending && <Spinner />}
           {pending ? "Saving…" : idea ? "Save changes" : "Save idea"}
         </Button>
-        {state.saved && !pending && (
-          <p role="status" className="text-[15px] text-ls-success">
-            Saved.
-          </p>
+        {idea && (
+          <Link href={`/i/${idea.id}`} className={`min-h-11 px-3 py-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}>
+            Cancel
+          </Link>
         )}
       </div>
     </form>
