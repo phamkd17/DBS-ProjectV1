@@ -29,6 +29,8 @@ export type DictationRow = {
   dish_name: string | null;
   cook_name: string | null;
   transcript: string;
+  original_transcript: string | null;
+  edited_at: string | null;
   copied_from: string | null;
   created_at: string;
 };
@@ -47,6 +49,7 @@ export type RecipeRow = {
   share_token: string | null;
   copied_from: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type QuestionRow = {

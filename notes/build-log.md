@@ -322,3 +322,19 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   saved" instead of "Create recipe", since tapping it only opens the page.
 - **Verify:** the button is disabled before the tick ✓ and enabled after ✓;
   edit idea saves and shows the new note ✓; 0 axe violations.
+
+### B30. Dictations become editable (product rule changed)
+- **Student** (looking at a dictation): "I don't see edit option."
+- **Options offered:** editable until the AI uses them (recommended) / lock the
+  words, edit names only / always editable.
+- **Student chose:** "Always editable." This replaces the proposal's
+  "her words are never edited."
+- **How it stays honest:** the database keeps the first version
+  (`original_transcript`, shown as "See the original words") and stamps
+  `edited_at` (the client can't forge either). A recipe made before an edit
+  shows "Their words were edited on …, after this recipe was made, so the
+  recipe may not match them anymore." The label reads "Their words · edited
+  <date>" instead of "exactly as said".
+- **Tested:** in the DB, the first version is kept across two edits ✓, forging
+  the original is blocked ✓, another user edits 0 ✓. Verify edits words after
+  the recipe exists: notice ✓, original kept ✓, 0 Gemini calls.

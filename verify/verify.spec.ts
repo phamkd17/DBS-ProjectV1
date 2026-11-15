@@ -285,6 +285,20 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.getByRole("button", { name: "Finished" }).click();
   await expect(page.getByRole("button", { name: "Development" })).toBeVisible();
 
+  // ---- Edit their words after the recipe exists (no AI call) ----
+  await page.goto(recipeUrl);
+  await view.getByRole("link", { name: "Edit their words" }).click();
+  await page.waitForURL(/\/d\/[^/]+\/edit$/);
+  await view.getByLabel("The cook's words").fill(`${YOGURT} oh and let the milk cool down first`);
+  await check(page, "dictation-edit", { keyboard: true });
+  await view.getByRole("button", { name: "Save changes" }).click();
+  await page.waitForURL((u) => u.pathname === new URL(recipeUrl).pathname);
+  await expect(view.getByText(/after this recipe was made/)).toBeVisible();
+  await expect(view.getByText(/Their words · edited/)).toBeVisible();
+  await view.getByText(/Their words · edited/).click(); // open the transcript
+  await expect(view.getByText("See the original words")).toBeVisible();
+  await check(page, "recipe-after-edit");
+
   await page.goto("/?tab=finished");
   await check(page, "home-finished-tab");
 

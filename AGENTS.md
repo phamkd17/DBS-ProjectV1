@@ -39,8 +39,11 @@ own lab book.
 
 ## Product rules (non-negotiable)
 
-1. **Her words are never edited.** Transcripts are stored verbatim, errors
-   included. Corrections happen only in the generated recipe.
+1. **Her words are kept honestly.** Changed by the student on Nov 15 ("Always
+   editable"): dictations can be edited, but the database keeps the first
+   version (`original_transcript`, shown as "See the original words") and stamps
+   `edited_at`. A recipe made before an edit is flagged as possibly out of date.
+   The AI's corrections still happen only in the generated recipe.
 2. **Ask, don't guess.** Unrecoverable amounts, contradictions, missing steps,
    and ambiguous dictation become questions.
 3. **Unknown → suggestion.** If no one knows, offer a suggestion the user

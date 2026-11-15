@@ -5,10 +5,12 @@ type Props = {
   recipe: Recipe;
   transcript: string;
   cookName?: string | null;
+  original?: string | null;
+  editedAt?: string | null;
 };
 
 /** The finished recipe: ingredients, steps, the why labeled by source, and her words. */
-export function RecipeView({ recipe, transcript, cookName }: Props) {
+export function RecipeView({ recipe, transcript, cookName, original, editedAt }: Props) {
   return (
     <article className="space-y-10">
       <header className="space-y-4">
@@ -121,7 +123,7 @@ export function RecipeView({ recipe, transcript, cookName }: Props) {
       )}
 
       <section aria-label="Original dictation">
-        <Transcript text={transcript} cookName={cookName} />
+        <Transcript text={transcript} cookName={cookName} original={original} editedAt={editedAt} />
       </section>
     </article>
   );

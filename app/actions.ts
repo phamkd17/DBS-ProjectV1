@@ -76,6 +76,37 @@ export async function createDictation(_prev: ActionState, formData: FormData): P
   redirect(`/d/${data.id}`);
 }
 
+// Edit a dictation (student's decision: always editable). The database keeps
+// the first version in original_transcript and stamps edited_at.
+export async function updateDictation(dictationId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser();
+  const transcript = String(formData.get("transcript") ?? "");
+  const dish_name = String(formData.get("dish_name") ?? "").trim().slice(0, 120) || null;
+  const cook_name = String(formData.get("cook_name") ?? "").trim().slice(0, 60) || null;
+  const values = { transcript, dish_name: dish_name ?? "", cook_name: cook_name ?? "" };
+
+  if (!transcript.trim()) return { values, fieldErrors: { transcript: "Their words can't be empty. To remove this, delete it instead." } };
+  if (transcript.length > MAX_TRANSCRIPT) {
+    return { values, fieldErrors: { transcript: `That's too long for one recipe (${transcript.length} of ${MAX_TRANSCRIPT} characters).` } };
+  }
+
+  const supabase = await supabaseForUser();
+  const { error } = await supabase.from("dictations").update({ transcript, dish_name, cook_name }).eq("id", dictationId);
+  if (error) {
+    console.error("[updateDictation]", error);
+    return { values, error: "Couldn't save your changes. What you typed is still here. Try again." };
+  }
+  const { data: recipe } = await supabase
+    .from("recipes")
+    .select("id")
+    .eq("dictation_id", dictationId)
+    .neq("status", "failed")
+    .limit(1)
+    .maybeSingle();
+  revalidatePath("/", "layout");
+  redirect(recipe ? `/r/${recipe.id}` : `/d/${dictationId}`);
+}
+
 // ---------------------------------------------------------------------------
 // 2. Create recipe: pass 1 (draft + questions).
 // ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { RecipeView } from "@/components/RecipeView";
-import { eyebrow, focusRing, SourceBadge, textLink, Transcript } from "@/components/ui";
+import { eyebrow, focusRing, formatDate, LinkButton, SourceBadge, textLink, Transcript } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
 import { QuestionsForm } from "./QuestionsForm";
@@ -44,7 +44,12 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
             words. Answer what you know.
           </p>
         </div>
-        <Transcript text={dictation.transcript} cookName={dictation.cook_name} />
+        <Transcript
+          text={dictation.transcript}
+          cookName={dictation.cook_name}
+          original={dictation.original_transcript}
+          editedAt={dictation.edited_at}
+        />
         <QuestionsForm recipeId={recipe.id} questions={questions ?? []} cookName={dictation.cook_name} />
       </main>
     );
@@ -65,7 +70,24 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
         {recipe.copied_from ? " · saved from a link" : ""}
       </p>
 
-      <RecipeView recipe={recipe.recipe} transcript={dictation.transcript} cookName={dictation.cook_name} />
+      {dictation.edited_at && dictation.edited_at > recipe.updated_at && (
+        <p role="note" className="border-l-2 border-ls-ink bg-ls-surface px-4 py-3 text-[15px]">
+          Their words were edited on {formatDate(dictation.edited_at)}, after this recipe was made, so the recipe may
+          not match them anymore.
+        </p>
+      )}
+
+      <RecipeView
+        recipe={recipe.recipe}
+        transcript={dictation.transcript}
+        cookName={dictation.cook_name}
+        original={dictation.original_transcript}
+        editedAt={dictation.edited_at}
+      />
+
+      <LinkButton href={`/d/${dictation.id}/edit`} variant="secondary">
+        Edit their words
+      </LinkButton>
 
       {answered.length > 0 && (
         <details className="border border-ls-border bg-ls-surface">

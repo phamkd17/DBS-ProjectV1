@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
-import { eyebrow, formatDate, textLink, Transcript } from "@/components/ui";
+import { eyebrow, formatDate, LinkButton, textLink, Transcript } from "@/components/ui";
 import Link from "next/link";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
@@ -38,12 +38,17 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
           </Link>
         </p>
         <h1 className="font-ls-serif text-5xl leading-none">{d.dish_name || "Untitled dictation"}</h1>
-        <p className={eyebrow}>
-          {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className={eyebrow}>
+            {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
+          </p>
+          <LinkButton href={`/d/${d.id}/edit`} variant="secondary">
+            Edit their words
+          </LinkButton>
+        </div>
       </div>
 
-      <Transcript text={d.transcript} cookName={d.cook_name} open />
+      <Transcript text={d.transcript} cookName={d.cook_name} original={d.original_transcript} editedAt={d.edited_at} open />
 
       <CreateRecipe dictationId={d.id} />
 

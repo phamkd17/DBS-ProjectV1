@@ -1,15 +1,33 @@
 "use client";
 
 import { useActionState } from "react";
-import { createDictation } from "@/app/actions";
-import { Button, ErrorNote, eyebrow, fieldClass, Spinner } from "@/components/ui";
-import type { ActionState } from "@/lib/types";
+import Link from "next/link";
+import { createDictation, updateDictation } from "@/app/actions";
+import { Button, ErrorNote, eyebrow, fieldClass, Spinner, textLink } from "@/components/ui";
+import type { ActionState, DictationRow } from "@/lib/types";
 
 const FIELD = fieldClass;
 
-export function NewDictationForm({ defaultDish = "" }: { defaultDish?: string }) {
-  const [state, action, pending] = useActionState<ActionState, FormData>(createDictation, {});
-  const v = state.values ?? { dish_name: defaultDish };
+type Editing = Pick<DictationRow, "id" | "transcript" | "dish_name" | "cook_name">;
+
+export function NewDictationForm({
+  defaultDish = "",
+  dictation,
+  backHref,
+}: {
+  defaultDish?: string;
+  dictation?: Editing;
+  backHref?: string;
+}) {
+  const [state, action, pending] = useActionState<ActionState, FormData>(
+    dictation ? updateDictation.bind(null, dictation.id) : createDictation,
+    {}
+  );
+  const v =
+    state.values ??
+    (dictation
+      ? { transcript: dictation.transcript, dish_name: dictation.dish_name ?? "", cook_name: dictation.cook_name ?? "" }
+      : { dish_name: defaultDish });
   const err = state.fieldErrors ?? {};
 
   return (
@@ -68,8 +86,16 @@ export function NewDictationForm({ defaultDish = "" }: { defaultDish?: string })
 
       <Button type="submit" disabled={pending} className="w-full sm:w-auto">
         {pending && <Spinner />}
-        {pending ? "Saving…" : "Save their words"}
+        {pending ? "Saving…" : dictation ? "Save changes" : "Save their words"}
       </Button>
+      {dictation && backHref && (
+        <Link
+          href={backHref}
+          className={`ml-2 inline-flex min-h-11 items-center px-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] ${textLink}`}
+        >
+          Cancel
+        </Link>
+      )}
     </form>
   );
 }
