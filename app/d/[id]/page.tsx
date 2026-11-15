@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { deleteDictation } from "@/app/actions";
-import { formatDate, Transcript } from "@/components/ui";
+import { eyebrow, formatDate, textLink, Transcript } from "@/components/ui";
+import Link from "next/link";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow } from "@/lib/types";
@@ -27,10 +28,15 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
   if (recipe) redirect(`/r/${recipe.id}`);
 
   return (
-    <main className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{d.dish_name || "Untitled dictation"}</h1>
-        <p className="text-sm text-stone-600">
+    <main className="space-y-8">
+      <div className="space-y-3">
+        <p className={eyebrow}>
+          <Link href="/?tab=ideas" className={textLink}>
+            Ideas
+          </Link>
+        </p>
+        <h1 className="font-ls-serif text-5xl leading-none">{d.dish_name || "Untitled dictation"}</h1>
+        <p className={eyebrow}>
           {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
         </p>
       </div>
@@ -39,8 +45,8 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
 
       <CreateRecipe dictationId={d.id} />
 
-      <form action={deleteDictation.bind(null, d.id)} className="border-t border-stone-200 pt-4">
-        <ConfirmSubmit variant="danger" className="text-sm" message="Delete these words and any recipe made from them? This can't be undone.">
+      <form action={deleteDictation.bind(null, d.id)} className="border-t border-ls-border pt-4">
+        <ConfirmSubmit variant="danger" message="Delete these words and any recipe made from them? This can't be undone.">
           Delete this dictation
         </ConfirmSubmit>
       </form>

@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Line & Stone: the design system from Assignment 2 (DBS-Assignment2,
+ * components/line-and-stone). Square corners, 1px hairlines, no shadows.
+ * Each color has one job.
+ */
+@theme {
+  --color-ls-bg: #ece7dc; /* Limestone: page */
+  --color-ls-surface: #f8f6f1; /* Plaster: cards, inputs */
+  --color-ls-ink: #1c1d1f; /* text, control lines, selected */
+  --color-ls-muted: #5e656e; /* Slate: secondary text */
+  --color-ls-border: #8a8377; /* deep Stone: dividers, card edges */
+  --color-ls-rule: #a8a196; /* Stone: decorative rules only */
+  --color-ls-accent: #23449a; /* Aegean: primary action only */
+  --color-ls-accent-hover: #1b367d;
+  --color-ls-accent-pressed: #142a61;
+  --color-ls-error: #9a4a31; /* deep Terracotta */
+  --color-ls-success: #3e6b45; /* Cypress */
+  --color-ls-disabled: #ddd8ce;
+
+  /* Source labels: who said each part of a recipe (one purpose: provenance). */
+  --color-src-cook: #efe3c4; /* the cook's own words: warm ochre */
+  --color-src-cook-ink: #5a4718;
+  --color-src-science: #dfe9dd; /* food science: Cypress tint */
+  --color-src-science-ink: #2f5135;
+  --color-src-suggested: #e1e7f4; /* AI suggestion: Aegean tint */
+  --color-src-suggested-ink: #23449a;
+
+  --font-ls-serif: var(--font-instrument-serif), Georgia, serif;
+  --font-ls-sans: var(--font-jost), system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-ls-bg);
+  color: var(--color-ls-ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-ls-sans);
+}
+
+@keyframes ls-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.ls-progress {
+  animation: ls-progress 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ls-progress { animation: none; transform: none; width: 100%; opacity: 0.4; }
 }

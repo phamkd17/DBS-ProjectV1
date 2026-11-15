@@ -79,3 +79,33 @@ own lab book.
 - Forms: one column, labels, errors next to fields, keep typed input;
   keyboard access; contrast; hover/focus/pressed states.
 - Supabase free projects pause after a week unused.
+
+## Visual style: Line & Stone (the student's own system)
+
+From Assignment 2 (`~/Desktop/Design-Ship-Build-Assignments/Assignment2/DBS-Assignment2`,
+`components/line-and-stone/`). Tokens live in `app/globals.css` (`ls-*`, `src-*`).
+- Limestone page, Plaster surfaces, Ink text and lines, Slate secondary text.
+- **Aegean blue = the one primary action per screen, nothing else.**
+- Instrument Serif for headings, Jost for body and UI. Small uppercase tracked
+  labels (`eyebrow`). Square corners, 1px hairlines, no shadows.
+- Source labels have one look each: cook = ochre, food science = Cypress tint,
+  suggested = Aegean tint, family answer = ink outline, not stated = dashed.
+- Don't introduce Tailwind default palettes (stone, sky, amber…) or rounded cards.
+
+## Design checklist: check on EVERY UI change (student's standing request)
+
+After any UI change: run `npm run verify` (Playwright: core task at **390px and
+1440px**, screenshots, axe contrast scan, keyboard Tab pass), **look at the
+screenshots**, and report what's broken against this list:
+
+- **Visual hierarchy:** it's clear what to look at first.
+- **Type:** a few sizes and weights, used the same way throughout; comfortable to read.
+- **Color:** a small palette where each color has a purpose.
+- **Accessibility:** text contrast is legible (axe shows no contrast violations).
+- **Layout:** aligned intentionally, related elements grouped, works on desktop and mobile (no sideways scroll at 390px).
+- **Affordances:** interactions are obvious.
+- **States:** controls respond to hover, focus, and press (every Tab stop has a visible focus style).
+- **Visual style:** it looks like Line & Stone, not the agent's default.
+- **Simplicity:** nothing extra. If a word or an image doesn't help, remove it.
+
+Then the student checks it themselves, including with the keyboard.

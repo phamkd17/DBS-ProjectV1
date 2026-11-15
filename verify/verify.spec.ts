@@ -1,0 +1,186 @@
+/**
+ * Design + interaction check in a real browser (Playwright / Chromium).
+ * Runs the core task as a new person, and at every screen:
+ *   - screenshots at 390px (mobile) and 1440px (desktop)
+ *   - axe accessibility scan (WCAG 2 A/AA, incl. color contrast)
+ *   - keyboard pass: Tab through, note anything without a visible focus style
+ * Output: verify/screenshots/*.png and verify/report.md (both git-ignored).
+ */
+import { mkdirSync, writeFileSync } from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
+import { clerk, clerkSetup } from "@clerk/testing/playwright";
+import { createClerkClient } from "@clerk/backend";
+import { expect, test, type Page } from "@playwright/test";
+
+const SHOTS = "verify/screenshots";
+const TEST_EMAIL = "labbook-tester+clerk_test@example.com";
+const YOGURT =
+  "Yogurt is a very simple dish you need about 1/2 gallon jug of milk and then one of these small 10 in yogurt container that is not flavored at all uh you heat up the milk make sure it doesn't boil uh just until it steams a little bit and then from there you add 1/3 a cup of sugar maybe less if you like it less sweet and then you mix in the yogurt with the milk you stir it into everything blends and then you put it into these little jars and then you put all these little jars into this incubator and you let it sit for about 8 hours if you don't like it too tangy but I like it at 12 hours super tangy and then from there you can either keep it in the fridge or freeze it and then serve";
+
+const report: string[] = ["# Verify report", "", `Run: ${new Date().toISOString()}`, ""];
+let n = 0;
+
+async function check(page: Page, name: string, opts: { keyboard?: boolean } = {}) {
+  n += 1;
+  const id = `${String(n).padStart(2, "0")}-${name}`;
+  report.push(`## ${id}`, `URL: ${new URL(page.url()).pathname}${new URL(page.url()).search}`);
+
+  for (const [label, size] of [
+    ["mobile", { width: 390, height: 844 }],
+    ["desktop", { width: 1440, height: 900 }],
+  ] as const) {
+    await page.setViewportSize(size);
+    await page.waitForTimeout(150);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
+    if (overflow) report.push(`- ⚠️ ${label}: page scrolls sideways (horizontal overflow)`);
+    await page.screenshot({ path: `${SHOTS}/${id}-${label}.png`, fullPage: true });
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  if (axe.violations.length === 0) report.push("- axe: no violations");
+  for (const v of axe.violations) {
+    report.push(`- ⚠️ axe ${v.impact}: ${v.id}: ${v.help} (${v.nodes.length}×)`);
+    for (const node of v.nodes.slice(0, 3)) report.push(`  - \`${node.target.join(" ")}\` ${node.failureSummary?.split("\n")[1] ?? ""}`);
+  }
+
+  if (opts.keyboard) {
+    await page.locator("body").click({ position: { x: 1, y: 1 } });
+    const seen: string[] = [];
+    const noFocusStyle: string[] = [];
+    for (let i = 0; i < 25; i++) {
+      await page.keyboard.press("Tab");
+      const info = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el || el === document.body) return null;
+        const cs = getComputedStyle(el);
+        const visible =
+          (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== "none";
+        const text = (el.getAttribute("aria-label") || el.textContent || (el as HTMLInputElement).placeholder || el.tagName)
+          .trim()
+          .replace(/\s+/g, " ")
+          .slice(0, 40);
+        return { key: `${el.tagName.toLowerCase()}:${text}`, visible };
+      });
+      if (!info) continue;
+      if (seen.includes(info.key)) break;
+      seen.push(info.key);
+      if (!info.visible) noFocusStyle.push(info.key);
+    }
+    report.push(`- keyboard: ${seen.length} stops: ${seen.join(" → ")}`);
+    if (noFocusStyle.length) report.push(`- ⚠️ no visible focus style: ${noFocusStyle.join(", ")}`);
+    await page.keyboard.press("Tab");
+    await page.screenshot({ path: `${SHOTS}/${id}-focus.png` });
+  }
+  report.push("");
+}
+
+test.beforeAll(async () => {
+  mkdirSync(SHOTS, { recursive: true });
+  await clerkSetup();
+  // Make sure the test user exists (Clerk test emails never send real mail).
+  const clerkApi = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+  const { data } = await clerkApi.users.getUserList({ emailAddress: [TEST_EMAIL] });
+  if (data.length === 0) await clerkApi.users.createUser({ emailAddress: [TEST_EMAIL], skipPasswordRequirement: true });
+});
+
+test.afterAll(() => {
+  writeFileSync("verify/report.md", report.join("\n"));
+});
+
+test("core task as a new person, every screen at 390 and 1440", async ({ page, browser }) => {
+  // ---- Signed out ----
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await check(page, "landing-signed-out", { keyboard: true });
+
+  await page.goto("/s/11111111-1111-1111-1111-111111111111");
+  await expect(page.getByText(/isn.t shared anymore/)).toBeVisible();
+  await check(page, "share-link-off");
+
+  // ---- Sign in ----
+  await page.goto("/");
+  await clerk.signIn({ page, emailAddress: TEST_EMAIL });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Your lab book" })).toBeVisible();
+  await check(page, "home", { keyboard: true });
+
+  // ---- Capture ----
+  await page.getByRole("link", { name: "New dictation" }).first().click();
+  await page.getByRole("button", { name: /Save their words/ }).click();
+  await expect(page.getByText(/Paste or dictate/)).toBeVisible();
+  await check(page, "new-empty-error", { keyboard: true });
+
+  await page.getByLabel("The cook's words").fill(YOGURT);
+  await page.getByLabel(/Dish name/).fill("Yogurt (verify run)");
+  await page.getByLabel(/Whose words/).fill("Grandma");
+  await page.getByRole("button", { name: /Save their words/ }).click();
+  await page.waitForURL(/\/d\//);
+  await check(page, "dictation", { keyboard: true });
+
+  await page.goto("/?tab=ideas");
+  await expect(page.getByText("Yogurt (verify run)").first()).toBeVisible();
+  await check(page, "home-ideas-tab");
+  await page.getByText("Yogurt (verify run)").first().click();
+  await page.waitForURL(/\/d\//);
+
+  // ---- Create recipe (pass 1) ----
+  await page.getByRole("button", { name: "Create recipe" }).click();
+  await expect(page.getByRole("status")).toBeVisible();
+  await check(page, "creating-loading");
+  await page.waitForURL(/\/r\//, { timeout: 4 * 60_000 });
+  const recipeUrl = page.url();
+  await expect(page.getByRole("heading", { name: /questions/i })).toBeVisible();
+  await check(page, "questions", { keyboard: true });
+
+  await page.goto("/?tab=development");
+  await check(page, "home-development-tab");
+  await page.goto(recipeUrl);
+
+  // ---- Answer: one suggestion, one typed, rest blank ----
+  await page.getByRole("button", { name: "Use suggestion" }).first().click();
+  await check(page, "questions-suggestion-used");
+  const boxes = page.getByPlaceholder("Your answer");
+  if ((await boxes.count()) > 1) await boxes.nth(1).fill("Plain Dannon, the small single cup.");
+  await page.getByRole("button", { name: /Make the recipe/ }).click();
+  await page.waitForFunction(() => !document.querySelector("textarea[placeholder='Your answer']"), null, {
+    timeout: 4 * 60_000,
+  });
+  await expect(page.getByRole("heading", { name: "Ingredients" })).toBeVisible();
+  await check(page, "recipe-finished", { keyboard: true });
+
+  // ---- Send ----
+  await page.getByRole("button", { name: "Make a link" }).click();
+  const shareUrl = await page.getByLabel("Private link").inputValue({ timeout: 15_000 });
+  expect(shareUrl).toMatch(/\/s\/[0-9a-f-]{36}$/);
+  await check(page, "recipe-shared");
+
+  const stranger = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const sp = await stranger.newPage();
+  await sp.goto(new URL(new URL(shareUrl).pathname, page.url()).toString());
+  await expect(sp.getByRole("heading", { name: "Ingredients" })).toBeVisible();
+  await expect(sp.getByRole("button", { name: /Sign in to save/ })).toBeVisible();
+  await check(sp, "shared-signed-out", { keyboard: true });
+
+  await page.getByRole("button", { name: "Turn off link" }).click();
+  await expect(page.getByRole("button", { name: "Make a link" })).toBeVisible();
+  await sp.reload();
+  await expect(sp.getByText(/isn.t shared anymore/)).toBeVisible();
+  await stranger.close();
+
+  await page.goto("/?tab=finished");
+  await check(page, "home-finished-tab");
+
+  // ---- Not found / someone else's ----
+  await page.goto("/r/00000000-0000-0000-0000-000000000000");
+  await check(page, "not-found");
+
+  // ---- Clean up: delete the verify-run dictation ----
+  const created = page.getByText("Yogurt (verify run)");
+  while ((await page.goto("/?tab=finished"), await created.count()) > 0) {
+    await created.first().click();
+    await page.waitForURL(/\/r\//);
+    break; // recipe pages have no delete yet; leave it (see report)
+  }
+  report.push("Note: recipe pages have no Delete yet, so verify-run recipes stay in the test account.");
+});

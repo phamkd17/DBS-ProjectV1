@@ -2,14 +2,23 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import type { Source } from "@/lib/ai/schema";
 
-// Colors from the proposal page: cook = cream, food science = green,
-// suggested = blue. Family answers get violet. All pairs pass WCAG AA.
+// Line & Stone building blocks (from Assignment 2's design system).
+
+/** Small uppercase label, used for section eyebrows and field captions. */
+export const eyebrow = "font-ls-sans text-[11px] font-medium uppercase tracking-[0.22em] text-ls-muted";
+
+export const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ls-ink";
+
+// ---------------------------------------------------------------------------
+// Source labels. Each source has one look, used everywhere.
+// ---------------------------------------------------------------------------
 const SOURCE_STYLE: Record<Source, string> = {
-  cook: "bg-amber-50 text-amber-900 ring-amber-300",
-  food_science: "bg-emerald-50 text-emerald-900 ring-emerald-300",
-  suggested: "bg-sky-50 text-sky-900 ring-sky-300",
-  user_answer: "bg-violet-50 text-violet-900 ring-violet-300",
-  not_stated: "bg-stone-100 text-stone-700 ring-stone-300",
+  cook: "bg-src-cook text-src-cook-ink border-transparent",
+  food_science: "bg-src-science text-src-science-ink border-transparent",
+  suggested: "bg-src-suggested text-src-suggested-ink border-transparent",
+  user_answer: "bg-ls-surface text-ls-ink border-ls-ink",
+  not_stated: "bg-transparent text-ls-muted border-dashed border-ls-border",
 };
 
 export function sourceLabel(source: Source, cookName?: string | null) {
@@ -30,20 +39,28 @@ export function sourceLabel(source: Source, cookName?: string | null) {
 export function SourceBadge({ source, cookName }: { source: Source; cookName?: string | null }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ${SOURCE_STYLE[source]}`}
+      className={`inline-flex shrink-0 items-center border px-2 py-0.5 font-ls-sans text-[11px] font-medium uppercase leading-4 tracking-[0.16em] ${SOURCE_STYLE[source]}`}
     >
       {sourceLabel(source, cookName)}
     </span>
   );
 }
 
-const BUTTON_BASE =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 disabled:cursor-not-allowed disabled:opacity-60";
+// ---------------------------------------------------------------------------
+// Buttons
+// ---------------------------------------------------------------------------
+const BUTTON_BASE = `inline-flex min-h-11 items-center justify-center gap-2 px-6 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] transition-colors duration-150 select-none cursor-pointer disabled:cursor-not-allowed ${focusRing}`;
+
 const BUTTON_VARIANT = {
-  primary: "bg-stone-900 text-white hover:bg-stone-700 active:bg-stone-800",
-  secondary: "bg-white text-stone-900 ring-1 ring-inset ring-stone-300 hover:bg-stone-100 active:bg-stone-200",
-  quiet: "text-stone-700 underline-offset-4 hover:bg-stone-100 hover:underline active:bg-stone-200",
-  danger: "text-red-800 hover:bg-red-50 active:bg-red-100",
+  /** The one main action on a screen. */
+  primary:
+    "bg-ls-accent text-ls-surface hover:bg-ls-accent-hover active:translate-y-px active:bg-ls-accent-pressed disabled:bg-ls-disabled disabled:text-ls-muted",
+  secondary:
+    "border border-ls-ink text-ls-ink hover:bg-ls-ink/[0.06] active:translate-y-px active:bg-ls-ink/[0.12] disabled:border-ls-border disabled:text-ls-muted",
+  quiet:
+    "px-3 text-ls-ink underline decoration-ls-rule underline-offset-4 hover:decoration-ls-ink active:text-ls-muted disabled:text-ls-muted",
+  danger:
+    "px-3 text-ls-error underline decoration-ls-error/40 underline-offset-4 hover:decoration-ls-error active:opacity-80",
 };
 export type ButtonVariant = keyof typeof BUTTON_VARIANT;
 
@@ -67,11 +84,30 @@ export function LinkButton({
   return <Link className={buttonClass(variant, className)} {...props} />;
 }
 
+export const textLink = `underline decoration-ls-rule underline-offset-4 transition-colors hover:decoration-ls-ink active:text-ls-muted ${focusRing}`;
+
+// ---------------------------------------------------------------------------
+// Form fields
+// ---------------------------------------------------------------------------
+export const fieldClass = `w-full border border-ls-ink bg-ls-surface px-3 py-2.5 font-ls-sans text-base text-ls-ink placeholder:text-ls-muted transition-colors duration-150 hover:bg-white ${focusRing} aria-invalid:border-ls-error aria-invalid:border-2`;
+
+// ---------------------------------------------------------------------------
+// States
+// ---------------------------------------------------------------------------
 export function ErrorNote({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <p id={id} role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-900 ring-1 ring-inset ring-red-200">
+    <p id={id} role="alert" className="border-l-2 border-ls-error bg-ls-surface px-4 py-3 text-[15px] text-ls-error">
       {children}
     </p>
+  );
+}
+
+/** A thin indeterminate line, Line & Stone's loading indicator. */
+export function ProgressLine() {
+  return (
+    <span aria-hidden className="relative block h-0.5 w-full overflow-hidden bg-ls-rule/40">
+      <span className="ls-progress absolute inset-y-0 left-0 w-2/5 bg-ls-ink" />
+    </span>
   );
 }
 
@@ -79,11 +115,14 @@ export function Spinner() {
   return (
     <span
       aria-hidden
-      className="inline-block size-4 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none"
+      className="inline-block size-3.5 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none"
     />
   );
 }
 
+// ---------------------------------------------------------------------------
+// Her words
+// ---------------------------------------------------------------------------
 /** Her words, exactly as saved. Never edited. */
 export function Transcript({
   text,
@@ -95,12 +134,21 @@ export function Transcript({
   open?: boolean;
 }) {
   return (
-    <details open={open} className="group rounded-xl bg-amber-50 ring-1 ring-inset ring-amber-200">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-xl px-4 py-3 font-medium text-amber-950 hover:bg-amber-100 focus-visible:outline-2 focus-visible:outline-stone-900">
-        <span>{cookName ? `${cookName}'s words` : "Her words"} · exactly as said</span>
-        <span aria-hidden className="text-sm transition-transform group-open:rotate-180">▾</span>
+    <details open={open} className="group border border-ls-border bg-ls-surface">
+      <summary
+        className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
+      >
+        <span className="flex items-center gap-3">
+          <SourceBadge source="cook" cookName={cookName} />
+          <span className="text-[15px]">Their words, exactly as said</span>
+        </span>
+        <span aria-hidden className="text-sm text-ls-muted transition-transform group-open:rotate-180">
+          ▾
+        </span>
       </summary>
-      <p className="whitespace-pre-wrap px-4 pb-4 text-[15px] leading-relaxed text-amber-950">{text}</p>
+      <p className="whitespace-pre-wrap border-t border-ls-border px-4 py-4 font-ls-serif text-lg leading-relaxed">
+        {text}
+      </p>
     </details>
   );
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { RecipeView } from "@/components/RecipeView";
-import { SourceBadge, Transcript } from "@/components/ui";
+import { eyebrow, focusRing, SourceBadge, textLink, Transcript } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
 import { QuestionsForm } from "./QuestionsForm";
@@ -26,16 +26,16 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
 
   if (recipe.status !== "ready" || !recipe.recipe) {
     return (
-      <main className="space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm text-stone-600">
-            <Link href="/?tab=development" className="underline underline-offset-4 hover:text-stone-900">
+      <main className="space-y-8">
+        <div className="space-y-3">
+          <p className={eyebrow}>
+            <Link href="/?tab=development" className={textLink}>
               Development
             </Link>{" "}
             / {dictation.dish_name || recipe.draft?.title || "Recipe"}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">A few questions first</h1>
-          <p className="text-stone-700">
+          <h1 className="font-ls-serif text-5xl leading-none">A few questions first</h1>
+          <p className="max-w-prose text-[17px] leading-relaxed text-ls-muted">
             These are things a new cook couldn&apos;t figure out from {dictation.cook_name ? `${dictation.cook_name}'s` : "the"}{" "}
             words. Answer what you know.
           </p>
@@ -52,9 +52,9 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
   const shareUrl = recipe.share_token ? `${origin}/s/${recipe.share_token}` : null;
 
   return (
-    <main className="space-y-8">
-      <p className="text-sm text-stone-600">
-        <Link href="/?tab=finished" className="underline underline-offset-4 hover:text-stone-900">
+    <main className="space-y-10">
+      <p className={eyebrow}>
+        <Link href="/?tab=finished" className={textLink}>
           Finished
         </Link>{" "}
         / {recipe.recipe.title}
@@ -64,20 +64,20 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       <RecipeView recipe={recipe.recipe} transcript={dictation.transcript} cookName={dictation.cook_name} />
 
       {answered.length > 0 && (
-        <details className="rounded-xl bg-white ring-1 ring-stone-200">
-          <summary className="flex min-h-11 cursor-pointer items-center px-4 py-3 font-medium hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-stone-900">
+        <details className="border border-ls-border bg-ls-surface">
+          <summary className={`flex min-h-11 cursor-pointer items-center px-4 py-3 text-[15px] hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}>
             Questions the app asked ({answered.length})
           </summary>
-          <ol className="space-y-3 px-4 pb-4">
+          <ol className="divide-y divide-ls-border border-t border-ls-border px-4">
             {answered.map((q) => (
-              <li key={q.id} className="space-y-1 text-sm">
+              <li key={q.id} className="space-y-1.5 py-3 text-[15px]">
                 <p className="font-medium">{q.question}</p>
                 {q.answer_source === "skipped" ? (
-                  <p className="flex items-baseline gap-2 text-stone-600">
+                  <p className="flex flex-wrap items-baseline gap-2 text-ls-muted">
                     <SourceBadge source="not_stated" /> Nobody knew yet
                   </p>
                 ) : (
-                  <p className="flex items-baseline gap-2">
+                  <p className="flex flex-wrap items-baseline gap-2">
                     <SourceBadge source={q.answer_source === "user_answer" ? "user_answer" : "suggested"} /> {q.answer}
                   </p>
                 )}
@@ -89,7 +89,7 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
 
       <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
 
-      <p className="text-xs text-stone-500">
+      <p className={eyebrow}>
         Made with {recipe.model} · prompt {recipe.prompt_version}
       </p>
     </main>

@@ -26,7 +26,7 @@ export function CreateRecipe({ dictationId }: { dictationId: string }) {
           <Button type="submit" className="w-full sm:w-auto">
             {state.error ? "Try again" : "Create recipe"}
           </Button>
-          <p className="text-sm text-stone-600">
+          <p className="text-[15px] text-ls-muted">
             The app drafts a recipe and asks you about anything it can&apos;t know from their words.
           </p>
         </>
