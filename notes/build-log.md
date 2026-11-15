@@ -188,3 +188,22 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   "permission denied"; normal answering, sharing, and saving a copy still work.
 - From here on, work happens on branches (`refine-v1`), each with its own
   Vercel preview link, merged after review.
+
+## Nov 14 — Lab book tabs
+
+### B21. Ideas / Development / Finished
+- **Student:** "I want to add tabs for Ideas, Development, and Finished
+  Recipes." Then: "I want the ideas to be where i can attached quick notes,
+  pictures, links. Development is were I actively work on developing a recipe.
+  And the finished have different iterations and notes."
+- **Pushback (once):** v1 is due Tuesday, and user testing plus the v2 plan
+  still have to happen. Photos are the biggest piece (upload, storage, privacy
+  rules).
+- **Options offered:** all 3 tabs with photos in v2 / everything now / tabs now
+  with the rest in v2.
+- **Student chose:** "Tabs now, the rest in v2."
+- **Built:** the home page has three tabs with counts. Ideas = words saved, no
+  recipe yet. Development = recipe with questions waiting. Finished = ready.
+  It opens on the tab where the work is, and each tab has its own empty state.
+- **v2 headline:** Ideas get notes, photos, and links, plus "Start developing";
+  Finished recipes get iterations (each trial: what changed, how it turned out).

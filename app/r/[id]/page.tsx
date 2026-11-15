@@ -29,8 +29,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       <main className="space-y-6">
         <div className="space-y-2">
           <p className="text-sm text-stone-600">
-            <Link href="/" className="underline underline-offset-4 hover:text-stone-900">
-              Lab book
+            <Link href="/?tab=development" className="underline underline-offset-4 hover:text-stone-900">
+              Development
             </Link>{" "}
             / {dictation.dish_name || recipe.draft?.title || "Recipe"}
           </p>
@@ -54,8 +54,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
   return (
     <main className="space-y-8">
       <p className="text-sm text-stone-600">
-        <Link href="/" className="underline underline-offset-4 hover:text-stone-900">
-          Lab book
+        <Link href="/?tab=finished" className="underline underline-offset-4 hover:text-stone-900">
+          Finished
         </Link>{" "}
         / {recipe.recipe.title}
         {recipe.copied_from ? " · saved from a link" : ""}
