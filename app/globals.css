@@ -3,7 +3,8 @@
 /*
  * Line & Stone: the design system from Assignment 2 (DBS-Assignment2,
  * components/line-and-stone). Square corners, 1px hairlines, no shadows.
- * Each color has one job.
+ * Each color has one job. Change from A2: the primary action is Scarlet
+ * (#ae1f2e) instead of Aegean blue. See notes/design/red-swatches-2.html.
  */
 @theme {
   --color-ls-bg: #ece7dc; /* Limestone: page */
@@ -12,9 +13,9 @@
   --color-ls-muted: #5e656e; /* Slate: secondary text */
   --color-ls-border: #8a8377; /* deep Stone: dividers, card edges */
   --color-ls-rule: #a8a196; /* Stone: decorative rules only */
-  --color-ls-accent: #23449a; /* Aegean: primary action only */
-  --color-ls-accent-hover: #1b367d;
-  --color-ls-accent-pressed: #142a61;
+  --color-ls-accent: #ae1f2e; /* Scarlet (student's pick, Nov 14): primary action only */
+  --color-ls-accent-hover: #941a27;
+  --color-ls-accent-pressed: #7a1620;
   --color-ls-error: #9a4a31; /* deep Terracotta */
   --color-ls-success: #3e6b45; /* Cypress */
   --color-ls-disabled: #ddd8ce;

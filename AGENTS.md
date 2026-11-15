@@ -85,11 +85,12 @@ own lab book.
 From Assignment 2 (`~/Desktop/Design-Ship-Build-Assignments/Assignment2/DBS-Assignment2`,
 `components/line-and-stone/`). Tokens live in `app/globals.css` (`ls-*`, `src-*`).
 - Limestone page, Plaster surfaces, Ink text and lines, Slate secondary text.
-- **Aegean blue = the one primary action per screen, nothing else.**
+- **Scarlet `#ae1f2e` = the one primary action per screen, nothing else.**
+  (Student swapped it for A2's Aegean blue on Nov 14; see `notes/design/red-swatches-2.html`.)
 - Instrument Serif for headings, Jost for body and UI. Small uppercase tracked
   labels (`eyebrow`). Square corners, 1px hairlines, no shadows.
 - Source labels have one look each: cook = ochre, food science = Cypress tint,
-  suggested = Aegean tint, family answer = ink outline, not stated = dashed.
+  suggested = blue tint, family answer = ink outline, not stated = dashed.
 - Don't introduce Tailwind default palettes (stone, sky, amber…) or rounded cards.
 
 ## Design checklist: check on EVERY UI change (student's standing request)

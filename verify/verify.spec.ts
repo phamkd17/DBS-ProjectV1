@@ -6,7 +6,7 @@
  *   - keyboard pass: Tab through, note anything without a visible focus style
  * Output: verify/screenshots/*.png and verify/report.md (both git-ignored).
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { clerk, clerkSetup } from "@clerk/testing/playwright";
 import { createClerkClient } from "@clerk/backend";
@@ -88,6 +88,26 @@ test.afterAll(() => {
   writeFileSync("verify/report.md", report.join("\n"));
 });
 
+test("served CSS matches app/globals.css (dev server not stale)", async ({ page }) => {
+  // The dev server has served stale Tailwind CSS before. Compare every color token.
+  const src = readFileSync("app/globals.css", "utf8");
+  const tokens = [...src.matchAll(/(--color-[a-z0-9-]+):\s*(#[0-9a-f]{6})/gi)].map((m) => [m[1], m[2].toLowerCase()]);
+  await page.goto("/", { timeout: 60_000 });
+  const served = await page.evaluate(() =>
+    Array.from(document.styleSheets)
+      .map((s) => {
+        try {
+          return Array.from(s.cssRules).map((r) => r.cssText).join("\n");
+        } catch {
+          return "";
+        }
+      })
+      .join("\n")
+  );
+  const stale = tokens.filter(([name, hex]) => served.includes(name) && !served.includes(`${name}: ${hex}`));
+  expect(stale, `Stale CSS. Restart the dev server (rm -rf .next). Mismatched: ${stale.map((t) => t.join(" ")).join(", ")}`).toEqual([]);
+});
+
 test("core task as a new person, every screen at 390 and 1440", async ({ page, browser }) => {
   // ---- Signed out ----
   await page.goto("/");
@@ -96,7 +116,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await check(page, "landing-signed-out", { keyboard: true });
 
   await page.goto("/s/11111111-1111-1111-1111-111111111111");
-  await expect(page.getByText(/isn.t shared anymore/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /isn.t shared anymore/ })).toBeVisible();
   await check(page, "share-link-off");
 
   // ---- Sign in ----
@@ -165,7 +185,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.getByRole("button", { name: "Turn off link" }).click();
   await expect(page.getByRole("button", { name: "Make a link" })).toBeVisible();
   await sp.reload();
-  await expect(sp.getByText(/isn.t shared anymore/)).toBeVisible();
+  await expect(sp.getByRole("heading", { name: /isn.t shared anymore/ })).toBeVisible();
   await stranger.close();
 
   await page.goto("/?tab=finished");
@@ -175,12 +195,11 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.goto("/r/00000000-0000-0000-0000-000000000000");
   await check(page, "not-found");
 
-  // ---- Clean up: delete the verify-run dictation ----
-  const created = page.getByText("Yogurt (verify run)");
-  while ((await page.goto("/?tab=finished"), await created.count()) > 0) {
-    await created.first().click();
-    await page.waitForURL(/\/r\//);
-    break; // recipe pages have no delete yet; leave it (see report)
-  }
-  report.push("Note: recipe pages have no Delete yet, so verify-run recipes stay in the test account.");
+  // ---- Clean up: delete this run's recipe (exercises the confirm dialog) ----
+  await page.goto(recipeUrl);
+  page.once("dialog", (d) => d.accept());
+  await page.getByRole("button", { name: "Delete this recipe" }).click();
+  await page.waitForURL((u) => u.pathname === "/");
+  await page.goto(recipeUrl);
+  await expect(page.getByRole("heading", { name: "Not in your lab book" })).toBeVisible();
 });

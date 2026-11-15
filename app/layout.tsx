@@ -20,7 +20,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 // Clerk's sign-in screens, dressed in Line & Stone.
 const clerkAppearance = {
   variables: {
-    colorPrimary: "#23449a",
+    colorPrimary: "#ae1f2e",
     colorDanger: "#9a4a31",
     colorForeground: "#1c1d1f",
     colorMutedForeground: "#5e656e",

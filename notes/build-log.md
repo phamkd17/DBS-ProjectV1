@@ -236,3 +236,23 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   a visible focus style on every Tab stop.
 - **Known, left:** Clerk's default avatar is purple (only for accounts without a
   photo).
+
+### B24. Primary color: Scarlet
+- **Student:** "Instead of agean blue, I want a scarlet red/ burgundy for the
+  design template." Agent made `notes/design/red-swatches.html` (Scarlet →
+  Oxblood, with contrast ratios). **Student:** "I am between scarlet and
+  crimsom." Agent made `red-swatches-2.html` (5 steps). **Student chose:**
+  "Scarlet-leaning": `#ae1f2e` (hover `#941a27`, pressed `#7a1620`), 6.4:1.
+- Everything else stays Line & Stone. Terracotta errors still read as
+  different from the Scarlet button.
+
+### B25. Verify found two more real problems
+- **Stale CSS, again:** the dev server ignores `globals.css` edits (a
+  Tailwind/Turbopack cache issue). `npm run verify` now starts with a test
+  that compares every color token in `globals.css` to the served CSS, and
+  fails with "restart the dev server" if they differ.
+- **Finished recipes couldn't be deleted** (only ideas could). Added "Delete
+  this recipe" with a confirmation. The verify run now deletes its own
+  recipe and checks that it's gone.
+- Next's floating dev badge covered the Delete button at 390px (dev only),
+  so the badge is now off (`devIndicators: false`).

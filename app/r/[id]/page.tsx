@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { deleteDictation } from "@/app/actions";
+import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { RecipeView } from "@/components/RecipeView";
 import { eyebrow, focusRing, SourceBadge, textLink, Transcript } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
@@ -91,6 +93,15 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       )}
 
       <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
+
+      <form action={deleteDictation.bind(null, dictation.id)} className="border-t border-ls-border pt-4">
+        <ConfirmSubmit
+          variant="danger"
+          message="Delete this recipe and the words it came from? Links you've sent will stop working. This can't be undone."
+        >
+          Delete this recipe
+        </ConfirmSubmit>
+      </form>
 
     </main>
   );
