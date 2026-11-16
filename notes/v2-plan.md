@@ -141,8 +141,10 @@ with notes and a date, and the original is unchanged.
 
 **Why:** cousins and friends cook for different numbers of people than Grandma
 does, and a recipe that can't be resized means guessing again, which is the
-problem the app exists to fix. Nutrition was asked about in my proposal
-interviews as a "nice to have" for sharing recipes beyond the family.
+problem the app exists to fix. Both were on my proposal's "ambitious"
+list ("portion scaling, nutrition label agent"), and they matter more once
+recipes are shared beyond the family. *(Add tester quotes here if anyone asks
+for them.)*
 
 **The hard part, handled honestly:** Grandma's amounts are often "a little
 bit" or not stated at all.
