@@ -64,7 +64,8 @@ export async function createDictation(_prev: ActionState, formData: FormData): P
   const supabase = await supabaseForUser();
   const { data, error } = await supabase
     .from("dictations")
-    .insert({ transcript, dish_name, cook_name })
+    // Adding the cook's words is Development work, so a new dictation starts there.
+    .insert({ transcript, dish_name, cook_name, stage: "development" })
     .select("id")
     .single();
 

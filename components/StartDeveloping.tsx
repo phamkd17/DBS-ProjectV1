@@ -18,7 +18,7 @@ export function StartDeveloping({ dictationId }: { dictationId: string }) {
         Ready to develop it?
       </h2>
       <p className="max-w-prose text-[15px] leading-relaxed text-ls-muted">
-        Recipes are made with AI in Development. Move it there when their words are complete, then create the recipe.
+        Move it to Development to add the cook&apos;s words and create the recipe with AI.
       </p>
       <Button
         disabled={pending}

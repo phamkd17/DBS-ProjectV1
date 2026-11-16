@@ -49,16 +49,20 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
       {/* Idea notes stay in every stage. */}
       <EditableNotes kind="dictation" id={d.id} note={d.notes} link={d.link} />
 
-      {/* Cook · Their words: shown, or a way to add them. The AI step follows. */}
-      <DictationEditor dictation={d} open addIsPrimary={d.stage === "development"}>
-        {d.stage === "development" ? (
-          d.transcript ? (
-            <CreateRecipe dictationId={d.id} />
-          ) : null
-        ) : (
-          <StartDeveloping dictationId={d.id} />
-        )}
-      </DictationEditor>
+      {/* Cook · Their words: added only in Development (shown anywhere once they exist). */}
+      {d.stage === "development" || d.transcript ? (
+        <DictationEditor dictation={d} open addIsPrimary={d.stage === "development"}>
+          {d.stage === "development" ? (
+            d.transcript ? (
+              <CreateRecipe dictationId={d.id} />
+            ) : null
+          ) : (
+            <StartDeveloping dictationId={d.id} />
+          )}
+        </DictationEditor>
+      ) : (
+        <StartDeveloping dictationId={d.id} />
+      )}
 
       <MoveTo kind="dictation" id={d.id} current={d.stage} hide={d.stage === "development" ? [] : ["development"]} />
 

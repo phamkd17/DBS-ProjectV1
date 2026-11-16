@@ -536,3 +536,13 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   dictation page intro, the dictation form tip, and the first-run "Start with the
   cook's words" card. Dropped "Their words are saved exactly as they are" (no
   longer true). Verify ✓ + empty-account check ✓.
+
+### B45. The cook's words are added only in Development
+- **Student:** "only have add cooks word in the development section."
+- In Ideas, an entry shows title, Idea notes, and "Ready to develop it? · Move
+  to Development" ("…to add the cook's words and create the recipe with AI").
+  No cook's-words box. In Development, the words section appears (Add the cook's
+  words → then the AI step). Words that already exist still show in any tab.
+- To match, **New → Dictation now creates the entry in Development** (adding
+  words is Development work). Verify ✓: no words box in Ideas, and a new dictation
+  lands in Development with the AI panel.
