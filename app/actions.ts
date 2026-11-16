@@ -114,6 +114,7 @@ export async function createRecipe(dictationId: string, _prev: ActionState): Pro
     .eq("id", dictationId)
     .single<DictationRow>();
   if (!dictation) return { error: "We couldn't find that dictation in your lab book." };
+  if (!dictation.transcript) return { error: "Add the cook's words first. The AI makes the recipe from them." };
   // The AI step only runs from Development (the UI hides it elsewhere; this enforces it).
   if (dictation.stage !== "development") {
     return { error: "Move this to Development first, then create the recipe." };
@@ -185,14 +186,14 @@ export async function submitAnswers(recipeId: string, _prev: ActionState, formDa
     .from("dictations")
     .select("transcript")
     .eq("id", recipe.dictation_id)
-    .single<Pick<DictationRow, "transcript">>();
+    .single<{ transcript: string | null }>();
   const { data: questions } = await supabase
     .from("recipe_questions")
     .select("*")
     .eq("recipe_id", recipeId)
     .order("position")
     .returns<QuestionRow[]>();
-  if (!dictation || !questions) return { error: "Couldn't load the questions. Try again." };
+  if (!dictation?.transcript || !questions) return { error: "Couldn't load the questions. Try again." };
 
   const values: Record<string, string> = {};
   const answers: Answer[] = [];
@@ -315,13 +316,18 @@ export async function createIdea(_prev: ActionState, formData: FormData): Promis
   if (Object.keys(fieldErrors).length) return { values, fieldErrors };
 
   const supabase = await supabaseForUser();
-  const { data, error } = await supabase.from("ideas").insert({ title, note, link }).select("id").single();
+  // One kind of lab-book entry: an idea is an entry with notes and no cook's words yet.
+  const { data, error } = await supabase
+    .from("dictations")
+    .insert({ dish_name: title, notes: note, link })
+    .select("id")
+    .single();
   if (error || !data) {
     console.error("[createIdea]", error);
     return { values, error: "Couldn't save the idea. What you typed is still here. Try again." };
   }
   revalidatePath("/");
-  redirect(`/i/${data.id}`);
+  redirect(`/d/${data.id}`);
 }
 
 export async function updateIdea(ideaId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -404,30 +410,16 @@ export async function updateNotes(
   await requireUser();
   const supabase = await supabaseForUser();
 
-  if (kind === "idea") {
-    const { note, link, fieldErrors } = readIdea(formData);
-    const values = { note, link: String(formData.get("link") ?? "") };
-    if (fieldErrors.link) return { values, fieldErrors: { link: fieldErrors.link } };
-    const { error } = await supabase
-      .from("ideas")
-      .update({ note, link, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      console.error("[updateNotes idea]", error);
-      return { values, error: "Couldn't save your notes. What you typed is still here. Try again." };
-    }
-  } else {
-    const transcript = String(formData.get("note") ?? "");
-    const values = { note: transcript };
-    if (!transcript.trim()) return { values, fieldErrors: { note: "Add a few words, or delete this instead." } };
-    if (transcript.length > MAX_TRANSCRIPT) {
-      return { values, fieldErrors: { note: `That's too long (${transcript.length} of ${MAX_TRANSCRIPT} characters).` } };
-    }
-    const { error } = await supabase.from("dictations").update({ transcript }).eq("id", id);
-    if (error) {
-      console.error("[updateNotes dictation]", error);
-      return { values, error: "Couldn't save your notes. What you typed is still here. Try again." };
-    }
+  const { note, link, fieldErrors } = readIdea(formData);
+  const values = { note, link: String(formData.get("link") ?? "") };
+  if (fieldErrors.link) return { values, fieldErrors: { link: fieldErrors.link } };
+  const { error } =
+    kind === "idea"
+      ? await supabase.from("ideas").update({ note, link, updated_at: new Date().toISOString() }).eq("id", id)
+      : await supabase.from("dictations").update({ notes: note, link }).eq("id", id);
+  if (error) {
+    console.error("[updateNotes]", error);
+    return { values, error: "Couldn't save your notes. What you typed is still here. Try again." };
   }
   revalidatePath("/", "layout");
   return { saved: true };

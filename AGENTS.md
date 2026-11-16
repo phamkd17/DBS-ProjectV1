@@ -52,6 +52,16 @@ own lab book.
    `suggested`, `food_science`.
 5. Capture and recipe creation are **separate moments**. Capture asks nothing.
 
+## Lab-book entries (decided Nov 15)
+
+- One kind of entry (`public.dictations`): **title** (`dish_name`), **Idea
+  notes** (`notes` + `link`, the user's own, kept in every stage), and **Cook ·
+  Their words** (`transcript`, optional until added). "New → Idea" starts with
+  notes; "New → Dictation" starts with words. `public.ideas` is no longer used.
+- Tabs = `stage`: Ideas → Development → Finished (move freely). The AI recipe
+  step only runs in Development and only once the cook's words exist (checked
+  in the UI and in `createRecipe`). Idea notes are not sent to the AI.
+
 ## Sharing model (decided Nov 13)
 
 - Every user has a **private lab book** (single-user works on its own).

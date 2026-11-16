@@ -5,6 +5,7 @@ import { deleteDictation } from "@/app/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { RecipeView } from "@/components/RecipeView";
 import { DictationEditor } from "@/components/DictationEditor";
+import { EditableNotes } from "@/components/InlineEdit";
 import { eyebrow, focusRing, formatDate, SourceBadge, textLink } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
@@ -45,6 +46,7 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
             words. Answer what you know.
           </p>
         </div>
+        <EditableNotes kind="dictation" id={dictation.id} note={dictation.notes} link={dictation.link} />
         <DictationEditor dictation={dictation} />
         <QuestionsForm recipeId={recipe.id} questions={questions ?? []} cookName={dictation.cook_name} />
       </main>
@@ -74,6 +76,8 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
       )}
 
       <RecipeView recipe={recipe.recipe} cookName={dictation.cook_name} />
+
+      <EditableNotes kind="dictation" id={dictation.id} note={dictation.notes} link={dictation.link} />
 
       <section aria-label="Original dictation" className="space-y-3">
         <DictationEditor dictation={dictation} />

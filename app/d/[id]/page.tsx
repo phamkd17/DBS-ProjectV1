@@ -32,8 +32,6 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
     .maybeSingle();
   if (recipe) redirect(`/r/${recipe.id}`);
 
-  const inIdeas = d.stage === "ideas";
-
   return (
     <main className="space-y-8">
       <div className="space-y-3">
@@ -42,35 +40,31 @@ export default async function DictationPage({ params }: PageProps<"/d/[id]">) {
             {STAGE_LABEL[d.stage]}
           </Link>
         </p>
-        <EditableTitle kind="dictation" id={d.id} title={d.dish_name ?? ""} placeholder="Untitled dictation" />
+        <EditableTitle kind="dictation" id={d.id} title={d.dish_name ?? ""} placeholder="Untitled" />
         <p className={eyebrow}>
           {d.cook_name ? `${d.cook_name} · ` : ""}Saved {formatDate(d.created_at)}
         </p>
       </div>
 
-      {inIdeas ? (
-        <>
-          {/* In Ideas it's just notes. Moved to Development, these become the cook's words for the AI. */}
-          <EditableNotes
-            kind="dictation"
-            id={d.id}
-            note={d.transcript}
-            hint="When you move this to Development, these notes become the cook's words the AI reads."
-          />
+      {/* Idea notes stay in every stage. */}
+      <EditableNotes kind="dictation" id={d.id} note={d.notes} link={d.link} />
+
+      {/* Cook · Their words: shown, or a way to add them. The AI step follows. */}
+      <DictationEditor dictation={d} open addIsPrimary={d.stage === "development"}>
+        {d.stage === "development" ? (
+          d.transcript ? (
+            <CreateRecipe dictationId={d.id} />
+          ) : null
+        ) : (
           <StartDeveloping dictationId={d.id} />
-        </>
-      ) : (
-        <DictationEditor dictation={d} open>
-          {/* The AI recipe step only appears in Development. */}
-          {d.stage === "development" ? <CreateRecipe dictationId={d.id} /> : <StartDeveloping dictationId={d.id} />}
-        </DictationEditor>
-      )}
+        )}
+      </DictationEditor>
 
       <MoveTo kind="dictation" id={d.id} current={d.stage} hide={d.stage === "development" ? [] : ["development"]} />
 
       <form action={deleteDictation.bind(null, d.id)} className="border-t border-ls-border pt-4">
-        <ConfirmSubmit variant="danger" message="Delete these words and any recipe made from them? This can't be undone.">
-          Delete this dictation
+        <ConfirmSubmit variant="danger" message="Delete this, with its notes, words, and any recipe made from them? This can't be undone.">
+          Delete
         </ConfirmSubmit>
       </form>
     </main>

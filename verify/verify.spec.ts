@@ -15,7 +15,7 @@ import { expect, test, type Page } from "@playwright/test";
 const SHOTS = "verify/screenshots";
 const TEST_EMAIL = "labbook-tester+clerk_test@example.com";
 // Unique per run, so leftovers from a failed run never match this run's checks.
-const RUN = new Date().toISOString().slice(5, 16).replace("T", " ");
+const RUN = new Date().toISOString().slice(5, 19).replace("T", " ");
 const IDEA = `Caramelized onion crunch (verify ${RUN})`;
 // Constant, so the dev-only AI cache can reuse responses (the dish name is part of the prompt).
 const DISH = "Yogurt (verify run)";
@@ -170,7 +170,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await check(page, "idea-new-errors", { keyboard: true });
   await page.getByLabel(/Link/).fill("example.com/onions");
   await page.getByRole("button", { name: "Save idea" }).click();
-  await page.waitForURL(/\/i\//);
+  await page.waitForURL(/\/d\//); // an idea is an entry with notes and no cook's words yet
   const ideaUrl = page.url();
   await expect(page.getByRole("link", { name: /example\.com\/onions/ })).toBeVisible();
   await check(page, "idea", { keyboard: true });
@@ -205,10 +205,24 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await expect(page.getByRole("listitem").filter({ hasText: IDEA, visible: true })).toBeVisible();
   await check(page, "home-development-moved-idea");
 
+  // In Development, the idea keeps its notes and offers "Add the cook's words".
   await page.goto(ideaUrl);
+  await expect(view.getByText(/Dry at 200°F/)).toBeVisible(); // notes kept after the move
+  await expect(view.getByText(/No cook's words yet/)).toBeVisible();
+  await expect(view.getByRole("button", { name: "Create recipe with AI" })).toHaveCount(0);
+  await check(page, "idea-in-development-no-words", { keyboard: true });
+  await view.getByRole("button", { name: "Add the cook's words" }).click();
+  await view.getByLabel("The cook's words", { exact: true }).fill("You slice the onions thin and cook them low for an hour until deep brown, then dry them in the oven.");
+  await view.getByLabel(/Whose words/).fill("Auntie");
+  await view.getByRole("button", { name: "Save changes" }).click();
+  await expect(view.getByText("Their words, exactly as said")).toBeVisible();
+  await expect(view.getByRole("heading", { name: "Ready to make it a recipe?" })).toBeVisible(); // AI step now offered
+  await expect(view.getByText(/Dry at 200°F/)).toBeVisible(); // notes still there
+  await check(page, "idea-with-words-added");
+
   page.once("dialog", (d) => d.accept());
-  await page.getByRole("button", { name: "Delete this idea" }).click();
-  await page.waitForURL(/tab=ideas/);
+  await view.getByRole("button", { name: "Delete", exact: true }).click();
+  await page.waitForURL((u) => u.pathname === "/");
   // Scope to <main>: Next keeps hidden copies of past pages, and its screen-reader
   // route announcer still holds the old title.
   await expect(page.locator("main").getByText(IDEA).filter({ visible: true })).toHaveCount(0);
@@ -238,9 +252,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   // In Ideas there's no AI button, only "Move to Development". (Wait for the page first,
   // or the "no AI button" check passes trivially on the loading skeleton.)
   await expect(view.getByRole("heading", { name: "Ready to develop it?" })).toBeVisible();
-  // In Ideas a dictation reads as idea notes, not the cook's-words panel.
+  // Idea notes and the cook's words are separate sections.
   await expect(view.getByRole("heading", { name: "Idea notes" })).toBeVisible();
-  await expect(view.getByText("Their words, exactly as said")).toHaveCount(0);
+  await expect(view.getByText("Their words, exactly as said")).toBeVisible();
   await expect(view.getByRole("button", { name: "Create recipe with AI" })).toHaveCount(0);
   await check(page, "dictation-in-ideas");
   await view.getByRole("button", { name: "Move to Development" }).click();

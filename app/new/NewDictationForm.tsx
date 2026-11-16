@@ -29,7 +29,7 @@ export function NewDictationForm({
   const v =
     state.values ??
     (dictation
-      ? { transcript: dictation.transcript, dish_name: dictation.dish_name ?? "", cook_name: dictation.cook_name ?? "" }
+      ? { transcript: dictation.transcript ?? "", dish_name: dictation.dish_name ?? "", cook_name: dictation.cook_name ?? "" }
       : { dish_name: defaultDish });
   const err = state.fieldErrors ?? {};
 

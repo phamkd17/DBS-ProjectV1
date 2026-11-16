@@ -28,7 +28,11 @@ export type DictationRow = {
   stage: Stage;
   dish_name: string | null;
   cook_name: string | null;
-  transcript: string;
+  /** Idea notes + link: the user's own notes. Kept in every stage. */
+  notes: string;
+  link: string | null;
+  /** The cook's words. Optional until someone adds them. */
+  transcript: string | null;
   original_transcript: string | null;
   edited_at: string | null;
   copied_from: string | null;

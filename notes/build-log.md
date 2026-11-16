@@ -382,3 +382,21 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   titles were cut off in a one-line box. Now it's the same serif size and wraps
   (a textarea where Enter saves). Rename ✓, notes ✓, focus returns to the
   pencil ✓, no cook panel in Ideas ✓.
+
+### B34. Idea notes and the cook's words are separate
+- **Student:** "Keep ideas note when it is move to develompent. Have a new
+  setction for Cook Their words. If it doesn't have one have a way to add it."
+- **Data model change:** ideas and dictations became **one kind of entry**
+  (`dictations`: title, `notes` + `link`, optional `transcript`). Existing
+  ideas were migrated over (stage and date kept). Adding words for the first
+  time doesn't count as an "edit" (the trigger was updated).
+- **Every entry page:** title (pencil) · **Idea notes** (pencil, kept in every
+  stage, also on the recipe page) · **Cook · Their words**: the words with "Edit
+  their words", or a dashed "No cook's words yet" box with **Add the cook's
+  words** (in place). The AI step appears only in Development **and** once
+  words exist; `createRecipe` refuses without words.
+- "Add the cook's words" is the primary button in Development (it's the next
+  step) and secondary in Ideas (where "Move to Development" is primary).
+- **Verify:** an idea moved to Development keeps its notes ✓, shows "No cook's
+  words yet" with no AI button ✓; adding words in place shows them and the AI
+  panel ✓; notes still there ✓. 0 Gemini calls.
