@@ -503,3 +503,6 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - Landing paragraph updated to match the app (words are editable now; labels
   are behind Show sources). **Options offered:** A workflow / B short and plain /
   C lab-book voice. **Student chose:** "A: The workflow."
+- **Student:** "When it's ready, send it to someone else to cook or save it for
+  future use. The sending is only an option." Last sentence updated to their
+  wording.
