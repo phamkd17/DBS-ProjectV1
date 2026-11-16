@@ -496,3 +496,7 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   (think aloud, I won't help), 5 tasks worded without button names, what to
   watch for in each, after-task questions, a notes template, and the yogurt
   dictation to text.
+
+### B41. Landing eyebrow
+- **Student:** "A lab book for family recipes can you change to a lab book for
+  receipe development." Now reads "A lab book for recipe development". Verify ✓.

@@ -179,7 +179,7 @@ function FirstRun() {
 function Landing() {
   return (
     <main className="space-y-8 py-8">
-      <p className={eyebrow}>A lab book for family recipes</p>
+      <p className={eyebrow}>A lab book for recipe development</p>
       <h1 className="font-ls-serif text-5xl leading-[1.05] sm:text-7xl">
         Turn what cooks say while they cook into recipes others can repeat.
       </h1>
