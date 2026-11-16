@@ -186,7 +186,7 @@ function Landing() {
       <p className="max-w-prose text-lg leading-relaxed text-ls-muted">
         Jot down ideas, save what the cook says while they cook, and develop them into recipes. The AI asks what a new
         cook couldn&apos;t know, explains the science behind each step, and keeps track of what came from whom. When
-        it&apos;s ready, send it to someone else to cook.
+        it&apos;s ready, send it to someone else to cook or save it for future use.
       </p>
       <div className="flex flex-wrap gap-3 border-t border-ls-ink pt-8">
         <SignUpButton mode="modal">
