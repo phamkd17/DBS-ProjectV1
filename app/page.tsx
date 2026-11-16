@@ -162,23 +162,41 @@ function EntryCard({ d }: { d: Row }) {
 
 function FirstRun() {
   // Draft wording: for the student to review.
+  const cards = [
+    {
+      id: "start-idea",
+      title: "Start with an idea",
+      body: "Tasted something you want to make, saw a technique, or found a recipe online? Jot it down with a note and a link. It waits in Ideas until you're ready to develop it into a recipe.",
+      href: "/ideas/new",
+      cta: "Save an idea",
+    },
+    {
+      id: "start-words",
+      title: "Start with the cook's words",
+      body: "While someone cooks, tap the microphone on the phone keyboard and let them talk through what they're doing. Then paste or dictate it here. The app asks about anything a new cook couldn't figure out and helps you turn it into a recipe.",
+      href: "/new",
+      cta: "Add the cook's words",
+    },
+  ];
   return (
-    <div className="space-y-4 border border-ls-ink bg-ls-surface p-6">
-      <h2 className="font-ls-serif text-3xl leading-tight">Start with one dish</h2>
-      <p className="max-w-prose text-[17px] leading-relaxed">
-        Save an idea for something you want to make, or the cook&apos;s words: while someone cooks, tap the microphone
-        on the phone keyboard and let them talk through what they&apos;re doing. The app asks about anything a new cook
-        couldn&apos;t figure out and helps you turn it into a recipe.
-      </p>
-      <div className="flex flex-wrap gap-3">
-        <LinkButton href="/ideas/new" variant="secondary">
-          Save an idea
-        </LinkButton>
-        <LinkButton href="/new" variant="secondary">
-          Add your first dictation
-        </LinkButton>
-      </div>
-    </div>
+    <section aria-labelledby="first-run" className="space-y-4">
+      <h2 id="first-run" className="font-ls-serif text-3xl leading-tight">
+        Start with one dish
+      </h2>
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {cards.map((c) => (
+          <li key={c.id} aria-labelledby={c.id} className="flex flex-col gap-4 border border-ls-ink bg-ls-surface p-6">
+            <h3 id={c.id} className="font-ls-serif text-2xl leading-tight">
+              {c.title}
+            </h3>
+            <p className="flex-1 text-[17px] leading-relaxed">{c.body}</p>
+            <LinkButton href={c.href} variant="secondary" className="self-start">
+              {c.cta}
+            </LinkButton>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

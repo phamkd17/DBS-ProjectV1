@@ -514,3 +514,11 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   paragraph (agent draft) to mention ideas and drop "keeps their words exactly",
   which is no longer true. Checked with a brand-new test account: 390/1440
   screenshots, 0 axe violations, button goes to /ideas/new.
+
+### B43. First-run: two cards
+- **Student:** "Can the first landing page have a different cards for Idea and
+  have a similar explanation?"
+- The empty lab book now shows "Start with one dish" with two matching cards:
+  **Start with an idea** (Save an idea) and **Start with the cook's words** (Add
+  the cook's words), side by side on wide screens and stacked on phones.
+  Agent-drafted copy. Empty test account at 390/1440 ✓, 0 axe violations.
