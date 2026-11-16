@@ -35,7 +35,7 @@ export function DictationEditor({ dictation: d, open = false, addIsPrimary = fal
         <p className="text-[15px] text-ls-muted">
           {hasWords
             ? "The first version is always kept, so you can see the original later."
-            : "Paste what the cook said, or tap the microphone on your keyboard and dictate."}
+            : "Tap the microphone on your phone's keyboard and have the cook talk through the ingredients and each step, in their own words. Or paste what they said."}
         </p>
         <NewDictationForm dictation={d} onSaved={() => setEditing(false)} onCancel={() => setEditing(false)} />
       </section>
@@ -68,7 +68,8 @@ export function DictationEditor({ dictation: d, open = false, addIsPrimary = fal
             </h2>
           </div>
           <p className="text-[15px] text-ls-muted">
-            No cook&apos;s words yet. Add what the cook said while they cooked. The AI makes the recipe from them.
+            No cook&apos;s words yet. Have the cook dictate how they make the dish: the ingredients, then each step in
+            detail. The AI will format it into a recipe anyone can repeat.
           </p>
           <Button ref={editBtn} variant={addIsPrimary ? "primary" : "secondary"} onClick={() => setEditing(true)}>
             Add the cook&apos;s words

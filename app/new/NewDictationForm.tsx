@@ -56,7 +56,7 @@ export function NewDictationForm({
           </p>
         ) : (
           <p id="transcript-hint" className="text-[15px] text-ls-muted">
-            Tip: on a phone, tap the 🎤 on the keyboard to dictate.
+            Tip: on a phone, tap the 🎤 on the keyboard and have the cook name the ingredients first, then each step.
           </p>
         )}
       </div>

@@ -180,6 +180,11 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   const ideaUrl = page.url();
   await expect(page.getByRole("link", { name: /example\.com\/onions/ })).toBeVisible();
   await check(page, "idea", { keyboard: true });
+  // In Ideas there's no cook's-words box, only "Move to Development".
+  const ideaView = page.locator("main").filter({ visible: true });
+  await expect(ideaView.getByRole("heading", { name: "Ready to develop it?" })).toBeVisible();
+  await expect(ideaView.getByText(/No cook's words yet/)).toHaveCount(0);
+  await expect(ideaView.getByRole("button", { name: "Add the cook's words" })).toHaveCount(0);
 
   // Edit in place: same page, no navigation.
   // Next keeps hidden copies of earlier pages (e.g. the New idea form), so act on the visible <main>.
@@ -246,24 +251,22 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.getByLabel(/Whose words/).fill("Grandma");
   await page.getByRole("button", { name: /Save their words/ }).click();
   await page.waitForURL(/\/d\//);
+  // A new dictation starts in Development (adding the cook's words is Development work).
+  // Wait for the real page, not the loading skeleton.
+  await expect(view.getByRole("heading", { name: "Ready to make it a recipe?" })).toBeVisible();
+  await expect(view.getByRole("link", { name: "Development" }).first()).toBeVisible(); // breadcrumb
+  // Idea notes and the cook's words are separate sections.
+  await expect(view.getByRole("heading", { name: "Idea notes" })).toBeVisible();
+  await expect(view.getByText("Their words, exactly as said")).toBeVisible();
   await check(page, "dictation", { keyboard: true });
 
-  await page.goto("/?tab=ideas");
+  await page.goto("/?tab=development");
   await expect(page.getByText(DISH).first()).toBeVisible();
-  await check(page, "home-ideas-tab");
+  await check(page, "home-development-with-dictation");
   await page.getByText(DISH).first().click();
   await page.waitForURL(/\/d\//);
 
   // ---- Create recipe (pass 1) ----
-  // In Ideas there's no AI button, only "Move to Development". (Wait for the page first,
-  // or the "no AI button" check passes trivially on the loading skeleton.)
-  await expect(view.getByRole("heading", { name: "Ready to develop it?" })).toBeVisible();
-  // Idea notes and the cook's words are separate sections.
-  await expect(view.getByRole("heading", { name: "Idea notes" })).toBeVisible();
-  await expect(view.getByText("Their words, exactly as said")).toBeVisible();
-  await expect(view.getByRole("button", { name: "Create recipe with AI" })).toHaveCount(0);
-  await check(page, "dictation-in-ideas");
-  await view.getByRole("button", { name: "Move to Development" }).click();
 
   // The AI step stays off until the user confirms they're ready.
   const createBtn = view.getByRole("button", { name: "Create recipe with AI" });

@@ -522,3 +522,27 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   **Start with an idea** (Save an idea) and **Start with the cook's words** (Add
   the cook's words), side by side on wide screens and stacked on phones.
   Agent-drafted copy. Empty test account at 390/1440 ✓, 0 axe violations.
+
+### B44. Ask the cook for ingredients and detailed steps
+- **Student:** "Change this to have the cook dictate how they would make the
+  dishes. If possible have ingredients and detailed steps dictated. The AI will
+  format it into repeatable recipes."
+- The empty "Their words" box now says "Have the cook dictate how they make the
+  dish: the ingredients, then each step in detail. The AI will format it into a
+  recipe anyone can repeat." The add-words hint asks the cook to talk through
+  the ingredients and each step. Verify ✓.
+- **Student:** "update in all places." The same ask (ingredients, then each step
+  in detail; the AI formats it into a repeatable recipe) is now on the New
+  dictation page intro, the dictation form tip, and the first-run "Start with the
+  cook's words" card. Dropped "Their words are saved exactly as they are" (no
+  longer true). Verify ✓ + empty-account check ✓.
+
+### B45. The cook's words are added only in Development
+- **Student:** "only have add cooks word in the development section."
+- In Ideas, an entry shows title, Idea notes, and "Ready to develop it? · Move
+  to Development" ("…to add the cook's words and create the recipe with AI").
+  No cook's-words box. In Development, the words section appears (Add the cook's
+  words → then the AI step). Words that already exist still show in any tab.
+- To match, **New → Dictation now creates the entry in Development** (adding
+  words is Development work). Verify ✓: no words box in Ideas, and a new dictation
+  lands in Development with the AI panel.
