@@ -161,17 +161,23 @@ function EntryCard({ d }: { d: Row }) {
 }
 
 function FirstRun() {
+  // Draft wording: for the student to review.
   return (
     <div className="space-y-4 border border-ls-ink bg-ls-surface p-6">
       <h2 className="font-ls-serif text-3xl leading-tight">Start with one dish</h2>
       <p className="max-w-prose text-[17px] leading-relaxed">
-        While someone cooks, tap the microphone on the phone keyboard and let them talk through what they&apos;re doing.
-        Then paste or dictate it here. The app keeps their words exactly, asks about anything a new cook couldn&apos;t
-        figure out, and turns it into a recipe you can send to others.
+        Save an idea for something you want to make, or the cook&apos;s words: while someone cooks, tap the microphone
+        on the phone keyboard and let them talk through what they&apos;re doing. The app asks about anything a new cook
+        couldn&apos;t figure out and helps you turn it into a recipe.
       </p>
-      <LinkButton href="/new" variant="secondary">
-        Add your first dictation
-      </LinkButton>
+      <div className="flex flex-wrap gap-3">
+        <LinkButton href="/ideas/new" variant="secondary">
+          Save an idea
+        </LinkButton>
+        <LinkButton href="/new" variant="secondary">
+          Add your first dictation
+        </LinkButton>
+      </div>
     </div>
   );
 }
