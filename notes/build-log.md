@@ -468,3 +468,21 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   checks every custom rule in globals.css too. The icons first sat on their own
   line (big gaps), so they moved inline. Labels hidden by default ✓, science
   opens ✓, dials open ✓, Show sources reveals labels ✓.
+
+## Nov 15 — Review and merge `refine-v1`
+
+### B39. `/security-review` on the branch (origin/main...refine-v1)
+- **Result: no findings** at or above the reporting bar. The reviewer agent
+  checked: the dictations column grants + owner-only UPDATE policy (owner_id,
+  copied_from, original_transcript, edited_at can't be changed); the
+  edit-tracking trigger; the ideas → dictations migration (keeps each row's
+  owner); share functions don't expose `notes`, `link`, or
+  `original_transcript`; every server action goes through `requireUser()` +
+  RLS, so tampered ids only reach your own rows; links are http(s) only (server
+  check + DB constraint), with no `javascript:`; the dev-only AI cache is off in
+  production, its file names are hashes (no path traversal), and keys include
+  the full input (no cross-user leaks).
+- Below the bar (not fixed): malformed `rows` JSON could make
+  `updateIngredients` throw (a robustness issue only); the unused `ideas` table
+  is still granted but fully owner-only.
+- The Vercel preview build of the branch passed. Merged via a pull request.
