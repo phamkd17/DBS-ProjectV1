@@ -411,3 +411,8 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   interviews, this week's flow fixes, evals) / how / done-when, plus the AI
   angle (a labeled trial summary with its own eval), a schedule to Dec 1, and
   a cut order. It has a placeholder for real-user test findings.
+- **Student added:** "V2 will include nutritional facts from the ingredients and
+  the ability to scale different portions." Added as feature 5, with how vague
+  amounts are handled (never invented; nutrition labeled an estimate),
+  amounts as number + unit for code-based scaling, and a USDA tool-calling
+  nutrition step. Placed in the schedule, first in the cut order.

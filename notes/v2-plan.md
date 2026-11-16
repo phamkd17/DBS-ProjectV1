@@ -1,6 +1,6 @@
 # Culinary Lab Book: Plan for v2
 
-> **Draft for Khang to edit.** The four v2 features are Khang's (Nov 15). The
+> **Draft for Khang to edit.** The five v2 features are Khang's (Nov 15). The
 > evidence, design sketches, and schedule were drafted by the agent from the
 > build log. Put it in your own words before submitting.
 >
@@ -130,6 +130,44 @@ gets lost. A variation keeps her original intact, which is the core promise.
 **Done when:** a finished recipe has a description and two variations, each
 with notes and a date, and the original is unchanged.
 
+### 5. Nutrition facts and portion scaling
+
+**What:**
+- **Scale the recipe:** pick how many servings ("Makes 6 jars → make 12"), and
+  every amount that can be scaled updates (½ gallon → 1 gallon). It switches
+  between cups/spoons and grams.
+- **Nutrition facts** per serving (calories, protein, fat, carbs, sugar,
+  sodium), worked out from the ingredients.
+
+**Why:** cousins and friends cook for different numbers of people than Grandma
+does, and a recipe that can't be resized means guessing again, which is the
+problem the app exists to fix. Nutrition was asked about in my proposal
+interviews as a "nice to have" for sharing recipes beyond the family.
+
+**The hard part, handled honestly:** Grandma's amounts are often "a little
+bit" or not stated at all.
+- Amounts that aren't numbers (**"a little bit of fish sauce"**) are shown
+  unscaled, with a note, never turned into an invented number.
+- Nutrition is labeled an **estimate** and lists which ingredients it couldn't
+  count ("fish sauce: amount not stated").
+- Accepted suggestions still count, and stay labeled **Suggested**.
+- "How much does this make?" becomes one of the AI's questions in pass 1, since
+  the dictations rarely say.
+
+**How (sketch), with the AI angle:**
+- The recipe format stores each amount as **number + unit** (plus the original
+  words), so scaling and unit conversion are plain code, not AI. These are the
+  `convert_units` tool from my proposal.
+- A **nutrition step with tool calling:** the AI matches each ingredient to a
+  food in USDA FoodData Central (free API), and code does the math. The AI
+  never makes up nutrient numbers.
+- **Evals:** scaling is unit-tested (½ gallon × 2 = 1 gallon; "a little bit"
+  stays as is). Nutrition is checked against hand-computed totals for the yogurt.
+
+**Done when:** I can make the yogurt for 12 instead of 6 and every measurable
+amount doubles correctly, the vague ones stay as they are, and the nutrition
+panel is labeled as an estimate and names what it left out.
+
 ---
 
 ## Also fixing (from v1)
@@ -145,14 +183,17 @@ with notes and a date, and the original is unchanged.
 |---|---|
 | Weekend before Nov 17 | Real-user tests on v1; fill in "What we saw" |
 | Week of Nov 17 | **2. Streamlined flow** (from test findings) · **1. Photos** · AI recall fix (p5) |
-| Week of Nov 24 (no class) | **3. Iterations** + AI trial summary and its eval · my yogurt test batch, logged as trial 1 |
-| Nov 28 – Dec 1 | **4. Descriptions + variations** · cousin's batch as trial 2 · fair prep |
+| Week of Nov 24 (no class) | **3. Iterations** + AI trial summary and its eval · **5. Portion scaling** (amounts as number + unit) · my yogurt test batch, logged as trial 1 |
+| Nov 28 – Dec 1 | **4. Descriptions + variations** · **5. Nutrition** (USDA tool) · cousin's batch as trial 2 · fair prep |
 
-**If behind, cut in this order:** the AI trial summary → variations (keep the
-description) → multiple photos (keep one per idea).
+**If behind, cut in this order:** nutrition (keep scaling) → the AI trial
+summary → variations (keep the description) → multiple photos (keep one per
+idea).
 
 ## Open questions
 
 - Should Idea notes (and photos) ever be sent to the AI, or only the cook's words?
 - Can trials and variations be shared with family by link, like recipes are now?
 - Who logs the cousin's trial: the cousin in their own copy, or me in mine?
+- Nutrition: is calories + the big four (protein, fat, carbs, sugar) enough, or
+  does it need a full nutrition label?

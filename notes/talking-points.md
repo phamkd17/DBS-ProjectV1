@@ -192,4 +192,5 @@ now gets "permission denied".
 - **Testing with real users:** who, what they did, where they got stuck
 - **Plan for v2:** see `notes/v2-plan.md` (photos in ideas, a streamlined
   idea → development → recipe flow, iterations/trials with what each change does,
-  and descriptions + variations with notes and dates)
+  descriptions + variations with notes and dates, and portion scaling +
+  nutrition facts)
