@@ -184,8 +184,9 @@ function Landing() {
         Turn what cooks say while they cook into recipes others can repeat.
       </h1>
       <p className="max-w-prose text-lg leading-relaxed text-ls-muted">
-        Paste a cook&apos;s dictation. Culinary Lab Book keeps their words exactly, asks what a new cook couldn&apos;t
-        know, labels every reason by who said it, and lets you send the recipe to someone else.
+        Jot down ideas, save what the cook says while they cook, and develop them into recipes. The AI asks what a new
+        cook couldn&apos;t know, explains the science behind each step, and keeps track of what came from whom. When
+        it&apos;s ready, send it to someone else to cook.
       </p>
       <div className="flex flex-wrap gap-3 border-t border-ls-ink pt-8">
         <SignUpButton mode="modal">

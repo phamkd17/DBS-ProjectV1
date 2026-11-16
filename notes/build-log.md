@@ -500,3 +500,6 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 ### B41. Landing eyebrow
 - **Student:** "A lab book for family recipes can you change to a lab book for
   receipe development." Now reads "A lab book for recipe development". Verify ✓.
+- Landing paragraph updated to match the app (words are editable now; labels
+  are behind Show sources). **Options offered:** A workflow / B short and plain /
+  C lab-book voice. **Student chose:** "A: The workflow."
