@@ -506,3 +506,11 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Student:** "When it's ready, send it to someone else to cook or save it for
   future use. The sending is only an option." Last sentence updated to their
   wording.
+
+### B42. First-run: "Save an idea"
+- **Student:** "Add Save an idea" (on the empty lab book's "Start with one dish").
+- Added a **Save an idea** button (→ /ideas/new) before "Add your first
+  dictation", both secondary (New stays the one primary). Reworded the
+  paragraph (agent draft) to mention ideas and drop "keeps their words exactly",
+  which is no longer true. Checked with a brand-new test account: 390/1440
+  screenshots, 0 axe violations, button goes to /ideas/new.
