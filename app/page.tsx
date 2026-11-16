@@ -173,7 +173,7 @@ function FirstRun() {
     {
       id: "start-words",
       title: "Start with the cook's words",
-      body: "While someone cooks, tap the microphone on the phone keyboard and let them talk through what they're doing. Then paste or dictate it here. The app asks about anything a new cook couldn't figure out and helps you turn it into a recipe.",
+      body: "Have the cook dictate how they make the dish: the ingredients, then each step in detail. Tap the microphone on the phone keyboard, or paste what they said. The AI will format it into a recipe anyone can repeat.",
       href: "/new",
       cta: "Add the cook's words",
     },

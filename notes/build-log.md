@@ -531,3 +531,8 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   dish: the ingredients, then each step in detail. The AI will format it into a
   recipe anyone can repeat." The add-words hint asks the cook to talk through
   the ingredients and each step. Verify ✓.
+- **Student:** "update in all places." The same ask (ingredients, then each step
+  in detail; the AI formats it into a repeatable recipe) is now on the New
+  dictation page intro, the dictation form tip, and the first-run "Start with the
+  cook's words" card. Dropped "Their words are saved exactly as they are" (no
+  longer true). Verify ✓ + empty-account check ✓.
