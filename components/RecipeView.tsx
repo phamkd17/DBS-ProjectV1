@@ -1,4 +1,5 @@
 import type { Recipe } from "@/lib/ai/schema";
+import { EditableAmount } from "./EditableAmount";
 import { eyebrow, SourceBadge, Transcript } from "./ui";
 
 type Props = {
@@ -8,10 +9,12 @@ type Props = {
   cookName?: string | null;
   original?: string | null;
   editedAt?: string | null;
+  /** Owner's own recipe: amounts get a pencil to edit them. Omit for read-only (shared links). */
+  editableRecipeId?: string;
 };
 
 /** The finished recipe: ingredients, steps, the why labeled by source, and her words. */
-export function RecipeView({ recipe, transcript, cookName, original, editedAt }: Props) {
+export function RecipeView({ recipe, transcript, cookName, original, editedAt, editableRecipeId }: Props) {
   return (
     <article className="space-y-10">
       <header className="space-y-4">
@@ -27,11 +30,24 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt }:
           {recipe.ingredients.map((ing, i) => (
             <li key={i} className="space-y-1.5 py-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <p className="text-[17px]">
-                  {ing.amount ? <span className="font-medium">{ing.amount} </span> : null}
-                  {ing.item}
-                  {!ing.amount && <span className="text-ls-muted"> · amount not stated</span>}
-                </p>
+                {editableRecipeId ? (
+                  <p className="flex flex-wrap items-center gap-x-2 text-[17px]">
+                    <EditableAmount
+                      recipeId={editableRecipeId}
+                      index={i}
+                      amount={ing.amount}
+                      item={ing.item}
+                      cookName={cookName ?? ""}
+                    />
+                    <span>{ing.item}</span>
+                  </p>
+                ) : (
+                  <p className="text-[17px]">
+                    {ing.amount ? <span className="font-medium">{ing.amount} </span> : null}
+                    {ing.item}
+                    {!ing.amount && <span className="text-ls-muted"> · amount not stated</span>}
+                  </p>
+                )}
                 <SourceBadge source={ing.source} cookName={cookName} />
               </div>
               {ing.from_answers.map((a, j) => (

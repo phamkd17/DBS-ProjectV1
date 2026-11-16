@@ -424,3 +424,48 @@ export async function updateNotes(
   revalidatePath("/", "layout");
   return { saved: true };
 }
+
+// ---------------------------------------------------------------------------
+// Edit one ingredient's amount on a finished recipe. The new amount is labeled
+// as a family answer (not the cook's), and the old one is kept in the note.
+// ---------------------------------------------------------------------------
+export async function updateIngredientAmount(
+  recipeId: string,
+  index: number,
+  cookName: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireUser();
+  const amount = String(formData.get("amount") ?? "").trim().slice(0, 60);
+  const values = { amount };
+
+  const supabase = await supabaseForUser();
+  // RLS: only your own recipe comes back.
+  const { data: row } = await supabase.from("recipes").select("recipe").eq("id", recipeId).single<Pick<RecipeRow, "recipe">>();
+  const ing = row?.recipe?.ingredients?.[index];
+  if (!row?.recipe || !ing || !Number.isInteger(index)) return { values, error: "We couldn't find that ingredient. Refresh and try again." };
+  if (amount === ing.amount) return { saved: true };
+
+  const who = ing.source === "cook" ? cookName || "the cook" : ing.source === "suggested" ? "a suggestion" : ing.source === "user_answer" ? "a family answer" : "not stated";
+  const when = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const history = ing.amount ? `Changed from “${ing.amount}” (${who}) on ${when}.` : `Amount added on ${when}.`;
+  const ingredients = row.recipe.ingredients.map((x, i) =>
+    i === index
+      ? { ...x, amount, source: amount ? ("user_answer" as const) : ("not_stated" as const), note: [x.note, history].filter(Boolean).join(" ") }
+      : x
+  );
+
+  const { error } = await supabase
+    .from("recipes")
+    // Not bumping updated_at: it marks when the AI made the recipe, which the
+    // "words edited after this recipe was made" notice compares against.
+    .update({ recipe: { ...row.recipe, ingredients } })
+    .eq("id", recipeId);
+  if (error) {
+    console.error("[updateIngredientAmount]", error);
+    return { values, error: "Couldn't save the amount. Try again." };
+  }
+  revalidatePath(`/r/${recipeId}`);
+  return { saved: true };
+}

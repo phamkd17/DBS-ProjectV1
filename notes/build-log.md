@@ -416,3 +416,17 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   amounts are handled (never invented; nutrition labeled an estimate),
   amounts as number + unit for code-based scaling, and a USDA tool-calling
   nutrition step. Placed in the schedule, first in the cut order.
+
+### B36. Edit ingredient amounts on a recipe
+- **Student:** "Please have a way that I can edit the quantity in the
+  ingredients list for the recepie."
+- **Built:** a pencil next to each amount on your own finished recipe; it edits
+  in place (Enter saves, Escape cancels, focus returns to the pencil).
+- **Honest labels:** a changed amount becomes **Family answer** (no longer the
+  cook's), and the ingredient note keeps the history ("Changed from “1/2
+  gallon” (Grandma) on Nov 15."). Clearing it marks it "Not stated". Shared
+  links stay read-only (no pencils).
+- **Bug avoided:** saving an amount doesn't bump the recipe's `updated_at`,
+  which would have hidden the "words edited after this recipe was made" notice.
+- **Verify:** edit → "Family answer" ✓, history note ✓, focus ✓, no pencils
+  on the shared page ✓.

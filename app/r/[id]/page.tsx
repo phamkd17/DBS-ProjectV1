@@ -75,7 +75,7 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
         </p>
       )}
 
-      <RecipeView recipe={recipe.recipe} cookName={dictation.cook_name} />
+      <RecipeView recipe={recipe.recipe} cookName={dictation.cook_name} editableRecipeId={recipe.id} />
 
       <EditableNotes kind="dictation" id={dictation.id} note={dictation.notes} link={dictation.link} />
 

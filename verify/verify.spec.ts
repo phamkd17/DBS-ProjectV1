@@ -290,6 +290,20 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   );
   await check(page, "recipe-finished", { keyboard: true });
 
+  // ---- Edit an ingredient amount in place ----
+  const amountPencil = page.getByRole("button", { name: /^Edit amount of / }).first();
+  const ingredientName = (await amountPencil.getAttribute("aria-label"))!.replace("Edit amount of ", "");
+  await amountPencil.click();
+  const amountBox = page.getByRole("textbox", { name: `Amount of ${ingredientName}` });
+  await amountBox.fill("2 cups (verify)");
+  await check(page, "recipe-amount-editing");
+  await amountBox.press("Enter");
+  const row = page.locator("main").getByRole("listitem").filter({ hasText: "2 cups (verify)", visible: true });
+  await expect(row).toBeVisible();
+  await expect(row.getByText("Family answer")).toBeVisible(); // relabeled: no longer the cook's amount
+  await expect(row.getByText(/Changed from|Amount added/)).toBeVisible(); // the old amount is kept
+  await expect(page.getByRole("button", { name: `Edit amount of ${ingredientName}` })).toBeFocused();
+
   // ---- Send ----
   await page.getByRole("button", { name: "Make a link" }).click();
   const shareUrl = await page.getByLabel("Private link").inputValue({ timeout: 15_000 });
@@ -301,6 +315,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await sp.goto(new URL(new URL(shareUrl).pathname, page.url()).toString());
   await expect(sp.getByRole("heading", { name: "Ingredients" })).toBeVisible();
   await expect(sp.getByRole("button", { name: /Sign in to save/ })).toBeVisible();
+  await expect(sp.getByRole("button", { name: /^Edit amount of / })).toHaveCount(0); // shared links are read-only
   await check(sp, "shared-signed-out", { keyboard: true });
 
   await page.getByRole("button", { name: "Turn off link" }).click();
