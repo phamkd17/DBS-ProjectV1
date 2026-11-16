@@ -190,4 +190,6 @@ now gets "permission denied".
 - **Where identity and access are decided:** Clerk session → Supabase RLS policies
 - **Where API calls happen and why:** server-only, so the key never reaches the phone
 - **Testing with real users:** who, what they did, where they got stuck
-- **Plan for v2**
+- **Plan for v2:** see `notes/v2-plan.md` (photos in ideas, a streamlined
+  idea → development → recipe flow, iterations/trials with what each change does,
+  and descriptions + variations with notes and dates)

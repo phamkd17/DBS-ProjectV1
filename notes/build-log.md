@@ -400,3 +400,14 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Verify:** an idea moved to Development keeps its notes ✓, shows "No cook's
   words yet" with no AI button ✓; adding words in place shows them and the AI
   panel ✓; notes still there ✓. 0 Gemini calls.
+
+### B35. v2 plan drafted
+- **Student:** "Can you generate V2 proposal with this: V2 will include pictures
+  in the idea generation; better UIUX to streamline the workflow from idea
+  generation to development to final recipes; iterations and the development
+  with notes on how different parameters changes the dish; recipe description
+  and the different variation of the same recipes with notes and dates."
+- Draft in `notes/v2-plan.md`: each feature with what / why (evidence from
+  interviews, this week's flow fixes, evals) / how / done-when, plus the AI
+  angle (a labeled trial summary with its own eval), a schedule to Dec 1, and
+  a cut order. It has a placeholder for real-user test findings.
