@@ -522,3 +522,12 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   **Start with an idea** (Save an idea) and **Start with the cook's words** (Add
   the cook's words), side by side on wide screens and stacked on phones.
   Agent-drafted copy. Empty test account at 390/1440 ✓, 0 axe violations.
+
+### B44. Ask the cook for ingredients and detailed steps
+- **Student:** "Change this to have the cook dictate how they would make the
+  dishes. If possible have ingredients and detailed steps dictated. The AI will
+  format it into repeatable recipes."
+- The empty "Their words" box now says "Have the cook dictate how they make the
+  dish: the ingredients, then each step in detail. The AI will format it into a
+  recipe anyone can repeat." The add-words hint asks the cook to talk through
+  the ingredients and each step. Verify ✓.
