@@ -1,7 +1,8 @@
 import type { Recipe } from "@/lib/ai/schema";
 import { EditableIngredients } from "./EditableIngredients";
+import { SourcesScope, StepExtras } from "./RecipeExtras";
 import { IngredientList } from "./IngredientList";
-import { eyebrow, SourceBadge, Transcript } from "./ui";
+import { SourceBadge, Transcript } from "./ui";
 
 type Props = {
   recipe: Recipe;
@@ -17,6 +18,7 @@ type Props = {
 /** The finished recipe: ingredients, steps, the why labeled by source, and her words. */
 export function RecipeView({ recipe, transcript, cookName, original, editedAt, editableRecipeId }: Props) {
   return (
+    <SourcesScope>
     <article className="space-y-10">
       <header className="space-y-4">
         <h1 className="font-ls-serif text-5xl leading-none sm:text-6xl">{recipe.title}</h1>
@@ -45,10 +47,9 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt, e
                 {i + 1}
               </span>
               <div className="min-w-0 flex-1 space-y-4">
-                <p className="text-[17px] leading-relaxed">{step.text}</p>
-
+                <StepExtras step={step} number={i + 1} cookName={cookName} />
                 {step.from_answers.length > 0 && (
-                  <ul className="space-y-1.5">
+                  <ul className="src-only space-y-1.5">
                     {step.from_answers.map((a, j) => (
                       <li key={j} className="flex flex-wrap items-baseline gap-2 text-[15px] text-ls-muted">
                         <SourceBadge source={a.source} /> {a.text}
@@ -57,42 +58,6 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt, e
                   </ul>
                 )}
 
-                {step.dials.length > 0 && (
-                  <div className="space-y-1.5">
-                    <p className={eyebrow}>Adjust to taste</p>
-                    <ul className="divide-y divide-ls-rule/60 border border-ls-border bg-ls-surface">
-                      {step.dials.map((d, j) => (
-                        <li key={j} className="flex flex-wrap items-baseline gap-x-2 px-3 py-2 text-[15px]">
-                          <span className="font-medium">{d.setting}</span>
-                          <span aria-hidden className="text-ls-muted">
-                            →
-                          </span>
-                          <span>{d.effect}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {step.why.length > 0 && (
-                  <div className="space-y-2 border-l-2 border-ls-ink pl-4">
-                    <p className={eyebrow}>Why</p>
-                    <ul className="space-y-2.5">
-                      {step.why.map((w, j) => (
-                        <li key={j} className="space-y-1 text-[15px] leading-relaxed">
-                          <SourceBadge source={w.source} cookName={cookName} />
-                          <p>
-                            {w.source === "cook" && w.quote ? (
-                              <q className="font-ls-serif text-lg italic">{w.quote}</q>
-                            ) : (
-                              w.text
-                            )}
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </li>
           ))}
@@ -100,7 +65,7 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt, e
       </section>
 
       {recipe.notes.length > 0 && (
-        <section aria-labelledby="changes" className="space-y-3">
+        <section aria-labelledby="changes" className="src-only space-y-3">
           <h2 id="changes" className="font-ls-serif text-3xl leading-tight">
             What the app changed
           </h2>
@@ -118,13 +83,14 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt, e
         </section>
       )}
     </article>
+    </SourcesScope>
   );
 }
 
 /** One line that explains the labels, near the top where they first appear. */
 function Legend({ cookName }: { cookName?: string | null }) {
   return (
-    <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[15px] text-ls-muted">
+    <p className="src-only flex flex-wrap items-center gap-x-3 gap-y-2 text-[15px] text-ls-muted">
       <span>Where each part came from:</span>
       <SourceBadge source="cook" cookName={cookName} />
       <SourceBadge source="user_answer" />

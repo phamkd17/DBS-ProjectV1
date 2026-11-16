@@ -123,7 +123,13 @@ test("served CSS matches app/globals.css (dev server not stale)", async ({ page 
       .join("\n")
   );
   const stale = tokens.filter(([name, hex]) => served.includes(name) && !served.includes(`${name}: ${hex}`));
-  expect(stale, `Stale CSS. Restart the dev server (rm -rf .next). Mismatched: ${stale.map((t) => t.join(" ")).join(", ")}`).toEqual([]);
+  // Also every custom rule outside @theme (e.g. [data-sources="hidden"] .src-only).
+  const selectors = [...src.matchAll(/^([.[][^{\n]+?)\s*\{/gm)].map((m) => m[1].trim().replace(/"/g, ""));
+  const missing = selectors.filter((sel) => !served.replace(/"/g, "").includes(sel));
+  expect(
+    [...stale.map((t) => t.join(" ")), ...missing],
+    "Stale CSS: the dev server isn't serving app/globals.css. Restart it (rm -rf .next)."
+  ).toEqual([]);
 });
 
 test("core task as a new person, every screen at 390 and 1440", async ({ page, browser }) => {
@@ -288,7 +294,24 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await waitForAi(page, () =>
     page.getByRole("heading", { name: "Ingredients" }).waitFor({ timeout: 4 * 60_000 })
   );
+  // Calm by default: no source labels until "Show sources".
+  const main = page.locator("main").filter({ visible: true });
+  await expect(main.getByText("Where each part came from:")).toBeHidden();
+  await expect(main.getByRole("switch", { name: "Show sources" })).toHaveAttribute("aria-checked", "false");
   await check(page, "recipe-finished", { keyboard: true });
+
+  // Science icon: opens "Why it works" for that step only.
+  const why = main.getByRole("button", { name: /^Why step \d+ works$/ }).first();
+  await why.click();
+  await expect(why).toHaveAttribute("aria-expanded", "true");
+  await expect(main.getByText("Why it works").first()).toBeVisible();
+  const dials = main.getByRole("button", { name: /^Adjust step \d+ to taste$/ }).first();
+  if (await dials.count()) {
+    await dials.click();
+    await expect(dials).toHaveAttribute("aria-expanded", "true");
+    await expect(main.getByText("Adjust to taste").first()).toBeVisible();
+  }
+  await check(page, "recipe-science-and-dials-open");
 
   // ---- Edit the whole ingredient list from one pencil ----
   await page.getByRole("button", { name: "Edit ingredients" }).click();
@@ -304,6 +327,9 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await page.getByRole("button", { name: "Save ingredients" }).click();
 
   const list = page.locator("main").filter({ visible: true });
+  // Labels and history are behind "Show sources".
+  await list.getByRole("switch", { name: "Show sources" }).click();
+  await expect(list.getByText("Where each part came from:")).toBeVisible();
   const changed = list.getByRole("listitem").filter({ hasText: "2 cups (verify)" });
   await expect(changed).toBeVisible();
   await expect(changed.getByText("Family answer").first()).toBeVisible(); // relabeled: no longer the cook's amount

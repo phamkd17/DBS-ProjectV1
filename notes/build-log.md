@@ -445,3 +445,26 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   contain…"). On phones each ingredient now stacks (name full width, amount
   below); wider screens keep the table. Change ✓, add ✓, remove ✓, focus
   returns ✓, no per-row pencils ✓.
+
+### B38. A calmer recipe: sources behind a switch, why and dials behind icons
+- **Student:** "Can you remove the cook, family answer, and suggested? In
+  addition can you make a small Science icon that if the user clicks on it
+  explains the food science and Adjust to taste as another icon where the user
+  can expand if they want. Having everything shown is too busy." Then: "Only show
+  the icon if they are relevant."
+- **Pushback (once):** the labels are the proposal's differentiator and the
+  AI-focus honesty promise. **Options offered:** hide them behind one "Show
+  sources" switch / remove them entirely. **Student chose:** "Hidden, one 'Show
+  sources' switch." Her quotes: **behind the Science icon** (her reason first,
+  then the science).
+- **Built:** the recipe shows only amounts, items, and instructions. A **Show
+  sources** switch (`role="switch"`) reveals the labels, answer details, edit
+  history, and "What the app changed" (`.src-only` + `[data-sources]`). Each
+  step has a **flask** icon (Why it works: "Grandma's reason" → "The science")
+  and a **sliders** icon (Adjust to taste), each only if there's real content
+  (blank entries don't count). They sit at the end of the step's first line;
+  `aria-expanded`, and solid ink when open.
+- **Verify found:** stale CSS again. The guard only compared colors, so it now
+  checks every custom rule in globals.css too. The icons first sat on their own
+  line (big gaps), so they moved inline. Labels hidden by default ✓, science
+  opens ✓, dials open ✓, Show sources reveals labels ✓.
