@@ -1,5 +1,6 @@
 import type { Recipe } from "@/lib/ai/schema";
-import { EditableAmount } from "./EditableAmount";
+import { EditableIngredients } from "./EditableIngredients";
+import { IngredientList } from "./IngredientList";
 import { eyebrow, SourceBadge, Transcript } from "./ui";
 
 type Props = {
@@ -22,44 +23,16 @@ export function RecipeView({ recipe, transcript, cookName, original, editedAt, e
         <Legend cookName={cookName} />
       </header>
 
-      <section aria-labelledby="ingredients" className="space-y-3">
-        <h2 id="ingredients" className="font-ls-serif text-3xl leading-tight">
-          Ingredients
-        </h2>
-        <ul className="divide-y divide-ls-border border-y border-ls-ink">
-          {recipe.ingredients.map((ing, i) => (
-            <li key={i} className="space-y-1.5 py-3">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                {editableRecipeId ? (
-                  <p className="flex flex-wrap items-center gap-x-2 text-[17px]">
-                    <EditableAmount
-                      recipeId={editableRecipeId}
-                      index={i}
-                      amount={ing.amount}
-                      item={ing.item}
-                      cookName={cookName ?? ""}
-                    />
-                    <span>{ing.item}</span>
-                  </p>
-                ) : (
-                  <p className="text-[17px]">
-                    {ing.amount ? <span className="font-medium">{ing.amount} </span> : null}
-                    {ing.item}
-                    {!ing.amount && <span className="text-ls-muted"> · amount not stated</span>}
-                  </p>
-                )}
-                <SourceBadge source={ing.source} cookName={cookName} />
-              </div>
-              {ing.from_answers.map((a, j) => (
-                <p key={j} className="flex flex-wrap items-baseline gap-2 text-[15px] text-ls-muted">
-                  <SourceBadge source={a.source} /> {a.text}
-                </p>
-              ))}
-              {ing.note && <p className="text-[15px] text-ls-muted">{ing.note}</p>}
-            </li>
-          ))}
-        </ul>
-      </section>
+      {editableRecipeId ? (
+        <EditableIngredients recipeId={editableRecipeId} ingredients={recipe.ingredients} cookName={cookName} />
+      ) : (
+        <section aria-labelledby="ingredients" className="space-y-3">
+          <h2 id="ingredients" className="font-ls-serif text-3xl leading-tight">
+            Ingredients
+          </h2>
+          <IngredientList ingredients={recipe.ingredients} cookName={cookName} />
+        </section>
+      )}
 
       <section aria-labelledby="steps" className="space-y-3">
         <h2 id="steps" className="font-ls-serif text-3xl leading-tight">

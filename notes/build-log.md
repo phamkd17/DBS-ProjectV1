@@ -430,3 +430,18 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   which would have hidden the "words edited after this recipe was made" notice.
 - **Verify:** edit → "Family answer" ✓, history note ✓, focus ✓, no pencils
   on the shared page ✓.
+
+### B37. One pencil for the whole ingredient list
+- **Student:** "I want only one edit button to edit all the ingredients list."
+- **Built:** a single pencil next to the "Ingredients" heading (the per-row
+  pencils are gone). It opens the whole list as one form: edit any amount or
+  name, × to remove, "+ Add ingredient", then Save ingredients / Cancel (Escape
+  works too).
+- **Labels:** a changed amount → Family answer + "Changed from “…” (Grandma) on
+  …"; a renamed item → "Renamed from …"; an added one → Family answer + "Added on
+  …"; a removed one → "Removed “…” (Grandma) on …" in "What the app changed".
+  Shared links stay read-only.
+- **Verify found:** at 390px the side-by-side boxes cut off names ("1 small
+  contain…"). On phones each ingredient now stacks (name full width, amount
+  below); wider screens keep the table. Change ✓, add ✓, remove ✓, focus
+  returns ✓, no per-row pencils ✓.

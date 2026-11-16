@@ -290,19 +290,29 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   );
   await check(page, "recipe-finished", { keyboard: true });
 
-  // ---- Edit an ingredient amount in place ----
-  const amountPencil = page.getByRole("button", { name: /^Edit amount of / }).first();
-  const ingredientName = (await amountPencil.getAttribute("aria-label"))!.replace("Edit amount of ", "");
-  await amountPencil.click();
-  const amountBox = page.getByRole("textbox", { name: `Amount of ${ingredientName}` });
-  await amountBox.fill("2 cups (verify)");
-  await check(page, "recipe-amount-editing");
-  await amountBox.press("Enter");
-  const row = page.locator("main").getByRole("listitem").filter({ hasText: "2 cups (verify)", visible: true });
-  await expect(row).toBeVisible();
-  await expect(row.getByText("Family answer")).toBeVisible(); // relabeled: no longer the cook's amount
-  await expect(row.getByText(/Changed from|Amount added/)).toBeVisible(); // the old amount is kept
-  await expect(page.getByRole("button", { name: `Edit amount of ${ingredientName}` })).toBeFocused();
+  // ---- Edit the whole ingredient list from one pencil ----
+  await page.getByRole("button", { name: "Edit ingredients" }).click();
+  const firstAmount = page.getByRole("textbox", { name: /^Amount of / }).first();
+  await firstAmount.fill("2 cups (verify)");
+  const lastItemBefore = page.getByRole("textbox", { name: /^Ingredient \d+/ }).last();
+  const removedName = await lastItemBefore.inputValue();
+  await page.getByRole("button", { name: `Remove ${removedName}` }).click();
+  await page.getByRole("button", { name: "+ Add ingredient" }).click();
+  await page.getByRole("textbox", { name: /^Amount of new ingredient/ }).fill("1 pinch");
+  await page.getByRole("textbox", { name: /^Ingredient \d+/ }).last().fill("salt (verify)");
+  await check(page, "recipe-ingredients-editing", { keyboard: true });
+  await page.getByRole("button", { name: "Save ingredients" }).click();
+
+  const list = page.locator("main").filter({ visible: true });
+  const changed = list.getByRole("listitem").filter({ hasText: "2 cups (verify)" });
+  await expect(changed).toBeVisible();
+  await expect(changed.getByText("Family answer").first()).toBeVisible(); // relabeled: no longer the cook's amount
+  await expect(changed.getByText(/Changed from|Amount added/)).toBeVisible(); // the old amount is kept
+  const added = list.getByRole("listitem").filter({ hasText: "salt (verify)" });
+  await expect(added.getByText(/Added on/)).toBeVisible();
+  await expect(list.getByText(new RegExp(`Removed “[^”]*${removedName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`))).toBeVisible();
+  await expect(page.getByRole("button", { name: "Edit ingredients" })).toBeFocused();
+  await expect(page.getByRole("button", { name: /^Edit amount of / })).toHaveCount(0); // one pencil, not one per row
 
   // ---- Send ----
   await page.getByRole("button", { name: "Make a link" }).click();
@@ -315,7 +325,7 @@ test("core task as a new person, every screen at 390 and 1440", async ({ page, b
   await sp.goto(new URL(new URL(shareUrl).pathname, page.url()).toString());
   await expect(sp.getByRole("heading", { name: "Ingredients" })).toBeVisible();
   await expect(sp.getByRole("button", { name: /Sign in to save/ })).toBeVisible();
-  await expect(sp.getByRole("button", { name: /^Edit amount of / })).toHaveCount(0); // shared links are read-only
+  await expect(sp.getByRole("button", { name: "Edit ingredients" })).toHaveCount(0); // shared links are read-only
   await check(sp, "shared-signed-out", { keyboard: true });
 
   await page.getByRole("button", { name: "Turn off link" }).click();

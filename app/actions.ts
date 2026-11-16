@@ -426,45 +426,76 @@ export async function updateNotes(
 }
 
 // ---------------------------------------------------------------------------
-// Edit one ingredient's amount on a finished recipe. The new amount is labeled
-// as a family answer (not the cook's), and the old one is kept in the note.
+// Edit the whole ingredient list of a finished recipe at once. Changed or added
+// amounts are labeled as family answers; old values are kept in notes; removed
+// ingredients are recorded in the recipe's "What the app changed" notes.
 // ---------------------------------------------------------------------------
-export async function updateIngredientAmount(
+export async function updateIngredients(
   recipeId: string,
-  index: number,
   cookName: string,
   _prev: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   await requireUser();
-  const amount = String(formData.get("amount") ?? "").trim().slice(0, 60);
-  const values = { amount };
+  let rows: { orig: number | null; amount: string; item: string }[];
+  try {
+    rows = JSON.parse(String(formData.get("rows") ?? "[]"));
+    if (!Array.isArray(rows) || rows.length > 80) throw new Error("bad");
+  } catch {
+    return { error: "Something went wrong reading the list. Refresh and try again." };
+  }
 
   const supabase = await supabaseForUser();
   // RLS: only your own recipe comes back.
   const { data: row } = await supabase.from("recipes").select("recipe").eq("id", recipeId).single<Pick<RecipeRow, "recipe">>();
-  const ing = row?.recipe?.ingredients?.[index];
-  if (!row?.recipe || !ing || !Number.isInteger(index)) return { values, error: "We couldn't find that ingredient. Refresh and try again." };
-  if (amount === ing.amount) return { saved: true };
+  if (!row?.recipe) return { error: "We couldn't find that recipe in your lab book." };
+  const old = row.recipe.ingredients;
 
-  const who = ing.source === "cook" ? cookName || "the cook" : ing.source === "suggested" ? "a suggestion" : ing.source === "user_answer" ? "a family answer" : "not stated";
   const when = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  const history = ing.amount ? `Changed from “${ing.amount}” (${who}) on ${when}.` : `Amount added on ${when}.`;
-  const ingredients = row.recipe.ingredients.map((x, i) =>
-    i === index
-      ? { ...x, amount, source: amount ? ("user_answer" as const) : ("not_stated" as const), note: [x.note, history].filter(Boolean).join(" ") }
-      : x
-  );
+  const whoSaid = (src: string) =>
+    src === "cook" ? cookName || "the cook" : src === "suggested" ? "a suggestion" : src === "user_answer" ? "a family answer" : "not stated";
+
+  const kept = new Set<number>();
+  const ingredients: typeof old = [];
+  for (const r of rows) {
+    const amount = String(r.amount ?? "").trim().slice(0, 60);
+    const item = String(r.item ?? "").trim().slice(0, 120);
+    if (!item && !amount) continue; // empty new row
+    if (!item) return { error: `Give the ingredient with “${amount}” a name, or remove it.` };
+    const o = typeof r.orig === "number" && Number.isInteger(r.orig) ? old[r.orig] : undefined;
+    if (o && typeof r.orig === "number") {
+      kept.add(r.orig);
+      const history: string[] = [];
+      if (amount !== o.amount) history.push(o.amount ? `Changed from “${o.amount}” (${whoSaid(o.source)}) on ${when}.` : `Amount added on ${when}.`);
+      if (item !== o.item) history.push(`Renamed from “${o.item}” on ${when}.`);
+      ingredients.push({
+        ...o,
+        item,
+        amount,
+        source: amount !== o.amount ? (amount ? "user_answer" : "not_stated") : o.source,
+        note: [o.note, ...history].filter(Boolean).join(" "),
+      });
+    } else {
+      ingredients.push({
+        item,
+        amount,
+        source: amount ? "user_answer" : "not_stated",
+        note: `Added on ${when}.`,
+        from_answers: [],
+      });
+    }
+  }
+  const removed = old.filter((_, i) => !kept.has(i)).map((o) => `Removed “${[o.amount, o.item].filter(Boolean).join(" ")}” (${whoSaid(o.source)}) on ${when}.`);
 
   const { error } = await supabase
     .from("recipes")
     // Not bumping updated_at: it marks when the AI made the recipe, which the
     // "words edited after this recipe was made" notice compares against.
-    .update({ recipe: { ...row.recipe, ingredients } })
+    .update({ recipe: { ...row.recipe, ingredients, notes: [...row.recipe.notes, ...removed] } })
     .eq("id", recipeId);
   if (error) {
-    console.error("[updateIngredientAmount]", error);
-    return { values, error: "Couldn't save the amount. Try again." };
+    console.error("[updateIngredients]", error);
+    return { error: "Couldn't save the ingredients. Your changes are still here. Try again." };
   }
   revalidatePath(`/r/${recipeId}`);
   return { saved: true };
