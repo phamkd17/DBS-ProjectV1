@@ -486,3 +486,13 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   `updateIngredients` throw (a robustness issue only); the unused `ideas` table
   is still granted but fully owner-only.
 - The Vercel preview build of the branch passed. Merged via a pull request.
+
+### B40. Merged and live; user testing script
+- PR #1 (`refine-v1` → `main`) merged. Vercel production deploy ✅. The live
+  site serves the Scarlet accent (`--color-ls-accent:#ae1f2e`), the landing page
+  loads, and signed-out `/ideas/new` → sign-in (307).
+- **Student:** "write the user testing script while we wait." Draft in
+  `notes/user-testing.md`: who (cousin, aunt, a new person), a read-aloud intro
+  (think aloud, I won't help), 5 tasks worded without button names, what to
+  watch for in each, after-task questions, a notes template, and the yogurt
+  dictation to text.
