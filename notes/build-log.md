@@ -167,3 +167,322 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - **Student:** "done, it worked on my phone." Signed in on the phone, read the
   recipe, made a link, opened it signed out, and saw the recipe without getting
   into the lab book.
+
+## Nov 14 — Security review
+
+### B20. `/security-review` on the whole app (d5c7577..HEAD)
+- One reviewer agent searched for vulnerabilities, and a second agent checked
+  each finding for false positives.
+- **Finding (MEDIUM, confirmed by both; 7/10 confidence, so just under the
+  skill's 8/10 reporting bar):** the UPDATE policy on `recipe_questions`
+  only checked `owner_id`. A user who saved a copy of someone's shared recipe
+  could learn the original recipe id (`copied_from`), re-point one of their own
+  questions at it, and `save_shared_recipe` would copy that fake Q&A,
+  labeled "Family answer", into every later recipient's lab book. The same gap
+  existed for `recipes.dictation_id` (no new data exposed).
+- **Fixed anyway** (`20261114010000_tighten_updates.sql`): column-level UPDATE
+  grants (questions: answer fields only; recipes: generated content + sharing
+  only), the UPDATE policy re-checks the parent owner, and both share functions
+  only follow rows with the same owner.
+- **Proved:** `supabase/tests/repoint_attack.sql`. Both attacks are now
+  "permission denied"; normal answering, sharing, and saving a copy still work.
+- From here on, work happens on branches (`refine-v1`), each with its own
+  Vercel preview link, merged after review.
+
+## Nov 14 — Lab book tabs
+
+### B21. Ideas / Development / Finished
+- **Student:** "I want to add tabs for Ideas, Development, and Finished
+  Recipes." Then: "I want the ideas to be where i can attached quick notes,
+  pictures, links. Development is were I actively work on developing a recipe.
+  And the finished have different iterations and notes."
+- **Pushback (once):** v1 is due Tuesday, and user testing plus the v2 plan
+  still have to happen. Photos are the biggest piece (upload, storage, privacy
+  rules).
+- **Options offered:** all 3 tabs with photos in v2 / everything now / tabs now
+  with the rest in v2.
+- **Student chose:** "Tabs now, the rest in v2."
+- **Built:** the home page has three tabs with counts. Ideas = words saved, no
+  recipe yet. Development = recipe with questions waiting. Finished = ready.
+  It opens on the tab where the work is, and each tab has its own empty state.
+- **v2 headline:** Ideas get notes, photos, and links, plus "Start developing";
+  Finished recipes get iterations (each trial: what changed, how it turned out).
+
+## Nov 14 — Line & Stone + browser verification
+
+### B22. Visual style
+- **Student:** "can you use line and stone" (their Assignment 2 design system).
+- Restyled every screen from the A2 tokens and components: Limestone, Plaster,
+  Ink, Slate, Stone hairlines, Aegean for the one primary action, Instrument
+  Serif + Jost, square corners, no shadows, underline tabs.
+- Source labels kept their meaning: cook = ochre, food science = Cypress tint,
+  suggested = Aegean tint, family answer = ink outline, not stated = dashed.
+
+### B23. "Constantly review" against the design checklist
+- **Student:** "Can you constantly review for the following requirements"
+  (brief step 6 Verify + Design Requirements). Written into AGENTS.md as a
+  standing rule.
+- `npm run verify` (Playwright): runs the whole core task as a test user and
+  takes screenshots at 390px and 1440px of 16 screens, an axe WCAG AA scan, a
+  keyboard Tab pass, and a sideways-scroll check.
+- **Caught by looking at the screenshots, not by the automated checks:** the
+  first run passed every check, but the screenshots showed none of the colors
+  or fonts. The dev server was serving stale CSS (Tailwind's cache, after a
+  production build ran alongside it). Restarted it with a clean cache.
+- **Review fixes:** placeholders looked like filled-in values ("Yogurt",
+  "Grandma"), so they now read "e.g. …" in italic. The "Made with model ·
+  prompt" line moved inside "Questions the app asked" (Simplicity).
+- **Result:** 0 axe violations on all 16 screens, no sideways scroll at 390px,
+  a visible focus style on every Tab stop.
+- **Known, left:** Clerk's default avatar is purple (only for accounts without a
+  photo).
+
+### B24. Primary color: Scarlet
+- **Student:** "Instead of agean blue, I want a scarlet red/ burgundy for the
+  design template." Agent made `notes/design/red-swatches.html` (Scarlet →
+  Oxblood, with contrast ratios). **Student:** "I am between scarlet and
+  crimsom." Agent made `red-swatches-2.html` (5 steps). **Student chose:**
+  "Scarlet-leaning": `#ae1f2e` (hover `#941a27`, pressed `#7a1620`), 6.4:1.
+- Everything else stays Line & Stone. Terracotta errors still read as
+  different from the Scarlet button.
+
+### B25. Verify found two more real problems
+- **Stale CSS, again:** the dev server ignores `globals.css` edits (a
+  Tailwind/Turbopack cache issue). `npm run verify` now starts with a test
+  that compares every color token in `globals.css` to the served CSS, and
+  fails with "restart the dev server" if they differ.
+- **Finished recipes couldn't be deleted** (only ideas could). Added "Delete
+  this recipe" with a confirmation. The verify run now deletes its own
+  recipe and checks that it's gone.
+- Next's floating dev badge covered the Delete button at 390px (dev only),
+  so the badge is now off (`devIndicators: false`).
+
+## Nov 15 — Ideas you can create, and Move to
+
+### B26. New ideas + moving between tabs
+- **Student:** "Can you add a way for me to create new ideas a move them between
+  ideas, development and finished."
+- **Built:** "New idea" (title, optional note, optional link; photos still v2)
+  → idea page (note, link opens in a new tab, "Add the cook's words" starts a
+  dictation with the dish name filled in, Edit, Delete). A **Move to** row on
+  every item (list, dictation page, recipe page). Creating a recipe moves it to
+  Development and finishing moves it to Finished automatically; the user can
+  move anything afterwards. Moving only reorganizes and never deletes anything.
+- **Database** (`20261115000000_ideas_and_stages.sql`): `ideas` table with
+  owner-only RLS; links must be http(s) (a check constraint, plus server
+  validation); `dictations.stage`, where owners may update **only** `stage`
+  (column grant). Her words stay blocked by the grant + trigger. Copies saved
+  from a link land in Finished. Tested: owner moves ✓, transcript edit
+  blocked ✓, `javascript:` link rejected ✓, another user sees/moves 0 ✓.
+- **Verify found:** Move gave no feedback (now shows "Moving to …"). Other
+  failures were test issues: Next keeps hidden copies of past pages, and its
+  screen-reader route announcer still holds the old title, so checks now count
+  only visible text inside `<main>`.
+- **Hit the Gemini free-tier rate limit** after many verify runs. The app
+  showed its designed state ("The recipe helper is busy right now. Try again in
+  a minute.") with Try again. Verify now fails fast with that message instead
+  of waiting 4 minutes.
+
+### B27. Limit Gemini calls during testing
+- **Student:** "Can you limit the API call to Gemini during testing?"
+- **Built:** a dev-only response cache (`lib/ai/cache.ts`), keyed by model +
+  prompt + transcript + answers + schema. The same request reuses the saved
+  answer; anything new still calls Gemini. Off in production (the live site
+  always calls the model) and off for evals (they measure the model).
+- **Measured:** two verify runs in a row = **0 Gemini calls** (2 cache hits
+  each), and each run took about 35 s instead of over a minute.
+- `npm run verify:fresh` clears it, for when a test should use the real model.
+
+### B28. One "New" button
+- **Student:** "arent these two buttons do the same thing? Can you merge with
+  the option to add dictation in the New button."
+- **Built:** a single Scarlet **New** button (the one primary action) that
+  opens **Idea** ("A note, link, or dish to try later") or **Dictation** ("The
+  cook's words, to turn into a recipe"). It's a disclosure button with
+  `aria-expanded`; outside click or Escape closes it and returns focus. The
+  first-run "Add your first dictation" became secondary, so there's still one
+  primary per screen.
+- **Verify found:** the menu was cut off at 390px (anchored right while the
+  button sits left on phones), and the ▾ rendered as a dot. Fixed (left-anchored
+  on mobile, an SVG chevron). Keyboard test: Enter opens ✓, Tab reaches Idea ✓,
+  Escape closes and returns focus ✓. Page waits now time out at 30 s.
+
+### B29. Edit ideas; make the AI step deliberate
+- **Student:** "Add a way to edit ideas. The crete recipe should be more
+  highlighted because it uses AI to generate the receipe. We do not want to hit
+  that as offten untile we are ready."
+- **Edit ideas:** an "Edit idea" button under the title → `/i/[id]/edit`
+  (same form; Save changes returns to the idea, Cancel goes back). Replaced
+  the folded "Edit idea" box that was easy to miss.
+- **AI step:** Create recipe is its own panel with a **Uses AI** badge (blue
+  tint = from AI, same as "Suggested"), a plain explanation, and a required
+  "Their words are complete. I'm ready." checkbox. The button ("Create recipe
+  with AI") stays disabled until it's ticked. "Make the recipe with AI" on the
+  questions page is marked the same way. The home card hint now says "Words
+  saved" instead of "Create recipe", since tapping it only opens the page.
+- **Verify:** the button is disabled before the tick ✓ and enabled after ✓;
+  edit idea saves and shows the new note ✓; 0 axe violations.
+
+### B30. Dictations become editable (product rule changed)
+- **Student** (looking at a dictation): "I don't see edit option."
+- **Options offered:** editable until the AI uses them (recommended) / lock the
+  words, edit names only / always editable.
+- **Student chose:** "Always editable." This replaces the proposal's
+  "her words are never edited."
+- **How it stays honest:** the database keeps the first version
+  (`original_transcript`, shown as "See the original words") and stamps
+  `edited_at` (the client can't forge either). A recipe made before an edit
+  shows "Their words were edited on …, after this recipe was made, so the
+  recipe may not match them anymore." The label reads "Their words · edited
+  <date>" instead of "exactly as said".
+- **Tested:** in the DB, the first version is kept across two edits ✓, forging
+  the original is blocked ✓, another user edits 0 ✓. Verify edits words after
+  the recipe exists: notice ✓, original kept ✓, 0 Gemini calls.
+
+### B31. The AI recipe step only lives in Development
+- **Student:** "Only have genearte Create Recipe with AI in the development tab."
+- **Built:** in Ideas (or Finished, with no recipe yet) a dictation shows
+  "Ready to develop it? · Move to Development" instead of the AI panel. Once
+  it's in Development, the "Create recipe with AI" panel appears (still behind
+  the "I'm ready" tick). **Enforced on the server too:** `createRecipe` refuses
+  unless the dictation's stage is development.
+- **Verify found:** the "no AI button in Ideas" check first passed on the
+  *loading skeleton* (a false pass), so it now waits for the panel. A
+  duplicate "Move to: Development" link sat under the big button and was hidden
+  (Simplicity). 0 Gemini calls per run.
+
+### B32. Edit in place, no separate page
+- **Student:** "I want to be able to edit the title and description and cooks
+  word all in the same page ... I don't want to click on the edit idea and open
+  up a whole new page."
+- **Built:** an **Edit** button turns the idea (title, note, link) or the
+  dictation (cook's words, dish name, whose words) into fields **in the same
+  spot**. Save changes / Cancel return to the view on the same URL, and focus
+  goes back to Edit. The recipe page has "Edit their words" in place too. The
+  separate `/edit` pages were removed.
+- **Verify found:** the breadcrumb overlapped the edit box (a negative-margin
+  spacing trick), and while editing there were two red buttons (Save + "Add the
+  cook's words" or "Create recipe with AI"). Fixed: the next-step panel hides
+  while editing, so Save is the only primary action. In-place save ✓, focus
+  returns ✓, URL unchanged ✓.
+
+### B33. Pencil icons, and "Idea notes" for everything in Ideas
+- **Student:** "I want to be able to click on a small icon next to french onion
+  soup and Change it. For all ideas it should have a Idea notes. It does not
+  need the [Cook · Their words, exactly as said panel]."
+- **Built:** a pencil right after every title (ideas and dictations). The title
+  becomes a field in place; Enter saves, Escape cancels. Every item in Ideas
+  shows **Idea notes** with its own pencil (for an idea: note + link; for a
+  dictation in Ideas: its words). The cook's-words panel only appears once
+  it's in Development, with the hint "When you move this to Development, these
+  notes become the cook's words the AI reads." The big Edit button is gone.
+  In-place Save is the secondary style, so the page's one primary stays the
+  next step.
+- **Verify found:** the title field was much smaller than the title, and long
+  titles were cut off in a one-line box. Now it's the same serif size and wraps
+  (a textarea where Enter saves). Rename ✓, notes ✓, focus returns to the
+  pencil ✓, no cook panel in Ideas ✓.
+
+### B34. Idea notes and the cook's words are separate
+- **Student:** "Keep ideas note when it is move to develompent. Have a new
+  setction for Cook Their words. If it doesn't have one have a way to add it."
+- **Data model change:** ideas and dictations became **one kind of entry**
+  (`dictations`: title, `notes` + `link`, optional `transcript`). Existing
+  ideas were migrated over (stage and date kept). Adding words for the first
+  time doesn't count as an "edit" (the trigger was updated).
+- **Every entry page:** title (pencil) · **Idea notes** (pencil, kept in every
+  stage, also on the recipe page) · **Cook · Their words**: the words with "Edit
+  their words", or a dashed "No cook's words yet" box with **Add the cook's
+  words** (in place). The AI step appears only in Development **and** once
+  words exist; `createRecipe` refuses without words.
+- "Add the cook's words" is the primary button in Development (it's the next
+  step) and secondary in Ideas (where "Move to Development" is primary).
+- **Verify:** an idea moved to Development keeps its notes ✓, shows "No cook's
+  words yet" with no AI button ✓; adding words in place shows them and the AI
+  panel ✓; notes still there ✓. 0 Gemini calls.
+
+### B35. v2 plan drafted
+- **Student:** "Can you generate V2 proposal with this: V2 will include pictures
+  in the idea generation; better UIUX to streamline the workflow from idea
+  generation to development to final recipes; iterations and the development
+  with notes on how different parameters changes the dish; recipe description
+  and the different variation of the same recipes with notes and dates."
+- Draft in `notes/v2-plan.md`: each feature with what / why (evidence from
+  interviews, this week's flow fixes, evals) / how / done-when, plus the AI
+  angle (a labeled trial summary with its own eval), a schedule to Dec 1, and
+  a cut order. It has a placeholder for real-user test findings.
+- **Student added:** "V2 will include nutritional facts from the ingredients and
+  the ability to scale different portions." Added as feature 5, with how vague
+  amounts are handled (never invented; nutrition labeled an estimate),
+  amounts as number + unit for code-based scaling, and a USDA tool-calling
+  nutrition step. Placed in the schedule, first in the cut order.
+
+### B36. Edit ingredient amounts on a recipe
+- **Student:** "Please have a way that I can edit the quantity in the
+  ingredients list for the recepie."
+- **Built:** a pencil next to each amount on your own finished recipe; it edits
+  in place (Enter saves, Escape cancels, focus returns to the pencil).
+- **Honest labels:** a changed amount becomes **Family answer** (no longer the
+  cook's), and the ingredient note keeps the history ("Changed from “1/2
+  gallon” (Grandma) on Nov 15."). Clearing it marks it "Not stated". Shared
+  links stay read-only (no pencils).
+- **Bug avoided:** saving an amount doesn't bump the recipe's `updated_at`,
+  which would have hidden the "words edited after this recipe was made" notice.
+- **Verify:** edit → "Family answer" ✓, history note ✓, focus ✓, no pencils
+  on the shared page ✓.
+
+### B37. One pencil for the whole ingredient list
+- **Student:** "I want only one edit button to edit all the ingredients list."
+- **Built:** a single pencil next to the "Ingredients" heading (the per-row
+  pencils are gone). It opens the whole list as one form: edit any amount or
+  name, × to remove, "+ Add ingredient", then Save ingredients / Cancel (Escape
+  works too).
+- **Labels:** a changed amount → Family answer + "Changed from “…” (Grandma) on
+  …"; a renamed item → "Renamed from …"; an added one → Family answer + "Added on
+  …"; a removed one → "Removed “…” (Grandma) on …" in "What the app changed".
+  Shared links stay read-only.
+- **Verify found:** at 390px the side-by-side boxes cut off names ("1 small
+  contain…"). On phones each ingredient now stacks (name full width, amount
+  below); wider screens keep the table. Change ✓, add ✓, remove ✓, focus
+  returns ✓, no per-row pencils ✓.
+
+### B38. A calmer recipe: sources behind a switch, why and dials behind icons
+- **Student:** "Can you remove the cook, family answer, and suggested? In
+  addition can you make a small Science icon that if the user clicks on it
+  explains the food science and Adjust to taste as another icon where the user
+  can expand if they want. Having everything shown is too busy." Then: "Only show
+  the icon if they are relevant."
+- **Pushback (once):** the labels are the proposal's differentiator and the
+  AI-focus honesty promise. **Options offered:** hide them behind one "Show
+  sources" switch / remove them entirely. **Student chose:** "Hidden, one 'Show
+  sources' switch." Her quotes: **behind the Science icon** (her reason first,
+  then the science).
+- **Built:** the recipe shows only amounts, items, and instructions. A **Show
+  sources** switch (`role="switch"`) reveals the labels, answer details, edit
+  history, and "What the app changed" (`.src-only` + `[data-sources]`). Each
+  step has a **flask** icon (Why it works: "Grandma's reason" → "The science")
+  and a **sliders** icon (Adjust to taste), each only if there's real content
+  (blank entries don't count). They sit at the end of the step's first line;
+  `aria-expanded`, and solid ink when open.
+- **Verify found:** stale CSS again. The guard only compared colors, so it now
+  checks every custom rule in globals.css too. The icons first sat on their own
+  line (big gaps), so they moved inline. Labels hidden by default ✓, science
+  opens ✓, dials open ✓, Show sources reveals labels ✓.
+
+## Nov 15 — Review and merge `refine-v1`
+
+### B39. `/security-review` on the branch (origin/main...refine-v1)
+- **Result: no findings** at or above the reporting bar. The reviewer agent
+  checked: the dictations column grants + owner-only UPDATE policy (owner_id,
+  copied_from, original_transcript, edited_at can't be changed); the
+  edit-tracking trigger; the ideas → dictations migration (keeps each row's
+  owner); share functions don't expose `notes`, `link`, or
+  `original_transcript`; every server action goes through `requireUser()` +
+  RLS, so tampered ids only reach your own rows; links are http(s) only (server
+  check + DB constraint), with no `javascript:`; the dev-only AI cache is off in
+  production, its file names are hashes (no path traversal), and keys include
+  the full input (no cross-user leaks).
+- Below the bar (not fixed): malformed `rows` JSON could make
+  `updateIngredients` throw (a robustness issue only); the unused `ideas` table
+  is still granted but fully owner-only.
+- The Vercel preview build of the branch passed. Merged via a pull request.

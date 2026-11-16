@@ -42,3 +42,11 @@ next-env.d.ts
 
 # allow the env template (no secrets)
 !.env.example
+
+# verify output
+/verify/screenshots/
+/verify/.results/
+/verify/report.md
+
+# dev-only Gemini response cache
+/.ai-cache/

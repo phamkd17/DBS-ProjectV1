@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { deleteDictation } from "@/app/actions";
+import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { RecipeView } from "@/components/RecipeView";
-import { SourceBadge, Transcript } from "@/components/ui";
+import { DictationEditor } from "@/components/DictationEditor";
+import { EditableNotes } from "@/components/InlineEdit";
+import { eyebrow, focusRing, formatDate, SourceBadge, textLink } from "@/components/ui";
 import { supabaseForUser } from "@/lib/supabase/server";
 import type { DictationRow, QuestionRow, RecipeRow } from "@/lib/types";
 import { QuestionsForm } from "./QuestionsForm";
+import { MoveTo } from "@/components/MoveTo";
+import { STAGE_LABEL } from "@/lib/types";
 import { SharePanel } from "./SharePanel";
 
 // Pass 2 can take a while on the free tier.
@@ -26,21 +32,22 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
 
   if (recipe.status !== "ready" || !recipe.recipe) {
     return (
-      <main className="space-y-6">
-        <div className="space-y-2">
-          <p className="text-sm text-stone-600">
-            <Link href="/" className="underline underline-offset-4 hover:text-stone-900">
-              Lab book
+      <main className="space-y-8">
+        <div className="space-y-3">
+          <p className={eyebrow}>
+            <Link href={`/?tab=${dictation.stage}`} className={textLink}>
+              {STAGE_LABEL[dictation.stage]}
             </Link>{" "}
             / {dictation.dish_name || recipe.draft?.title || "Recipe"}
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">A few questions first</h1>
-          <p className="text-stone-700">
+          <h1 className="font-ls-serif text-5xl leading-none">A few questions first</h1>
+          <p className="max-w-prose text-[17px] leading-relaxed text-ls-muted">
             These are things a new cook couldn&apos;t figure out from {dictation.cook_name ? `${dictation.cook_name}'s` : "the"}{" "}
             words. Answer what you know.
           </p>
         </div>
-        <Transcript text={dictation.transcript} cookName={dictation.cook_name} />
+        <EditableNotes kind="dictation" id={dictation.id} note={dictation.notes} link={dictation.link} />
+        <DictationEditor dictation={dictation} />
         <QuestionsForm recipeId={recipe.id} questions={questions ?? []} cookName={dictation.cook_name} />
       </main>
     );
@@ -52,46 +59,70 @@ export default async function RecipePage({ params }: PageProps<"/r/[id]">) {
   const shareUrl = recipe.share_token ? `${origin}/s/${recipe.share_token}` : null;
 
   return (
-    <main className="space-y-8">
-      <p className="text-sm text-stone-600">
-        <Link href="/" className="underline underline-offset-4 hover:text-stone-900">
-          Lab book
+    <main className="space-y-10">
+      <p className={eyebrow}>
+        <Link href={`/?tab=${dictation.stage}`} className={textLink}>
+          {STAGE_LABEL[dictation.stage]}
         </Link>{" "}
         / {recipe.recipe.title}
         {recipe.copied_from ? " · saved from a link" : ""}
       </p>
 
-      <RecipeView recipe={recipe.recipe} transcript={dictation.transcript} cookName={dictation.cook_name} />
+      {dictation.edited_at && dictation.edited_at > recipe.updated_at && (
+        <p role="note" className="border-l-2 border-ls-ink bg-ls-surface px-4 py-3 text-[15px]">
+          Their words were edited on {formatDate(dictation.edited_at)}, after this recipe was made, so the recipe may
+          not match them anymore.
+        </p>
+      )}
+
+      <RecipeView recipe={recipe.recipe} cookName={dictation.cook_name} editableRecipeId={recipe.id} />
+
+      <EditableNotes kind="dictation" id={dictation.id} note={dictation.notes} link={dictation.link} />
+
+      <section aria-label="Original dictation" className="space-y-3">
+        <DictationEditor dictation={dictation} />
+      </section>
 
       {answered.length > 0 && (
-        <details className="rounded-xl bg-white ring-1 ring-stone-200">
-          <summary className="flex min-h-11 cursor-pointer items-center px-4 py-3 font-medium hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-stone-900">
+        <details className="border border-ls-border bg-ls-surface">
+          <summary className={`flex min-h-11 cursor-pointer items-center px-4 py-3 text-[15px] hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}>
             Questions the app asked ({answered.length})
           </summary>
-          <ol className="space-y-3 px-4 pb-4">
+          <ol className="divide-y divide-ls-border border-t border-ls-border px-4">
             {answered.map((q) => (
-              <li key={q.id} className="space-y-1 text-sm">
+              <li key={q.id} className="space-y-1.5 py-3 text-[15px]">
                 <p className="font-medium">{q.question}</p>
                 {q.answer_source === "skipped" ? (
-                  <p className="flex items-baseline gap-2 text-stone-600">
+                  <p className="flex flex-wrap items-baseline gap-2 text-ls-muted">
                     <SourceBadge source="not_stated" /> Nobody knew yet
                   </p>
                 ) : (
-                  <p className="flex items-baseline gap-2">
+                  <p className="flex flex-wrap items-baseline gap-2">
                     <SourceBadge source={q.answer_source === "user_answer" ? "user_answer" : "suggested"} /> {q.answer}
                   </p>
                 )}
               </li>
             ))}
           </ol>
+          <p className={`border-t border-ls-border px-4 py-3 ${eyebrow}`}>
+            Made with {recipe.model} · prompt {recipe.prompt_version}
+          </p>
         </details>
       )}
 
       <SharePanel recipeId={recipe.id} url={shareUrl} title={recipe.recipe.title} />
 
-      <p className="text-xs text-stone-500">
-        Made with {recipe.model} · prompt {recipe.prompt_version}
-      </p>
+      <MoveTo kind="dictation" id={dictation.id} current={dictation.stage} />
+
+      <form action={deleteDictation.bind(null, dictation.id)} className="border-t border-ls-border pt-4">
+        <ConfirmSubmit
+          variant="danger"
+          message="Delete this recipe and the words it came from? Links you've sent will stop working. This can't be undone."
+        >
+          Delete this recipe
+        </ConfirmSubmit>
+      </form>
+
     </main>
   );
 }

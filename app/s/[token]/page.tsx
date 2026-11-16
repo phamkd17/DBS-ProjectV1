@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
 import { RecipeView } from "@/components/RecipeView";
-import { LinkButton } from "@/components/ui";
+import { eyebrow, LinkButton } from "@/components/ui";
 import type { Recipe } from "@/lib/ai/schema";
 import { supabaseAnon } from "@/lib/supabase/server";
 import { SaveCopy } from "./SaveCopy";
@@ -28,9 +28,9 @@ export default async function SharedRecipePage({ params }: PageProps<"/s/[token]
 
   if (!shared) {
     return (
-      <main className="space-y-4 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">This link isn&apos;t shared anymore</h1>
-        <p className="text-stone-700">
+      <main className="space-y-6 py-6">
+        <h1 className="font-ls-serif text-5xl leading-none">This link isn&apos;t shared anymore</h1>
+        <p className="max-w-prose text-[17px] leading-relaxed text-ls-muted">
           The person who sent it may have turned the link off. Ask them to send a new one.
         </p>
         <LinkButton href="/" variant="secondary">
@@ -44,7 +44,7 @@ export default async function SharedRecipePage({ params }: PageProps<"/s/[token]
 
   return (
     <main className="space-y-8">
-      <p className="rounded-lg bg-stone-100 px-3 py-2 text-sm text-stone-700">
+      <p className={eyebrow}>
         Someone sent you this recipe{shared.cook_name ? `, from ${shared.cook_name}'s own words` : ""}.
       </p>
       <RecipeView recipe={shared.recipe} transcript={shared.transcript} cookName={shared.cook_name} />

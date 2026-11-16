@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { submitAnswers } from "@/app/actions";
-import { Button, ErrorNote, SourceBadge } from "@/components/ui";
+import { AiBadge, Button, ErrorNote, eyebrow, fieldClass, focusRing, SourceBadge } from "@/components/ui";
 import { Working } from "@/components/Working";
 import type { ActionState, QuestionRow } from "@/lib/types";
 
@@ -53,40 +53,40 @@ export function QuestionsForm({
 
   return (
     <form action={action} className="space-y-5">
-      <p className="text-stone-700" aria-live="polite">
+      <p className="text-[15px] text-ls-muted" aria-live="polite">
         {questions.length === 0
           ? "No questions this time. Their words had everything a new cook needs."
           : `${answered} of ${questions.length} answered. Leave any blank if nobody knows. It will show as “not stated”.`}
       </p>
 
-      <ol className="space-y-4">
+      <ol className="divide-y divide-ls-border border-y border-ls-ink">
         {questions.map((q, i) => {
           const id = `answer_${q.id}`;
           const mode = modes[q.id];
           return (
-            <li key={q.id} className="space-y-3 rounded-xl bg-white p-4 ring-1 ring-stone-200">
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-600">
-                {i + 1}. {KIND_LABEL[q.kind]}
+            <li key={q.id} className="space-y-3 py-6">
+              <p className={eyebrow}>
+                {String(i + 1).padStart(2, "0")} · {KIND_LABEL[q.kind]}
               </p>
               {q.quote && (
-                <blockquote className="rounded-lg bg-amber-50 px-3 py-2 text-sm italic text-amber-950 ring-1 ring-inset ring-amber-200">
+                <blockquote className="border-l-2 border-src-cook-ink bg-src-cook px-4 py-2 font-ls-serif text-lg italic text-src-cook-ink">
                   “{q.quote}”
                 </blockquote>
               )}
-              <label htmlFor={id} className="block text-[17px] font-medium leading-snug">
+              <label htmlFor={id} className="block font-ls-serif text-2xl leading-snug">
                 {q.question}
               </label>
-              {q.why_it_matters && <p className="text-sm text-stone-600">{q.why_it_matters}</p>}
+              {q.why_it_matters && <p className="text-[15px] text-ls-muted">{q.why_it_matters}</p>}
 
               {q.suggestion && mode !== "suggestion" && (
-                <div className="flex flex-col gap-2 rounded-lg bg-sky-50 p-3 ring-1 ring-inset ring-sky-200 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm text-sky-950">
+                <div className="flex flex-col gap-3 bg-src-suggested p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-[15px] text-src-suggested-ink">
                     <span className="font-medium">Don&apos;t know? Suggestion:</span> {q.suggestion}
                   </p>
                   <Button
                     type="button"
                     variant="secondary"
-                    className="shrink-0 text-sm"
+                    className="shrink-0"
                     onClick={() => {
                       setAnswers((a) => ({ ...a, [q.id]: q.suggestion }));
                       setModes((m) => ({ ...m, [q.id]: "suggestion" }));
@@ -98,12 +98,12 @@ export function QuestionsForm({
               )}
 
               {mode === "suggestion" && (
-                <div className="flex flex-wrap items-center gap-2 text-sm text-stone-700">
+                <div className="flex flex-wrap items-center gap-2 text-[15px] text-ls-muted">
                   <SourceBadge source="suggested" />
                   <span>Will be labeled as a suggestion, not as {cookName || "the cook"}&apos;s. You can edit it.</span>
                   <button
                     type="button"
-                    className="rounded px-1 underline underline-offset-4 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-stone-900"
+                    className={`min-h-11 px-2 text-ls-ink underline decoration-ls-rule underline-offset-4 hover:decoration-ls-ink active:text-ls-muted ${focusRing}`}
                     onClick={() => {
                       setAnswers((a) => ({ ...a, [q.id]: "" }));
                       setModes((m) => ({ ...m, [q.id]: "own" }));
@@ -121,7 +121,7 @@ export function QuestionsForm({
                 value={answers[q.id]}
                 onChange={(e) => setAnswers((a) => ({ ...a, [q.id]: e.target.value }))}
                 placeholder="Your answer"
-                className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base placeholder:text-stone-500 focus:border-stone-900 focus:outline-2 focus:outline-stone-900"
+                className={fieldClass}
               />
               <input type="hidden" name={`mode_${q.id}`} value={mode} />
             </li>
@@ -131,9 +131,14 @@ export function QuestionsForm({
 
       {state.error && <ErrorNote>{state.error}</ErrorNote>}
 
-      <Button type="submit" className="w-full sm:w-auto">
-        {state.error ? "Try again" : "Make the recipe"}
-      </Button>
+      <div className="space-y-2">
+        <Button type="submit" className="w-full sm:w-auto">
+          {state.error ? "Try again with AI" : "Make the recipe with AI"}
+        </Button>
+        <p className="flex flex-wrap items-center gap-2 text-[15px] text-ls-muted">
+          <AiBadge /> Uses one AI request, about 15 seconds. Your answers are saved first.
+        </p>
+      </div>
     </form>
   );
 }

@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "eval": "node --env-file=.env.local --import tsx evals/run.ts",
+    "eval": "AI_CACHE=off node --env-file=.env.local --import tsx evals/run.ts",
     "models": "node --env-file=.env.local --import tsx evals/models.ts",
     "typecheck": "next typegen && tsc --noEmit",
-    "check-env": "node --env-file=.env.local scripts/check-env.mjs"
+    "check-env": "node --env-file=.env.local scripts/check-env.mjs",
+    "verify": "node --env-file=.env.local ./node_modules/@playwright/test/cli.js test",
+    "verify:fresh": "rm -rf .ai-cache && npm run verify"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.10.0",
@@ -23,6 +25,9 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@clerk/testing": "^2.3.0",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",

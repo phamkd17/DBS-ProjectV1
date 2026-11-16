@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Spinner } from "./ui";
+import { eyebrow, ProgressLine } from "./ui";
 
 /** A loading state for slow AI calls: says what's happening, and that it's normal. */
 export function Working({ messages }: { messages: string[] }) {
@@ -12,14 +12,11 @@ export function Working({ messages }: { messages: string[] }) {
   }, [messages.length]);
 
   return (
-    <div role="status" aria-live="polite" className="flex items-start gap-3 rounded-xl bg-white p-4 ring-1 ring-stone-200">
-      <span className="mt-1 text-stone-700">
-        <Spinner />
-      </span>
-      <div>
-        <p className="font-medium">{messages[i]}</p>
-        <p className="text-sm text-stone-600">This usually takes 20–40 seconds. You can keep this page open.</p>
-      </div>
+    <div role="status" aria-live="polite" className="space-y-3 border border-ls-ink bg-ls-surface p-5">
+      <p className={eyebrow}>Working on it</p>
+      <p className="font-ls-serif text-2xl leading-tight">{messages[i]}</p>
+      <ProgressLine />
+      <p className="text-[15px] text-ls-muted">This usually takes 20–40 seconds. You can keep this page open.</p>
     </div>
   );
 }

@@ -2,28 +2,44 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ClerkProvider, Show, SignInButton, UserButton } from "@clerk/nextjs";
-import { Geist } from "next/font/google";
+import { Instrument_Serif, Jost } from "next/font/google";
 import "./globals.css";
 import { PageLoading } from "@/components/PageLoading";
+import { focusRing } from "@/components/ui";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const serif = Instrument_Serif({ variable: "--font-instrument-serif", subsets: ["latin"], weight: "400" });
+const sans = Jost({ variable: "--font-jost", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Culinary Lab Book",
-  description:
-    "Turn what cooks say while they cook into recipes others can repeat.",
+  description: "Turn what cooks say while they cook into recipes others can repeat.",
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#ece7dc" };
+
+// Clerk's sign-in screens, dressed in Line & Stone.
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#ae1f2e",
+    colorDanger: "#9a4a31",
+    colorForeground: "#1c1d1f",
+    colorMutedForeground: "#5e656e",
+    colorBackground: "#f8f6f1",
+    colorInput: "#f8f6f1",
+    colorBorder: "#8a8377",
+    fontFamily: "var(--font-jost), system-ui, sans-serif",
+    borderRadius: "0px",
+  },
+};
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-        <body className="min-h-full flex flex-col bg-stone-50 text-stone-900">
-          <header className="border-b border-stone-200 bg-white">
-            <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-              <Link href="/" className="font-semibold tracking-tight">
+    <ClerkProvider appearance={clerkAppearance}>
+      <html lang="en" className={`${serif.variable} ${sans.variable} h-full antialiased`}>
+        <body className="flex min-h-full flex-col bg-ls-bg font-ls-sans text-ls-ink">
+          <header className="border-b border-ls-ink">
+            <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-3">
+              <Link href="/" className={`font-ls-serif text-2xl leading-none ${focusRing}`}>
                 Culinary Lab Book
               </Link>
               <Suspense fallback={<span className="size-7" />}>
@@ -32,7 +48,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </Show>
                 <Show when="signed-out">
                   <SignInButton mode="modal">
-                    <button className="min-h-11 rounded-md px-3 py-1.5 text-sm font-medium hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-stone-900 active:bg-stone-200">
+                    <button
+                      className={`min-h-11 px-3 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] underline decoration-ls-rule underline-offset-4 hover:decoration-ls-ink active:text-ls-muted ${focusRing}`}
+                    >
                       Sign in
                     </button>
                   </SignInButton>
@@ -40,7 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </Suspense>
             </div>
           </header>
-          <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">
+          <div className="mx-auto w-full max-w-3xl flex-1 px-5 py-8">
             <Suspense fallback={<PageLoading />}>{children}</Suspense>
           </div>
         </body>
@@ -48,4 +66,3 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </ClerkProvider>
   );
 }
-

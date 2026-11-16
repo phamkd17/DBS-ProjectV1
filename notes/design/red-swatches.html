@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Line & Stone · red primary options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ece7dc;--surface:#f8f6f1;--ink:#1c1d1f;--muted:#5e656e;--border:#8a8377;--rule:#a8a196;--error:#9a4a31;
+--cook:#efe3c4;--cook-ink:#5a4718;--sci:#dfe9dd;--sci-ink:#2f5135;--sug:#e1e7f4;--sug-ink:#23449a}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Jost,system-ui,sans-serif}
+header.page{max-width:1240px;margin:0 auto;padding:40px 24px 8px;border-bottom:1px solid var(--ink)}
+header.page h1{font:400 56px/1 "Instrument Serif",Georgia,serif;margin:8px 0 12px}
+header.page p{color:var(--muted);max-width:70ch;margin:0 0 20px}
+.grid{max-width:1240px;margin:0 auto;padding:24px;display:grid;gap:24px;grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.card{border:1px solid var(--ink);background:var(--bg)}
+.top{padding:14px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+.top .hex{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.eyebrow{font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin:0}
+.top .eyebrow{color:var(--a);font-size:13px}
+.mini{padding:16px;display:grid;gap:14px}
+.mini-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:8px}
+.wordmark{font:400 20px/1 "Instrument Serif",serif}
+.link{font-size:11px;letter-spacing:.18em;text-transform:uppercase;text-decoration:underline;text-decoration-color:var(--rule);text-underline-offset:4px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h2{font:400 34px/1 "Instrument Serif",serif;margin:0}
+button{font:500 11px/1 Jost,sans-serif;letter-spacing:.18em;text-transform:uppercase;min-height:40px;padding:0 18px;border:0;cursor:pointer}
+.primary{background:var(--a);color:var(--surface)} .primary:hover,.primary.hover{background:var(--ah)}
+.primary:active,.primary.pressed{background:var(--ap);transform:translateY(1px)}
+.primary.focus,.primary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.secondary{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.states{display:flex;gap:8px;flex-wrap:wrap} .states button{min-height:34px;padding:0 12px}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--border);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.tabs span{padding:8px 2px;border-bottom:2px solid transparent;margin-bottom:-1px} .tabs .on{color:var(--ink);border-color:var(--ink)}
+.entry{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:10px 2px}
+.entry .title{font:400 22px/1.2 "Instrument Serif",serif;margin:0 0 2px}
+.badges{display:flex;gap:6px;flex-wrap:wrap} .b{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:2px 8px;border:1px solid transparent}
+.cook{background:var(--cook);color:var(--cook-ink)} .sci{background:var(--sci);color:var(--sci-ink)} .sug{background:var(--sug);color:var(--sug-ink)} .fam{background:var(--surface);border-color:var(--ink)}
+.err{margin:0;border-left:2px solid var(--error);background:var(--surface);padding:8px 12px;color:var(--error);font-size:14px}
+</style></head><body>
+<header class="page">
+  <p class="eyebrow">Culinary Lab Book · design exploration · Nov 14</p>
+  <h1>A red for the one main action</h1>
+  <p>Each card is the same mini screen in Line &amp; Stone with a different primary color. The red appears only on the main button. The terracotta error line is there to check that errors still look different from the button. Hover and press the buttons, and Tab to see focus. Aegean is shown last for comparison.</p>
+</header>
+<main class="grid">
+<section class="card" style="--a:#b3202c;--ah:#981b25;--ap:#7d161e">
+  <div class="top">
+    <p class="eyebrow">Scarlet</p>
+    <p class="hex">#b3202c · text contrast 6.2:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+<section class="card" style="--a:#9e1b32;--ah:#86162a;--ap:#6e1223">
+  <div class="top">
+    <p class="eyebrow">Crimson</p>
+    <p class="hex">#9e1b32 · text contrast 7.3:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+<section class="card" style="--a:#8c2236;--ah:#771c2d;--ap:#621725">
+  <div class="top">
+    <p class="eyebrow">Garnet</p>
+    <p class="hex">#8c2236 · text contrast 8.1:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+<section class="card" style="--a:#7a1f2b;--ah:#671a24;--ap:#55151e">
+  <div class="top">
+    <p class="eyebrow">Burgundy</p>
+    <p class="hex">#7a1f2b · text contrast 9.5:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+<section class="card" style="--a:#5f1a22;--ah:#50161c;--ap:#421217">
+  <div class="top">
+    <p class="eyebrow">Oxblood</p>
+    <p class="hex">#5f1a22 · text contrast 11.7:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+<section class="card" style="--a:#23449a;--ah:#1b367d;--ap:#142a61">
+  <div class="top">
+    <p class="eyebrow">Aegean (current)</p>
+    <p class="hex">#23449a · text contrast 8.4:1</p>
+  </div>
+  <div class="mini">
+    <div class="mini-head"><span class="wordmark">Culinary Lab Book</span><span class="link">Sign in</span></div>
+    <div class="row"><h2>Your lab book</h2><button class="primary">New dictation</button></div>
+    <nav class="tabs"><span>Ideas 1</span><span>Development 0</span><span class="on">Finished 2</span></nav>
+    <div class="entry"><p class="title">Grandma's Yogurt</p><p class="eyebrow">Grandma · Nov 14, 2026</p></div>
+    <div class="badges"><span class="b cook">Grandma</span><span class="b fam">Family answer</span><span class="b sug">Suggested</span><span class="b sci">Food science</span></div>
+    <p class="err">Paste or dictate the cook's words here first.</p>
+    <div class="states">
+      <button class="primary">Rest</button><button class="primary hover">Hover</button><button class="primary pressed">Pressed</button><button class="primary focus">Focus</button>
+    </div>
+    <div class="row"><button class="secondary">Use suggestion</button><button class="primary">Make the recipe</button></div>
+  </div>
+</section>
+</main></body></html>

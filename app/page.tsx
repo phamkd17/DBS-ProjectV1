@@ -2,98 +2,192 @@ import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { SignUpButton } from "@clerk/nextjs";
 import { supabaseForUser } from "@/lib/supabase/server";
-import { Button, ErrorNote, formatDate, LinkButton } from "@/components/ui";
+import { Button, ErrorNote, eyebrow, focusRing, formatDate, LinkButton } from "@/components/ui";
+import { MoveTo } from "@/components/MoveTo";
+import { NewMenu } from "@/components/NewMenu";
 import type { DictationRow, RecipeStatus } from "@/lib/types";
 
 type Row = DictationRow & { recipes: { id: string; status: RecipeStatus; recipe: { title?: string } | null }[] };
 
-const STATUS: Record<RecipeStatus | "none", { label: string; style: string }> = {
-  none: { label: "Words saved", style: "bg-stone-100 text-stone-800" },
-  needs_answers: { label: "Has questions", style: "bg-amber-100 text-amber-950" },
-  ready: { label: "Recipe ready", style: "bg-emerald-100 text-emerald-950" },
-  failed: { label: "Try again", style: "bg-red-100 text-red-900" },
-};
 
-export default async function Home() {
+// Draft wording: for the student to review.
+const TABS = {
+  ideas: {
+    label: "Ideas",
+    blurb: "Notes, links, and saved words to come back to.",
+    empty: "Nothing here yet. Tap “New” to jot down an idea or save a cook's words.",
+  },
+  development: {
+    label: "Development",
+    blurb: "Recipes you're working on.",
+    empty: "Nothing in development. Move an idea here, or open saved words and tap “Create recipe”.",
+  },
+  finished: {
+    label: "Finished",
+    blurb: "Recipes ready to cook and send.",
+    empty: "No finished recipes yet. Answer a recipe's questions to finish it, or move something here.",
+  },
+} as const;
+type Tab = keyof typeof TABS;
+
+
+export default async function Home({ searchParams }: PageProps<"/">) {
   const { userId } = await auth();
   if (!userId) return <Landing />;
 
   const supabase = await supabaseForUser();
-  const { data, error } = await supabase
-    .from("dictations")
-    .select("*, recipes(id, status, recipe)")
-    .order("created_at", { ascending: false })
-    .returns<Row[]>();
+  const [{ tab: tabParam }, { data, error }] = await Promise.all([
+    searchParams,
+    supabase
+      .from("dictations")
+      .select("*, recipes(id, status, recipe)")
+      .order("created_at", { ascending: false })
+      .returns<Row[]>(),
+  ]);
+
+  const rows = data ?? [];
+  const byTab: Record<Tab, Row[]> = { ideas: [], development: [], finished: [] };
+  for (const d of rows) byTab[d.stage].push(d);
+
+  // Explicit ?tab= wins; otherwise open where the work is.
+  const tab: Tab =
+    typeof tabParam === "string" && tabParam in TABS
+      ? (tabParam as Tab)
+      : byTab.development.length
+        ? "development"
+        : byTab.finished.length
+          ? "finished"
+          : "ideas";
+
+  const items = byTab[tab];
 
   return (
-    <main className="space-y-6">
-      <div className="flex items-end justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Your lab book</h1>
-        <LinkButton href="/new">New dictation</LinkButton>
+    <main className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <h1 className="font-ls-serif text-5xl leading-none">Your lab book</h1>
+        <NewMenu />
       </div>
 
       {error && <ErrorNote>We couldn&apos;t load your lab book. Refresh the page to try again.</ErrorNote>}
 
-      {data && data.length === 0 && (
-        <div className="space-y-3 rounded-xl bg-white p-6 ring-1 ring-stone-200">
-          <h2 className="text-lg font-semibold">Start with one dish</h2>
-          <p className="text-stone-700">
-            While someone cooks, tap the microphone on the phone keyboard and let them talk through what they&apos;re
-            doing. Then paste or dictate it here. The app keeps their words exactly, asks about anything a new cook
-            couldn&apos;t figure out, and turns it into a recipe you can send to others.
-          </p>
-          <LinkButton href="/new">Add your first dictation</LinkButton>
-        </div>
-      )}
+      {rows.length === 0 && !error ? (
+        <FirstRun />
+      ) : (
+        <>
+          <nav aria-label="Lab book sections" className="border-b border-ls-border">
+            <ul className="flex gap-6 sm:gap-8">
+              {(Object.keys(TABS) as Tab[]).map((t) => {
+                const active = t === tab;
+                return (
+                  <li key={t}>
+                    <Link
+                      href={`/?tab=${t}`}
+                      aria-current={active ? "page" : undefined}
+                      className={`-mb-px inline-flex min-h-11 items-center gap-2 border-b-2 px-1 font-ls-sans text-xs font-medium uppercase tracking-[0.18em] transition-colors duration-150 ${focusRing} ${
+                        active
+                          ? "border-ls-ink text-ls-ink"
+                          : "border-transparent text-ls-muted hover:border-ls-rule hover:text-ls-ink active:border-ls-border"
+                      }`}
+                    >
+                      {TABS[t].label}
+                      <span className="tabular-nums text-ls-muted">{byTab[t].length}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
 
-      {data && data.length > 0 && (
-        <ul className="space-y-3">
-          {data.map((d) => {
-            const r = d.recipes[0];
-            const status = STATUS[r?.status ?? "none"];
-            const title = r?.recipe?.title || d.dish_name || "Untitled dictation";
-            const href = r ? `/r/${r.id}` : `/d/${d.id}`;
-            return (
-              <li key={d.id}>
-                <Link
-                  href={href}
-                  className="block rounded-xl bg-white p-4 ring-1 ring-stone-200 hover:ring-stone-400 focus-visible:outline-2 focus-visible:outline-stone-900 active:bg-stone-50"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{title}</p>
-                      <p className="text-sm text-stone-600">
-                        {d.cook_name ? `${d.cook_name} · ` : ""}
-                        {formatDate(d.created_at)}
-                        {d.copied_from ? " · saved from a link" : ""}
-                      </p>
-                    </div>
-                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${status.style}`}>
-                      {status.label}
-                    </span>
-                  </div>
-                  <p className="mt-2 line-clamp-2 text-sm text-stone-700">{d.transcript}</p>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+          <p className="text-[15px] text-ls-muted">{TABS[tab].blurb}</p>
+
+          {items.length === 0 ? (
+            <p className="border border-dashed border-ls-border p-6 text-[15px] text-ls-muted">{TABS[tab].empty}</p>
+          ) : (
+            <ul className="divide-y divide-ls-border border-y border-ls-ink">
+              {items.map((d) => (
+                <EntryCard key={d.id} d={d} />
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </main>
   );
 }
 
+function EntryCard({ d }: { d: Row }) {
+  const r = d.recipes[0];
+  const title = r?.recipe?.title || d.dish_name || "Untitled dictation";
+  const href = r ? `/r/${r.id}` : `/d/${d.id}`;
+  const next = r
+    ? r.status === "ready"
+      ? null
+      : "Answer questions"
+    : d.stage === "development"
+      ? d.transcript
+        ? "Create recipe"
+        : "Add the cook's words"
+      : null;
+  const preview = d.notes || d.transcript;
+  return (
+    <li className="pb-1">
+      <Link
+        href={href}
+        className={`group block px-1 pt-4 pb-1 transition-colors hover:bg-ls-ink/[0.04] active:bg-ls-ink/[0.08] ${focusRing}`}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 space-y-1">
+            <p className="truncate font-ls-serif text-2xl leading-tight">{title}</p>
+            <p className={eyebrow}>
+              {d.cook_name ? `${d.cook_name} · ` : ""}
+              {formatDate(d.created_at)}
+              {d.copied_from ? " · from a link" : ""}
+              {d.link ? " · has a link" : ""}
+            </p>
+          </div>
+          {next && (
+            <span className="shrink-0 pt-1 text-xs font-medium uppercase tracking-[0.18em] underline decoration-ls-rule underline-offset-4 group-hover:decoration-ls-ink">
+              {next}
+            </span>
+          )}
+        </div>
+        {preview && <p className="mt-2 line-clamp-2 text-[15px] text-ls-muted">{preview}</p>}
+      </Link>
+      <div className="px-1">
+        <MoveTo kind="dictation" id={d.id} current={d.stage} />
+      </div>
+    </li>
+  );
+}
+
+function FirstRun() {
+  return (
+    <div className="space-y-4 border border-ls-ink bg-ls-surface p-6">
+      <h2 className="font-ls-serif text-3xl leading-tight">Start with one dish</h2>
+      <p className="max-w-prose text-[17px] leading-relaxed">
+        While someone cooks, tap the microphone on the phone keyboard and let them talk through what they&apos;re doing.
+        Then paste or dictate it here. The app keeps their words exactly, asks about anything a new cook couldn&apos;t
+        figure out, and turns it into a recipe you can send to others.
+      </p>
+      <LinkButton href="/new" variant="secondary">
+        Add your first dictation
+      </LinkButton>
+    </div>
+  );
+}
+
 function Landing() {
   return (
-    <main className="space-y-6 py-6">
-      <h1 className="text-3xl font-semibold leading-tight tracking-tight">
+    <main className="space-y-8 py-8">
+      <p className={eyebrow}>A lab book for family recipes</p>
+      <h1 className="font-ls-serif text-5xl leading-[1.05] sm:text-7xl">
         Turn what cooks say while they cook into recipes others can repeat.
       </h1>
-      <p className="text-lg text-stone-700">
+      <p className="max-w-prose text-lg leading-relaxed text-ls-muted">
         Paste a cook&apos;s dictation. Culinary Lab Book keeps their words exactly, asks what a new cook couldn&apos;t
         know, labels every reason by who said it, and lets you send the recipe to someone else.
       </p>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 border-t border-ls-ink pt-8">
         <SignUpButton mode="modal">
           <Button>Start your lab book</Button>
         </SignUpButton>

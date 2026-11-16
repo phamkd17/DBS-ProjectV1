@@ -1,11 +1,40 @@
 import type { AnswerSource, Question, QuestionKind, Recipe } from "./ai/schema";
 
+export const STAGES = ["ideas", "development", "finished"] as const;
+export type Stage = (typeof STAGES)[number];
+export const STAGE_LABEL: Record<Stage, string> = {
+  ideas: "Ideas",
+  development: "Development",
+  finished: "Finished",
+};
+export function isStage(v: unknown): v is Stage {
+  return typeof v === "string" && (STAGES as readonly string[]).includes(v);
+}
+
+export type IdeaRow = {
+  id: string;
+  owner_id: string;
+  title: string;
+  note: string;
+  link: string | null;
+  stage: Stage;
+  created_at: string;
+  updated_at: string;
+};
+
 export type DictationRow = {
   id: string;
   owner_id: string;
+  stage: Stage;
   dish_name: string | null;
   cook_name: string | null;
-  transcript: string;
+  /** Idea notes + link: the user's own notes. Kept in every stage. */
+  notes: string;
+  link: string | null;
+  /** The cook's words. Optional until someone adds them. */
+  transcript: string | null;
+  original_transcript: string | null;
+  edited_at: string | null;
   copied_from: string | null;
   created_at: string;
 };
@@ -24,6 +53,7 @@ export type RecipeRow = {
   share_token: string | null;
   copied_from: string | null;
   created_at: string;
+  updated_at: string;
 };
 
 export type QuestionRow = {
@@ -53,6 +83,7 @@ export function toQuestion(q: QuestionRow): Question {
 /** Result shape for server actions used with useActionState. */
 export type ActionState = {
   error?: string;
+  saved?: boolean;
   fieldErrors?: Record<string, string>;
   values?: Record<string, string>;
 };

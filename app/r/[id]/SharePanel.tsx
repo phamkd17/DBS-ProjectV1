@@ -11,14 +11,14 @@ export function SharePanel({ recipeId, url, title }: { recipeId: string; url: st
   const toggle = (on: boolean) => start(() => setSharing(recipeId, on));
 
   return (
-    <section aria-labelledby="send" className="space-y-3 rounded-xl bg-white p-4 ring-1 ring-stone-200">
-      <h2 id="send" className="text-lg font-semibold">
+    <section aria-labelledby="send" className="space-y-4 border border-ls-ink bg-ls-surface p-5">
+      <h2 id="send" className="font-ls-serif text-3xl leading-tight">
         Send this recipe
       </h2>
 
       {!url ? (
         <>
-          <p className="text-sm text-stone-700">
+          <p className="max-w-prose text-[15px] leading-relaxed text-ls-muted">
             Make a private link to text or email. Anyone with the link can read this recipe and save a copy to their
             own lab book. You can turn the link off at any time.
           </p>
@@ -28,7 +28,7 @@ export function SharePanel({ recipeId, url, title }: { recipeId: string; url: st
         </>
       ) : (
         <>
-          <label htmlFor="share-url" className="block text-sm font-medium">
+          <label htmlFor="share-url" className="block text-[15px] font-medium">
             Private link
           </label>
           <input
@@ -36,7 +36,7 @@ export function SharePanel({ recipeId, url, title }: { recipeId: string; url: st
             readOnly
             value={url}
             onFocus={(e) => e.currentTarget.select()}
-            className="w-full rounded-lg border border-stone-300 bg-stone-50 px-3 py-2.5 text-sm"
+            className="w-full border border-ls-border bg-ls-bg px-3 py-2.5 text-[15px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ls-ink"
           />
           <div className="flex flex-wrap gap-2">
             <Button
@@ -64,7 +64,7 @@ export function SharePanel({ recipeId, url, title }: { recipeId: string; url: st
               {pending && <Spinner />} Turn off link
             </Button>
           </div>
-          <p aria-live="polite" className="text-sm text-stone-600">
+          <p aria-live="polite" className="text-[15px] text-ls-muted">
             {copied ? "Link copied. Paste it into a text or email." : "Only people you send it to will have the link."}
           </p>
         </>
