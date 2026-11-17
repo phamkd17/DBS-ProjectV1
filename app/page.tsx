@@ -204,8 +204,8 @@ function Landing() {
   return (
     <main className="space-y-8 py-8">
       <p className={eyebrow}>A lab book for recipe development</p>
-      <h1 className="font-ls-serif text-5xl leading-[1.05] sm:text-7xl">
-        Turn what cooks say while they cook into recipes others can repeat.
+      <h1 className="font-ls-serif text-5xl leading-[1.05] text-balance sm:text-7xl">
+        From inspiration to recipe: develop dishes by voice and AI, with the food science built in.
       </h1>
       <p className="max-w-prose text-lg leading-relaxed text-ls-muted">
         Jot down ideas, save what the cook says while they cook, and develop them into recipes. The AI asks what a new

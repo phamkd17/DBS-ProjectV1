@@ -10,8 +10,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # AGENTS.md — Culinary Lab Book
 
-**Culinary Lab Book helps cooks turn what they say while they cook into recipes
-that can be shared for others to repeat.**
+**From inspiration to recipe: develop dishes by voice and AI, with the food
+science built in.** (Landing headline, Nov 16, student's pick. The proposal's
+original one-liner was "Culinary Lab Book helps cooks turn what they say while
+they cook into recipes that can be shared for others to repeat." In the
+student's words, it's now "an app to track culinary inspiration, provides a
+platform for quickly developing recipes/iterations via voice/ai, and a place to
+store the recipes with incorporating food science.")
 
 Design, Build, Ship (MPCS 51238, Autumn 2026). v1 due **Nov 17** (core task end
 to end, tested with real users, plan for v2). v2 at the fair **Dec 1**.
