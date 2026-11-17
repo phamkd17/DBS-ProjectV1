@@ -1,7 +1,5 @@
 # Culinary Lab Book: Plan for v2
 
----
-
 ## What Culinary Lab Book is
 
 > **From inspiration to recipe: develop dishes by voice and AI, with the food
@@ -61,8 +59,6 @@ also the one who'll follow the yogurt recipe for the success test.
 3. **They didn't know how to create more than one idea.** After saving one,
    there was no clear way to add another.
 
-*(Add: quotes, with permission, and anything that worked well.)*
-
 These change the v2 priorities: **making the app understandable without
 reading (2) moves to first**, photos (1) grow beyond ideas, and categories (6)
 are new.
@@ -79,7 +75,7 @@ tasted, a page from Grandma's pantry notebook, a plating to try), on a
 They show as a gallery, open full screen, and the first photo is used as the
 cover in the lab book list.
 
-**Why:** testers asked for **more pictures**. In my interviews, inspiration
+**Why:** my cousin asked for **more pictures**. In my interviews, inspiration
 *"gets lost… in all different places"*, and most of it is photos on my phone.
 A note without the picture loses half of the idea, and a cook following a
 recipe wants to see what "golden" or "set" looks like.
@@ -96,7 +92,7 @@ URL.
 
 ### 2. Understandable at a glance, and a streamlined path (first priority)
 
-**What, part 1: less reading, plus built-in instructions** (from tester
+**What, part 1: less reading, plus built-in instructions** (from my cousin's
 feedback):
 - A short **"How it works" guide**: three steps with an icon each
   (**Ideas** → **Development** → **Finished**) and one line per step. It's
@@ -127,17 +123,18 @@ feedback):
   and fewer choices between saving words and getting a recipe.
 - **Faster AI waits:** show the questions as soon as they're ready, instead of
   a ~30 s spinner.
-- Polish from testers (to fill in after the tests), plus review of the drafted
-  on-screen wording.
+- A pass on all the on-screen wording, in my own words.
 
-**Why:** testers found it **text heavy** and needed to read a lot to
+**Why:** my cousin found it **text heavy** and needed to read a lot to
 understand the tabs. Also see "What we saw": almost every v1 change was a flow
 fix.
 
-**Done when:** my cousin (or another new tester) saves **three ideas in a row**
-without help, knows what to do after each one, and can explain the three tabs
-after the "How it works" guide alone, and goes from a saved idea to a finished recipe without asking me
-what to do next. The word count on the main screens is at least half of v1's.
+**Done when:** my cousin (or another new tester), without help:
+- saves **three ideas in a row** and knows what to do after each one,
+- explains the three tabs after reading only the "How it works" guide, and
+- goes from a saved idea to a finished recipe without asking me what to do next.
+
+The main screens also use at most half of v1's words.
 
 ### 3. Iterations in Development: what each change does to the dish
 
@@ -196,8 +193,7 @@ with notes and a date, and the original is unchanged.
 does, and a recipe that can't be resized means guessing again, which is the
 problem the app exists to fix. Both were on my proposal's "ambitious"
 list ("portion scaling, nutrition label agent"), and they matter more once
-recipes are shared beyond the family. *(Add tester quotes here if anyone asks
-for them.)*
+recipes are shared beyond the family.
 
 **The hard part, handled honestly:** Grandma's amounts are often "a little
 bit" or not stated at all.
@@ -229,7 +225,7 @@ panel is labeled as an estimate and names what it left out.
 "Vietnamese", "Grandma's", "Fermented"), pick several, and make your own. Filter
 the lab book by category inside any tab, and search by title.
 
-**Why:** testers asked for a way to categorize recipes. Once a lab book has more
+**Why:** my cousin asked for a way to categorize recipes. Once a lab book has more
 than a handful of entries, three tabs aren't enough to find things.
 
 **How (sketch):** a `categories` list on each entry (owner-only like
@@ -252,7 +248,7 @@ Finished tab to "Fermented", and find it in two taps.
 
 | When | What |
 |---|---|
-| Weekend before Nov 17 | Real-user tests on v1; fill in "What we saw" |
+| Nov 15–16 | ✓ Tested v1 with my cousin (findings above) |
 | Week of Nov 17 | **2. "How it works" guide + less text** (from feedback), then the streamlined flow · **1. Photos** · **6. Categories** · AI recall fix (p5) |
 | Week of Nov 24 (no class) | **3. Iterations** + AI trial summary and its eval · **5. Portion scaling** (amounts as number + unit) · my yogurt test batch, logged as trial 1 |
 | Nov 28 – Dec 1 | **4. Descriptions + variations** · **5. Nutrition** (USDA tool) · cousin's batch as trial 2 · fair prep |
@@ -260,12 +256,11 @@ Finished tab to "Fermented", and find it in two taps.
 **If behind, cut in this order:** nutrition (keep scaling) → the AI trial
 summary → variations (keep the description) → AI-suggested categories (keep
 manual ones) → photos on trials (keep ideas and recipes). The "How it works"
-guide and less text are **not** cuttable: they're the testers' main feedback.
+guide and less text are **not** cuttable: they're my cousin's main feedback.
 
 ## Open questions
 
 - Categories: a fixed starter list, fully custom, or both?
-
 - Should Idea notes (and photos) ever be sent to the AI, or only the cook's words?
 - Can trials and variations be shared with family by link, like recipes are now?
 - Who logs the cousin's trial: the cousin in their own copy, or me in mine?

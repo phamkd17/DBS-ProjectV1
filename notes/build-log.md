@@ -585,3 +585,10 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   "Saved to Ideas" message plus one next step after saving; "Save and add
   another" and a + New idea button on the Ideas tab and idea pages. New done-when:
   saves three ideas in a row without help.
+
+### B48. v2 plan finished
+- **Student:** "Finish the V2 plan." The student removed the draft note
+  themselves. Cleanup: "testers" → "my cousin" (one tester); removed the
+  leftover placeholders; replaced the stale "polish from testers (to fill in)"
+  line; the schedule marks testing done (Nov 15–16, cousin); split the run-on #2
+  "Done when" into three checks; tidied the open questions.
