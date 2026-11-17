@@ -11,19 +11,35 @@
 
 ---
 
-## 1. What v1 does (the core task)
+## 1. What it is, and what v1 does
 
-A cook's dictation goes in → the app asks what it can't know → you answer or
-accept a suggestion → you get a recipe page with her words, the recipe, and the
-why labeled by source → you can send it by link, and the person who opens it
-saves a copy to their own lab book.
+> **From inspiration to recipe: develop dishes by voice and AI, with the food
+> science built in.**
 
-**Why this is the smallest complete version:** it covers capture → recipe →
-sharing, the full journey from the one-liner ("…recipes that can be shared for
-others to repeat"). Everything else (dials UI, five tastes, photos, lab book of
-trials) builds on top, and the recipe format already has room for it.
+In my words: an app to track culinary inspiration, a platform for quickly
+developing recipes and iterations by voice and AI, and a place to store the
+recipes, with food science built in.
 
-## 2. A scope change since the proposal
+**The core task in v1:** save an idea → move it to Development → dictate the
+cook's words (ingredients, then each step) → the AI drafts a recipe and asks
+what a new cook couldn't know → answer, or accept a suggestion → a finished
+recipe, with a science icon on each step and where each part came from behind
+"Show sources" → keep it, or send it by link (the person who opens it can save
+their own copy).
+
+**Why this is the smallest complete version:** it covers the whole path,
+inspiration → development → stored recipe, once. Photos, iterations, variations,
+scaling, and nutrition build on top (see the v2 plan), and the recipe format
+already has room for them.
+
+**How the one-liner evolved:** the proposal said *"Culinary Lab Book helps
+cooks turn what they say while they cook into recipes that can be shared for
+others to repeat."* Building and using v1 showed the real job was broader: not
+only Grandma's dictations, but also my own inspiration and recipe development.
+So the landing page now says "a lab book for recipe development", and the
+headline changed with it.
+
+## 2. Scope changes since the proposal
 
 - **Proposal:** one family, built on Clerk Organizations.
 - **v1:** everyone gets their own **private lab book** and can **send** a
@@ -32,6 +48,9 @@ trials) builds on top, and the recipe format already has room for it.
 - **Why a link instead of email:** simplest, works for someone using it alone,
   nothing to look up. **Tradeoff:** anyone with the link can read that one
   recipe until the owner turns the link off.
+- **From family recipes to recipe development:** Ideas → Development →
+  Finished tabs, Idea notes kept at every stage, and the cook's words added in
+  Development, where the AI step lives.
 
 ## 3. Riskiest part first: the AI pipeline (my focus area)
 
