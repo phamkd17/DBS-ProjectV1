@@ -546,3 +546,14 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
 - To match, **New → Dictation now creates the entry in Development** (adding
   words is Development work). Verify ✓: no words box in Ideas, and a new dictation
   lands in Development with the AI panel.
+
+### B46. New headline (the one-liner evolved)
+- **Student:** "It is an app to track culinary inspiration, provides a platform
+  for quickly developing recipes/iterations via voice/ai, and a place to store
+  the recipes with incorporating food science."
+- **Options offered:** A three verbs / B from inspiration to recipe / C your
+  culinary lab. **Student chose:** B. The landing headline and page description
+  are now "From inspiration to recipe: develop dishes by voice and AI, with the
+  food science built in." Added `text-balance`, because verify showed "in."
+  alone on the last line at 1440px. AGENTS.md records the change from the
+  proposal's one-liner.

@@ -12,7 +12,7 @@ const sans = Jost({ variable: "--font-jost", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Culinary Lab Book",
-  description: "Turn what cooks say while they cook into recipes others can repeat.",
+  description: "From inspiration to recipe: develop dishes by voice and AI, with the food science built in.",
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#ece7dc" };
