@@ -1,6 +1,7 @@
 # Culinary Lab Book: Plan for v2
 
-> **Draft for Khang to edit.** The five v2 features are Khang's (Nov 15). The
+> **Draft for Khang to edit.** The v2 features are Khang's (Nov 15–16), and #6
+> plus the changes to #1–2 come from user feedback. The
 > evidence, design sketches, and schedule were drafted by the agent from the
 > build log. Put it in your own words before submitting.
 >
@@ -16,8 +17,8 @@
 An app to **track culinary inspiration**, a place to **quickly develop recipes
 and iterations by voice and AI**, and a place to **store finished recipes**
 with the food science behind each step. v2 builds on all three: photos for
-inspiration (1), a faster path through development (2), iterations (3), and
-richer finished recipes (4, 5).
+inspiration (1), a clearer, faster path through development with built-in
+instructions (2), iterations (3), and richer, organized finished recipes (4, 5, 6).
 
 ## Where v1 is
 
@@ -52,23 +53,36 @@ path from idea to recipe still takes too many decisions.
 prepped green onions go, how many parboils, "≈5 tomatoes", the kind of milk,
 and fridge vs. freezer. All five are in the eval results, and none have a fix yet.
 
-**From real users** (cousin / aunt / friends, watched without helping):
-> *To fill in after this weekend's tests: what each person did, where they got
-> stuck, what they said.*
+**From real users** (watched without helping). *Who: ______ (fill in: e.g.
+"cousin, on a phone"; no names)*
+- **It was text heavy.** There was a lot to read before it made sense, especially
+  **what the different tabs are** (Ideas / Development / Finished).
+- **They wanted instructions:** a read-me, or a guide to using the app.
+- **They wanted more pictures.**
+- **They wanted a way to categorize recipes.**
+- *(Add: where exactly people got stuck, quotes (with permission), and anything
+  that worked well.)*
+
+These change the v2 priorities: **making the app understandable without
+reading (2) moves to first**, photos (1) grow beyond ideas, and categories (6)
+are new.
 
 ---
 
 ## What v2 adds and changes
 
-### 1. Pictures in ideas
+### 1. Pictures: on ideas, recipes, and trials
 
-**What:** add photos to an idea (a dish I tasted, a page from Grandma's pantry
-notebook, a plating I want to try), next to the notes and the link. Several
-photos per idea, viewable full screen.
+**What:** add **several photos** wherever they help: on an **idea** (a dish I
+tasted, a page from Grandma's pantry notebook, a plating to try), on a
+**finished recipe** (what it should look like), and on each **trial** (see 3).
+They show as a gallery, open full screen, and the first photo is used as the
+cover in the lab book list.
 
-**Why:** in my interviews, inspiration *"gets lost… in all different places"*,
-and most of it is photos on my phone. A note without the picture loses half
-of the idea. A cousin has already photographed the pantry notebook.
+**Why:** testers asked for **more pictures**. In my interviews, inspiration
+*"gets lost… in all different places"*, and most of it is photos on my phone.
+A note without the picture loses half of the idea, and a cook following a
+recipe wants to see what "golden" or "set" looks like.
 
 **How (sketch):** a private Supabase Storage bucket. Files live under each
 user's id and follow the same owner-only rules as the rest of the lab book.
@@ -76,12 +90,26 @@ Photos are resized on the phone before upload to stay on the free tier, with a
 `photos` table linking each one to its entry. Photos go to the AI only when the
 user asks (see 4).
 
-**Done when:** I can add 3 photos from my phone to an idea, see them on the
-idea and in the list, and another user can't open them, even with the URL.
+**Done when:** I can add 3 photos from my phone to an idea and to a recipe,
+see a cover photo in the list, and another user can't open them, even with the
+URL.
 
-### 2. A streamlined path: idea → development → finished recipe
+### 2. Understandable at a glance, and a streamlined path (first priority)
 
-**What:** make the next step obvious and close at hand at every stage:
+**What, part 1: less reading, plus built-in instructions** (from tester
+feedback):
+- A short **"How it works" guide**: three steps with an icon each
+  (**Ideas** → **Development** → **Finished**) and one line per step. It's
+  shown the first time someone opens the app and is always reachable from a
+  **?** in the header. There's also a **README** for the repo.
+- **Cut the text on every screen** to one short line where a paragraph is now.
+  Each tab gets a one-line hint ("Notes and links to come back to", "Add the
+  cook's words and make the recipe", "Ready to cook and send").
+- **Icons and the progress line do the explaining** instead of paragraphs.
+- Test it: a new person can say what each tab is for **without reading more
+  than one line**.
+
+**What, part 2: the next step is obvious** at every stage:
 - A **progress line** on each entry: Idea → Development → Finished, showing
   where it is and what's needed next ("Add the cook's words", "Answer 3
   questions", "Make the recipe").
@@ -92,11 +120,13 @@ idea and in the list, and another user can't open them, even with the URL.
 - Polish from testers (to fill in after the tests), plus review of the drafted
   on-screen wording.
 
-**Why:** see "What we saw" above. Almost every v1 change was a flow fix, and
-the testers' sessions will show the rest.
+**Why:** testers found it **text heavy** and needed to read a lot to
+understand the tabs. Also see "What we saw": almost every v1 change was a flow
+fix.
 
-**Done when:** a new tester goes from a saved idea to a finished recipe without
-asking me what to do next, and I can count fewer taps than in v1.
+**Done when:** a new tester can explain the three tabs after the "How it works"
+guide alone, and goes from a saved idea to a finished recipe without asking me
+what to do next. The word count on the main screens is at least half of v1's.
 
 ### 3. Iterations in Development: what each change does to the dish
 
@@ -182,6 +212,22 @@ bit" or not stated at all.
 amount doubles correctly, the vague ones stay as they are, and the nutrition
 panel is labeled as an estimate and names what it left out.
 
+### 6. Categories for recipes
+
+**What:** tag each entry with **categories** ("Soup", "Breakfast",
+"Vietnamese", "Grandma's", "Fermented"), pick several, and make your own. Filter
+the lab book by category inside any tab, and search by title.
+
+**Why:** testers asked for a way to categorize recipes. Once a lab book has more
+than a handful of entries, three tabs aren't enough to find things.
+
+**How (sketch):** a `categories` list on each entry (owner-only like
+everything else), chips to filter the list, and the app suggesting categories
+from the dish name, labeled **Suggested** and never applied without a tap.
+
+**Done when:** I can tag the yogurt as "Breakfast" and "Fermented", filter the
+Finished tab to "Fermented", and find it in two taps.
+
 ---
 
 ## Also fixing (from v1)
@@ -196,15 +242,18 @@ panel is labeled as an estimate and names what it left out.
 | When | What |
 |---|---|
 | Weekend before Nov 17 | Real-user tests on v1; fill in "What we saw" |
-| Week of Nov 17 | **2. Streamlined flow** (from test findings) · **1. Photos** · AI recall fix (p5) |
+| Week of Nov 17 | **2. "How it works" guide + less text** (from feedback), then the streamlined flow · **1. Photos** · **6. Categories** · AI recall fix (p5) |
 | Week of Nov 24 (no class) | **3. Iterations** + AI trial summary and its eval · **5. Portion scaling** (amounts as number + unit) · my yogurt test batch, logged as trial 1 |
 | Nov 28 – Dec 1 | **4. Descriptions + variations** · **5. Nutrition** (USDA tool) · cousin's batch as trial 2 · fair prep |
 
 **If behind, cut in this order:** nutrition (keep scaling) → the AI trial
-summary → variations (keep the description) → multiple photos (keep one per
-idea).
+summary → variations (keep the description) → AI-suggested categories (keep
+manual ones) → photos on trials (keep ideas and recipes). The "How it works"
+guide and less text are **not** cuttable: they're the testers' main feedback.
 
 ## Open questions
+
+- Categories: a fixed starter list, fully custom, or both?
 
 - Should Idea notes (and photos) ever be sent to the AI, or only the cook's words?
 - Can trials and variations be shared with family by link, like recipes are now?
