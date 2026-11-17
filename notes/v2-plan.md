@@ -1,12 +1,5 @@
 # Culinary Lab Book: Plan for v2
 
-> **Draft for Khang to edit.** The v2 features are Khang's (Nov 15–16), and #6
-> plus the changes to #1–2 come from user feedback. The
-> evidence, design sketches, and schedule were drafted by the agent from the
-> build log. Put it in your own words before submitting.
->
-> v1 due Nov 17 · **v2 at the project fair, Dec 1** · course focus: **AI**
-
 ---
 
 ## What Culinary Lab Book is
