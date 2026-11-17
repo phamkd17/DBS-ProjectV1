@@ -53,8 +53,8 @@ path from idea to recipe still takes too many decisions.
 prepped green onions go, how many parboils, "≈5 tomatoes", the kind of milk,
 and fridge vs. freezer. All five are in the eval results, and none have a fix yet.
 
-**From real users** (watched without helping). *Who: ______ (fill in: e.g.
-"cousin, on a phone"; no names)*
+**From real users** (watched without helping). **Tester: my cousin**, who's
+also the one who'll follow the yogurt recipe for the success test.
 - **It was text heavy.** There was a lot to read before it made sense, especially
   **what the different tabs are** (Ideas / Development / Finished).
 - **They wanted instructions:** a read-me, or a guide to using the app.

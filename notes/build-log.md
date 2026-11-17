@@ -577,3 +577,4 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   cover photo); new #6 categories (multi-tag, filter, AI-suggested but never
   auto-applied). Schedule and cut order updated; the guide + less text aren't
   cuttable.
+- **Student:** "Cousin was the tester." Filled in the v2 plan's "From real users."
