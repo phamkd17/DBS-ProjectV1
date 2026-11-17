@@ -562,3 +562,18 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   current flow. Talking points §1 now gives the one-liner, the current core task,
   and "how the one-liner evolved"; §2 adds the shift from family recipes to
   recipe development.
+
+## Nov 16 — User feedback → v2 plan
+
+### B47. First user feedback
+- **Student:** "The feedback was it was text heavy so it was a lot of reading
+  to understand what the different tabs are. v2 should have a read me or
+  instructions on using the app. In addition, a way to add more pictures, a way
+  to categorize the recipes would be nice too."
+- Added to `notes/v2-plan.md` under "From real users" (who: left for the
+  student to fill in), and v2 changes: #2 moves to first priority with a "How
+  it works" guide, a header "?", a README, and less text (one line per screen,
+  icons + progress line); #1 photos extend to recipes and trials (gallery,
+  cover photo); new #6 categories (multi-tag, filter, AI-suggested but never
+  auto-applied). Schedule and cut order updated; the guide + less text aren't
+  cuttable.
