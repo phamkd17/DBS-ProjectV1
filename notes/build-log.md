@@ -578,3 +578,10 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   auto-applied). Schedule and cut order updated; the guide + less text aren't
   cuttable.
 - **Student:** "Cousin was the tester." Filled in the v2 plan's "From real users."
+- **Student (cousin's session):** "They took a while to read the intro page.
+  After they created an Idea they didn't know what to do next. They didn't know
+  how to create multiple ideas." Added as "Where they got stuck" (1–3), each
+  mapped to a v2 #2 fix: a shorter landing page with a how-it-works picture; a
+  "Saved to Ideas" message plus one next step after saving; "Save and add
+  another" and a + New idea button on the Ideas tab and idea pages. New done-when:
+  saves three ideas in a row without help.

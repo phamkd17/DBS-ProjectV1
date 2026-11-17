@@ -60,8 +60,15 @@ also the one who'll follow the yogurt recipe for the success test.
 - **They wanted instructions:** a read-me, or a guide to using the app.
 - **They wanted more pictures.**
 - **They wanted a way to categorize recipes.**
-- *(Add: where exactly people got stuck, quotes (with permission), and anything
-  that worked well.)*
+
+**Where they got stuck:**
+1. **The intro page took a while to read** before they started.
+2. **After creating an idea, they didn't know what to do next.** The idea page
+   didn't make the next step obvious.
+3. **They didn't know how to create more than one idea.** After saving one,
+   there was no clear way to add another.
+
+*(Add: quotes, with permission, and anything that worked well.)*
 
 These change the v2 priorities: **making the app understandable without
 reading (2) moves to first**, photos (1) grow beyond ideas, and categories (6)
@@ -109,6 +116,16 @@ feedback):
 - Test it: a new person can say what each tab is for **without reading more
   than one line**.
 
+**Fixes for the three places my cousin got stuck:**
+1. *Intro took a while to read* → a **shorter landing page**: the headline, one
+   line, and the three-step "How it works" picture instead of a paragraph.
+2. *Didn't know what to do after creating an idea* → right after saving, the
+   idea page shows **"Saved to Ideas"** and **one clear next step**: "Add
+   another idea", or "Ready to cook it? Move to Development".
+3. *Didn't know how to create multiple ideas* → **"Save and add another"** on
+   the idea form, and a **+ New idea** button on the Ideas tab and on every idea
+   page, not only behind the New menu on the home page.
+
 **What, part 2: the next step is obvious** at every stage:
 - A **progress line** on each entry: Idea → Development → Finished, showing
   where it is and what's needed next ("Add the cook's words", "Answer 3
@@ -124,8 +141,9 @@ feedback):
 understand the tabs. Also see "What we saw": almost every v1 change was a flow
 fix.
 
-**Done when:** a new tester can explain the three tabs after the "How it works"
-guide alone, and goes from a saved idea to a finished recipe without asking me
+**Done when:** my cousin (or another new tester) saves **three ideas in a row**
+without help, knows what to do after each one, and can explain the three tabs
+after the "How it works" guide alone, and goes from a saved idea to a finished recipe without asking me
 what to do next. The word count on the main screens is at least half of v1's.
 
 ### 3. Iterations in Development: what each change does to the dish
