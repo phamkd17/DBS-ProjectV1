@@ -557,3 +557,8 @@ Questions (answer / Use suggestion / leave blank) → Recipe page (labeled why,
   food science built in." Added `text-balance`, because verify showed "in."
   alone on the last line at 1440px. AGENTS.md records the change from the
   proposal's one-liner.
+- **Student:** "update both." The v2 plan opens with "What Culinary Lab Book is"
+  (new headline + the student's description), and its v1 summary matches the
+  current flow. Talking points §1 now gives the one-liner, the current core task,
+  and "how the one-liner evolved"; §2 adds the shift from family recipes to
+  recipe development.

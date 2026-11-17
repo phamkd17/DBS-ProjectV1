@@ -8,12 +8,24 @@
 
 ---
 
+## What Culinary Lab Book is
+
+> **From inspiration to recipe: develop dishes by voice and AI, with the food
+> science built in.**
+
+An app to **track culinary inspiration**, a place to **quickly develop recipes
+and iterations by voice and AI**, and a place to **store finished recipes**
+with the food science behind each step. v2 builds on all three: photos for
+inspiration (1), a faster path through development (2), iterations (3), and
+richer finished recipes (4, 5).
+
 ## Where v1 is
 
 A new person can do the core task end to end, on a phone or a laptop:
-**write an idea, or save a cook's words → move it to Development → the AI drafts
-a recipe and asks what it can't know → answer, or accept a suggestion → a
-finished recipe with every reason labeled by who said it → send it by link.**
+**save an idea → in Development, add the cook's words (dictated by voice) → the
+AI drafts a recipe and asks what it can't know → answer, or accept a
+suggestion → a finished recipe, with the why behind each step one tap away →
+keep it in your lab book, or send it by link.**
 
 - Live: https://dbs-project-v1-omega.vercel.app · Repo: github.com/phamkd17/DBS-ProjectV1
 - AI: two Gemini passes on prompt **p4**: **45/50** checks on Grandma's three
